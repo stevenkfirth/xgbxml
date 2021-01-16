@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
-from .parser import parser
+from .parser import create_gbXML
+from .parser import get_parser

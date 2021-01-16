@@ -1,0 +1,4234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://idea-server.com/xml/gbxml/0-32" xmlns="http://idea-server.com/xml/gbxml/0-32" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xhtml="http://www.w3.org/1999/xhtml" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.32">
+  <xsd:annotation>
+    <xsd:documentation>gbXML version 0.32 - created by GeoPraxis, Inc.</xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>Change Log: 
+0.32 
+  12/12/01
+    Changed xsd:any namespace="##any" to ##other for GeneralGeometry and Meter elements
+  12/10/01
+    Removed gbXML/CreatorPersonInfo and gbXML/CreatorCadInfo
+    Created Surface/RectangularGeometry and Opening/RectangularGeometry and their children
+    Created gbXML/DocumentHistory and its children
+    Updated schema to version http://www.w3.org/2001/XMLSchema
+    Changed enumerations for spaceTypeEnum to remove spaces and slashes
+    Changed Results/@timeIncrement to type xsd:duration as required for the 2001 schema specification
+0.31
+  8/1/01
+    Added HydronicLoopId to AirLoopEquipment element
+  7/26/01
+    Added Control element to equipment elements
+    Added FlowControl element to HydronicLoop element
+    Added PressureControl element to AirLoop element
+    Added TemperatureControl element to both loop elements
+    Added enumerations to tempTypeEnum
+  7/25/01
+    Added xmlns to schema element
+    Added conditioningTypeEnum
+    Changed enumerations for efficiencyTypeEnum
+    Changed enumerations for resourceTypeEnum
+    Added stadardsTypeEnum
+    Added DependantValue element
+    Added IndependantValue element
+    Removed XValue element
+    Removed YValue element
+    Added RefrigerantType to AirLoopEquipment element
+    Changed structure of Data element
+    Added attributes to DeltaP element
+    Added conditionType attribute to DeltaT element
+    Made Name and Description elements optional in the DependantVariable element
+    Added minValue and maxValue attributes to the DependantVariable element
+    Changed structure of the Efficiency element
+    Allowed up to 2 IndependantVariable elements in the Equation element
+    Added fluidType attribute to the HydronicLoop element
+    Changed structure of HydronicLoopEquipment element
+    Made Name in IndependantVariable element optional
+    Changed structure of MinFlow element
+    Added id attribute to the Performance element
+    Changed structure of PointData element
+  7/9/01
+    Added hydronicLoopType to HydronicLoopId
+    Added HydronicLoopId to HydronicLoopEquipment
+  7/3/01
+    Added ShadeControl to Opening
+    Added ShadeSchedule, SolarOnOpening, HorizontalSolar, AirTempature, ZoneCoolingLoad, and Glare to ShadeControl
+    Added attributes, enumerations, and documentation for these new elements
+    Removed frameIdRef, blindIdRef, GlazeId, GapId from Opening - they are redundant and already contained in WindowType
+0.30
+  6/28/01
+    Changed Results element
+    Removed MaterialType - it did not add information
+0.29
+  4/30/01
+    Added StreetAddress element to Building - removed Location.
+    Changed SIResults element to useSIUnitsForResults.
+    Made several attributes at the gbXML level required instead of defaulting to SI.
+    Campus/@buildingType removed - Building/@buildingType required.
+    Changed SpaceId element to AdjacentSpaceId.
+    Moved CADObjectId after PlanarGeometry in the Opening element.
+    Made PlanarGeometry/@id optional.
+    Removed shadeTypeEnum (no longer used).
+  4/27/01
+    Added annotation to several elements and attributes.
+    Added Enum to the end of enumerations to clarify distinction between 'type', meaning simple type (used for enumerations) and 'type', used in classifying an object (example: buildingType, surfaceType).
+0.28
+  4/12/01
+    Added uValueUnit.
+    Made exposedToSun default = true.
+  4/10/01
+    Changed sequence of gbXML, Campus, Building, Surface, and Location children.
+    Added more of a description for Location.
+    Made Building/@id, Surface/@id optional.
+    Moved Surface to be child of Campus.
+    Added enumerations to conditionType.
+    Changed ShadingSurface element to ExposedToSun boolean attribute.
+    Renamed SpaceRef to SpaceId, @spaceRef to @spaceIdRef
+    Removed Name and Description from PlanarGeometry.
+    Added explicit right-hand-rule documentation to the PolyLoop element.
+    Constrained PolyLoop to at least 3 CartesianPoints.
+    Constrained CartesianPoint to exactly 3 Coordinates.
+    Added @lengthUnit, @areaUnit, @volumeUnit, and @temperatureUnit to the gbXML element.
+    Changed documentation for Latitude and Longitude.
+  4/6/01
+    Added targetNamespace.
+    Removed gbXML/@version.
+    Made gbXML/@id optional.
+    Removed GeoPraxisEAM from gbXML/@engine.
+    Renamed gbXML/SI to gbXML/SIResults and added documentation.
+    Removed @unit from Latitude and Longitude and made simple type - must be in decimal degrees.
+    Added global enumerations to be called out elsewhere.
+0.27
+  2/13/01
+    Removed buildingType attribute from Space.
+    Added spaceType attribute to Space.
+    Changed FloorArea to Area.
+    Changed CADObjectIdRef attribute to CADObjectId element to allow for multiples.
+    Changed to surface-centric model.
+    Changed Geometry to PlanarGeometry, ShellGeometry, and GeneralGeometry
+  2/12/01
+    Changing from X3D elements to ifcXML elements.
+    Removed X3D element.
+    Placed in alphabetical order.
+    Seperated complex types from simple type elements.
+    Changed back to sequence type - all had unusable restrictions.
+0.26
+  2/7/01
+    Replaced sequence types with type all.
+    Removed empty sequence elements.
+</xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>ifcXML namespace is http://www.iai-na.org/ifcXML/schema/v04a-20010301</xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>Enumerations</xsd:documentation>
+  </xsd:annotation>
+  <xsd:simpleType name="absorptanceUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="IntIR"/>
+      <xsd:enumeration value="IntSolar"/>
+      <xsd:enumeration value="IntVisible"/>
+      <xsd:enumeration value="IntTotal"/>
+      <xsd:enumeration value="ExtIR"/>
+      <xsd:enumeration value="ExtSolar"/>
+      <xsd:enumeration value="ExtVisible"/>
+      <xsd:enumeration value="ExtTotal"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="airTemperatureTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Outside"/>
+      <xsd:enumeration value="Zone"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="areaUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="SquareKilometers"/>
+      <xsd:enumeration value="SquareMeters"/>
+      <xsd:enumeration value="SquareCentimeters"/>
+      <xsd:enumeration value="SquareMillimeters"/>
+      <xsd:enumeration value="SquareMiles"/>
+      <xsd:enumeration value="SquareYards"/>
+      <xsd:enumeration value="SquareFeet"/>
+      <xsd:enumeration value="SquareInches"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="blowerDoorUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="ACH"/>
+      <xsd:enumeration value="AirChangesPerHour"/>
+      <xsd:enumeration value="SquareFeet"/>
+      <xsd:enumeration value="SquareMeter"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="buildingTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="AutomotiveFacility"/>
+      <xsd:enumeration value="ConventionCenter"/>
+      <xsd:enumeration value="Courthouse"/>
+      <xsd:enumeration value="Dining-BarLoungeOrLeisure"/>
+      <xsd:enumeration value="Dining-Family"/>
+      <xsd:enumeration value="Dormitory"/>
+      <xsd:enumeration value="ExerciseCenter"/>
+      <xsd:enumeration value="FireStation"/>
+      <xsd:enumeration value="Gymnasium"/>
+      <xsd:enumeration value="HospitalOrHealthcare"/>
+      <xsd:enumeration value="Hotel"/>
+      <xsd:enumeration value="Library"/>
+      <xsd:enumeration value="Manufacturing"/>
+      <xsd:enumeration value="Motel"/>
+      <xsd:enumeration value="MotionPictureTheatre"/>
+      <xsd:enumeration value="MultiFamily"/>
+      <xsd:enumeration value="Museum"/>
+      <xsd:enumeration value="Office"/>
+      <xsd:enumeration value="ParkingGarage"/>
+      <xsd:enumeration value="Penitentiary"/>
+      <xsd:enumeration value="PerformingArtsTheater"/>
+      <xsd:enumeration value="PoliceStation"/>
+      <xsd:enumeration value="PostOffice"/>
+      <xsd:enumeration value="ReligiousBuilding"/>
+      <xsd:enumeration value="Retail"/>
+      <xsd:enumeration value="SchoolOrUniversity"/>
+      <xsd:enumeration value="SportsArena"/>
+      <xsd:enumeration value="TownHall"/>
+      <xsd:enumeration value="Transportation"/>
+      <xsd:enumeration value="Warehouse"/>
+      <xsd:enumeration value="Workshop"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="capacityTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Heating"/>
+      <xsd:enumeration value="CoolingTotal"/>
+      <xsd:enumeration value="CooingSensible"/>
+      <xsd:enumeration value="CoolingLatent"/>
+      <xsd:enumeration value="CoolingSHR"/>
+      <xsd:enumeration value="Volume"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="capacityUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Tons"/>
+      <xsd:enumeration value="kW"/>
+      <xsd:enumeration value="BtuPerHour"/>
+      <xsd:enumeration value="kBtuPerHour"/>
+      <xsd:enumeration value="Gallons"/>
+      <xsd:enumeration value="Liters"/>
+      <xsd:enumeration value="CubicMeters"/>
+      <xsd:enumeration value="CubicFeet"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="conditioningUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="kBtu"/>
+      <xsd:enumeration value="Btu"/>
+      <xsd:enumeration value="kW"/>
+      <xsd:enumeration value="Tons"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="conditionTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Heated"/>
+      <xsd:enumeration value="Cooled"/>
+      <xsd:enumeration value="HeatedAndCooled"/>
+      <xsd:enumeration value="Unconditioned"/>
+      <xsd:enumeration value="Vented"/>
+      <xsd:enumeration value="NaturallyVentedOnly"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="conditioningTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Heating"/>
+      <xsd:enumeration value="Cooling"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="conductivityFofTUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="WPerMSquareK"/>
+      <xsd:enumeration value="BtuPerHourFtSquareF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="conductivityUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="WPerCmC"/>
+      <xsd:enumeration value="WPerMeterK"/>
+      <xsd:enumeration value="BtuPerHourFtF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="controlTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Fan"/>
+      <xsd:enumeration value="Pump"/>
+      <xsd:enumeration value="Valve"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="costTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="CO2"/>
+      <xsd:enumeration value="SOx"/>
+      <xsd:enumeration value="NOx"/>
+      <xsd:enumeration value="EmbodiedEnergyTransportation"/>
+      <xsd:enumeration value="EmbodiedEnergyManufacture"/>
+      <xsd:enumeration value="EmbodiedEnergyInstallation"/>
+      <xsd:enumeration value="EmbodiedEnergyTotal"/>
+      <xsd:enumeration value="PurchaseCost"/>
+      <xsd:enumeration value="DeliveryCost"/>
+      <xsd:enumeration value="FirstCost"/>
+      <xsd:enumeration value="MonthlyCost"/>
+      <xsd:enumeration value="AnnualCost"/>
+      <xsd:enumeration value="MaintenanceCost"/>
+      <xsd:enumeration value="OverhaulCost"/>
+      <xsd:enumeration value="InstallationCost"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="currencyTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="USDollars"/>
+      <xsd:enumeration value="CanadianDollars"/>
+      <xsd:enumeration value="Pesos"/>
+      <xsd:enumeration value="Euros"/>
+      <xsd:enumeration value="Yen"/>
+      <xsd:enumeration value="IndianRupee"/>
+      <xsd:enumeration value="Yuan"/>
+      <xsd:enumeration value="TaiwanDollar"/>
+      <xsd:enumeration value="EnglishPound"/>
+      <xsd:enumeration value="Mark"/>
+      <xsd:enumeration value="Franc"/>
+      <xsd:enumeration value="Ruble"/>
+      <xsd:enumeration value="Real"/>
+      <xsd:enumeration value="NewZealandDollar"/>
+      <xsd:enumeration value="AustralianDollar"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dayTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Weekday"/>
+      <xsd:enumeration value="Weekend"/>
+      <xsd:enumeration value="Holiday"/>
+      <xsd:enumeration value="WeekendOrHoliday"/>
+      <xsd:enumeration value="HeatingDesignDay"/>
+      <xsd:enumeration value="CoolingDesignDay"/>
+      <xsd:enumeration value="Sun"/>
+      <xsd:enumeration value="Mon"/>
+      <xsd:enumeration value="Tue"/>
+      <xsd:enumeration value="Wed"/>
+      <xsd:enumeration value="Thu"/>
+      <xsd:enumeration value="Fri"/>
+      <xsd:enumeration value="Sat"/>
+      <xsd:enumeration value="All"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="deltaPUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PSI"/>
+      <xsd:enumeration value="kPa"/>
+      <xsd:enumeration value="Atmospheres"/>
+      <xsd:enumeration value="InchesOfH2O"/>
+      <xsd:enumeration value="CentimetersOfH2O"/>
+      <xsd:enumeration value="InchesOfMercury"/>
+      <xsd:enumeration value="CentimetersOfMercury"/>
+      <xsd:enumeration value="MillimetersOfMercury"/>
+      <xsd:enumeration value="Pascals"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="densityUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="GramsPerCubicCm"/>
+      <xsd:enumeration value="LbsPerCubicIn"/>
+      <xsd:enumeration value="LbsPerCubicFt"/>
+      <xsd:enumeration value="KgPerCubicM"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="densityFofTUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="LbsPerCubicFtF"/>
+      <xsd:enumeration value="KgPerCubicMK"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="directionUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="DegreeDecimalFromNorth"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="equipmentTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Fan"/>
+      <xsd:enumeration value="HeatExchanger"/>
+      <xsd:enumeration value="Coil"/>
+      <xsd:enumeration value="Furnace"/>
+      <xsd:enumeration value="Evaporative"/>
+      <xsd:enumeration value="Radiant"/>
+      <xsd:enumeration value="Economizer"/>
+      <xsd:enumeration value="Duct"/>
+      <xsd:enumeration value="Humidifier"/>
+      <xsd:enumeration value="Dehumidifier"/>
+      <xsd:enumeration value="UnitaryAC"/>
+      <xsd:enumeration value="UnitaryHP"/>
+      <xsd:enumeration value="SplitAC"/>
+      <xsd:enumeration value="SplitHP"/>
+      <xsd:enumeration value="TerminalUnit"/>
+      <xsd:enumeration value="Register"/>
+      <xsd:enumeration value="VAVBox"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="efficiencyTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="COP">
+        <xsd:annotation>
+          <xsd:documentation>Coefficient of Performance</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="EER">
+        <xsd:annotation>
+          <xsd:documentation>Energy Efficiency Ratio</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SEER">
+        <xsd:annotation>
+          <xsd:documentation>Seasonal Energy Efficiency Ratio</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="AFUE">
+        <xsd:annotation>
+          <xsd:documentation>Annual Fuel Utilization Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="HSPF">
+        <xsd:annotation>
+          <xsd:documentation>Heating Seasonal Performance Factor</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="effectiveness"/>
+      <xsd:enumeration value="EnergyFactor"/>
+      <xsd:enumeration value="ThermalEff">
+        <xsd:annotation>
+          <xsd:documentation>Thermal Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="MotorEff">
+        <xsd:annotation>
+          <xsd:documentation>Motor Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FanEff">
+        <xsd:annotation>
+          <xsd:documentation>Fan Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="MechanicalEff">
+        <xsd:annotation>
+          <xsd:documentation>Mechanical Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="BoilerEff">
+        <xsd:annotation>
+          <xsd:documentation>Boiler Efficiency</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="kWPerTon"/>
+      <xsd:enumeration value="kWPerkW"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="emissionUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PoundsPerHour"/>
+      <xsd:enumeration value="KilogramsPerHour"/>
+      <xsd:enumeration value="GramsPerHour"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="emittanceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="IntIR"/>
+      <xsd:enumeration value="ExtIR"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="energyUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="KilowattHours"/>
+      <xsd:enumeration value="Joules"/>
+      <xsd:enumeration value="BTU"/>
+      <xsd:enumeration value="Therms"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="extEquipTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Sprinkler"/>
+      <xsd:enumeration value="LawnMower"/>
+      <xsd:enumeration value="GeneralPlugload"/>
+      <xsd:enumeration value="Fountain"/>
+      <xsd:enumeration value="Refrigerator"/>
+      <xsd:enumeration value="Freezer"/>
+      <xsd:enumeration value="Pool"/>
+      <xsd:enumeration value="HotTub"/>
+      <xsd:enumeration value="Pump"/>
+      <xsd:enumeration value="Sauna"/>
+      <xsd:enumeration value="BatteryCharger"/>
+      <xsd:enumeration value="Furnace"/>
+      <xsd:enumeration value="IndustrialEquip"/>
+      <xsd:enumeration value="Irrigation"/>
+      <xsd:enumeration value="MiscEquip"/>
+      <xsd:enumeration value="Vending"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="flowUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="CFM"/>
+      <xsd:enumeration value="LPerSec"/>
+      <xsd:enumeration value="CubicMPerHr"/>
+      <xsd:enumeration value="GPM"/>
+      <xsd:enumeration value="GPH"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="flowPerAreaUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="CFMPerSquareFoot"/>
+      <xsd:enumeration value="LPerSecPerSquareM"/>
+      <xsd:enumeration value="CubicMPerSecPerSquareM"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="fluidTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Water"/>
+      <xsd:enumeration value="Brine"/>
+      <xsd:enumeration value="Glycol"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="frameTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Wood"/>
+      <xsd:enumeration value="Vinyl"/>
+      <xsd:enumeration value="Aluminum"/>
+      <xsd:enumeration value="AluminumWithBreak"/>
+      <xsd:enumeration value="Insulated"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="fuelLoadUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="BtuPerHour"/>
+      <xsd:enumeration value="kBtuPerHour"/>
+      <xsd:enumeration value="MBtuPerHour"/>
+      <xsd:enumeration value="Watts"/>
+      <xsd:enumeration value="kW"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="gasTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Air"/>
+      <xsd:enumeration value="Argon"/>
+      <xsd:enumeration value="Krypton"/>
+      <xsd:enumeration value="CO2"/>
+      <xsd:enumeration value="SF6"/>
+      <xsd:enumeration value="Custom"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="hydronicEquipTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Chiller"/>
+      <xsd:enumeration value="CoolingTower"/>
+      <xsd:enumeration value="Condenser"/>
+      <xsd:enumeration value="Boiler"/>
+      <xsd:enumeration value="HeatExchanger"/>
+      <xsd:enumeration value="Pump"/>
+      <xsd:enumeration value="RadiantPanel"/>
+      <xsd:enumeration value="HotWaterHeater"/>
+      <xsd:enumeration value="SolarPanels"/>
+      <xsd:enumeration value="Earth"/>
+      <xsd:enumeration value="Pipe"/>
+      <xsd:enumeration value="Storage"/>
+      <xsd:enumeration value="Coil"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="illuminanceUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Footcandles"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="infiltrationTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Loose"/>
+      <xsd:enumeration value="Average"/>
+      <xsd:enumeration value="Tight"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="intEquipTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="GeneralPlugload"/>
+      <xsd:enumeration value="Computer"/>
+      <xsd:enumeration value="Copier"/>
+      <xsd:enumeration value="Refrigerator"/>
+      <xsd:enumeration value="Stove"/>
+      <xsd:enumeration value="Cooktop"/>
+      <xsd:enumeration value="Fryer"/>
+      <xsd:enumeration value="Freezer"/>
+      <xsd:enumeration value="ClothesDryer"/>
+      <xsd:enumeration value="ClothesWasher"/>
+      <xsd:enumeration value="Dishwasher"/>
+      <xsd:enumeration value="TV"/>
+      <xsd:enumeration value="VCR"/>
+      <xsd:enumeration value="Microwave"/>
+      <xsd:enumeration value="Fan"/>
+      <xsd:enumeration value="AudioEquip"/>
+      <xsd:enumeration value="MiscEquip"/>
+      <xsd:enumeration value="Toilet"/>
+      <xsd:enumeration value="Urinal"/>
+      <xsd:enumeration value="Shower"/>
+      <xsd:enumeration value="Sink"/>
+      <xsd:enumeration value="Pool"/>
+      <xsd:enumeration value="HotTub"/>
+      <xsd:enumeration value="Sauna"/>
+      <xsd:enumeration value="BatteryCharger"/>
+      <xsd:enumeration value="Furnace"/>
+      <xsd:enumeration value="IndustrialEquip"/>
+      <xsd:enumeration value="Printer"/>
+      <xsd:enumeration value="Vending"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="inverseTempUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PerK"/>
+      <xsd:enumeration value="PerF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="lengthUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Kilometers"/>
+      <xsd:enumeration value="Meters"/>
+      <xsd:enumeration value="Centimeters"/>
+      <xsd:enumeration value="Millimeters"/>
+      <xsd:enumeration value="Miles"/>
+      <xsd:enumeration value="Yards"/>
+      <xsd:enumeration value="Feet"/>
+      <xsd:enumeration value="Inches"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="lifeUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Months"/>
+      <xsd:enumeration value="Years"/>
+      <xsd:enumeration value="Cycles"/>
+      <xsd:enumeration value="MillionCycles"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="lightControlTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Continuous"/>
+      <xsd:enumeration value="OnOff"/>
+      <xsd:enumeration value="Stepped2"/>
+      <xsd:enumeration value="Stepped3"/>
+      <xsd:enumeration value="Stepped4"/>
+      <xsd:enumeration value="Stepped5"/>
+      <xsd:enumeration value="Stepped6"/>
+      <xsd:enumeration value="Stepped7"/>
+      <xsd:enumeration value="Stepped8"/>
+      <xsd:enumeration value="Stepped9"/>
+      <xsd:enumeration value="Stepped10"/>
+      <xsd:enumeration value="Stepped11"/>
+      <xsd:enumeration value="Stepped12"/>
+      <xsd:enumeration value="Stepped13"/>
+      <xsd:enumeration value="Stepped14"/>
+      <xsd:enumeration value="Stepped15"/>
+      <xsd:enumeration value="Stepped16"/>
+      <xsd:enumeration value="Stepped17"/>
+      <xsd:enumeration value="Stepped18"/>
+      <xsd:enumeration value="Stepped19"/>
+      <xsd:enumeration value="Stepped20"/>
+      <xsd:enumeration value="ContinuousOff"/>
+      <xsd:enumeration value="MotionSensor"/>
+      <xsd:enumeration value="Photocell"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="loadUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="BtuPerHour"/>
+      <xsd:enumeration value="Watt"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="loopTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PrimaryChilledWater"/>
+      <xsd:enumeration value="SecondaryChilledWater"/>
+      <xsd:enumeration value="HotWater"/>
+      <xsd:enumeration value="CondenserWater"/>
+      <xsd:enumeration value="DomesticHotWater"/>
+      <xsd:enumeration value="WaterLoopHeatPump"/>
+      <xsd:enumeration value="TwoPipe"/>
+      <xsd:enumeration value="PotableWaterLoop"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="openingTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="FixedWindow"/>
+      <xsd:enumeration value="OperableWindow"/>
+      <xsd:enumeration value="FixedSkylight"/>
+      <xsd:enumeration value="OperableSkylight"/>
+      <xsd:enumeration value="SlidingDoor"/>
+      <xsd:enumeration value="NonSlidingDoor"/>
+      <xsd:enumeration value="Air"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="peopleHeatGainUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="WattPerPerson"/>
+      <xsd:enumeration value="BtuPerHourPerson"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="peopleNumberUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="NumberOfPeople"/>
+      <xsd:enumeration value="SquareFtPerPerson"/>
+      <xsd:enumeration value="SquareMPerPerson"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="permUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PermSI"/>
+      <xsd:enumeration value="PermIP"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="powerTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Electricity"/>
+      <xsd:enumeration value="NaturalGas"/>
+      <xsd:enumeration value="Propane"/>
+      <xsd:enumeration value="FuelOil1"/>
+      <xsd:enumeration value="FuelOil2"/>
+      <xsd:enumeration value="FuelOil4"/>
+      <xsd:enumeration value="Water"/>
+      <xsd:enumeration value="ChilledWater"/>
+      <xsd:enumeration value="HotWater"/>
+      <xsd:enumeration value="Steam"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="powerUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Kilowatt"/>
+      <xsd:enumeration value="Horsepower"/>
+      <xsd:enumeration value="KilogramForceMeterPerSecond"/>
+      <xsd:enumeration value="BtuPerSecond"/>
+      <xsd:enumeration value="FootPoundForcePerSecond"/>
+      <xsd:enumeration value="KilocaloriesPerSecond"/>
+      <xsd:enumeration value="BtuPerHour"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="powerUseTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Heating"/>
+      <xsd:enumeration value="Cooling"/>
+      <xsd:enumeration value="Both"/>
+      <xsd:enumeration value="Other"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="powerPerAreaUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="WattPerSquareMeter"/>
+      <xsd:enumeration value="WattPerSquareFoot"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="pressureUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PSI"/>
+      <xsd:enumeration value="kPa"/>
+      <xsd:enumeration value="Atmospheres"/>
+      <xsd:enumeration value="InchesOfH2O"/>
+      <xsd:enumeration value="CentimetersOfH2O"/>
+      <xsd:enumeration value="InchesOfMercury"/>
+      <xsd:enumeration value="CentimetersOfMercury"/>
+      <xsd:enumeration value="MillimetersOfMercury"/>
+      <xsd:enumeration value="Pascals"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="radiationWavelengthTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Solar"/>
+      <xsd:enumeration value="IR"/>
+      <xsd:enumeration value="Visible"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="reflectanceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Ground"/>
+      <xsd:enumeration value="IntSolar"/>
+      <xsd:enumeration value="IntIR"/>
+      <xsd:enumeration value="IntVisible"/>
+      <xsd:enumeration value="ExtSolar"/>
+      <xsd:enumeration value="ExtVisible"/>
+      <xsd:enumeration value="ExtIR"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="resistanceUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="SquareMeterKPerW"/>
+      <xsd:enumeration value="HrSquareFtFPerBTU"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="uValueUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="WPerSquareMeterK"/>
+      <xsd:enumeration value="BtuPerHourSquareFtF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="resourceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Electricity"/>
+      <xsd:enumeration value="NaturalGas"/>
+      <xsd:enumeration value="Propane"/>
+      <xsd:enumeration value="FuelOil1"/>
+      <xsd:enumeration value="FuelOil2"/>
+      <xsd:enumeration value="FuelOil4"/>
+      <xsd:enumeration value="Water"/>
+      <xsd:enumeration value="ChilledWater"/>
+      <xsd:enumeration value="HotWater"/>
+      <xsd:enumeration value="Steam"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="resultsExtraResourceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Thermal"/>
+      <xsd:enumeration value="Light"/>
+      <xsd:enumeration value="Moisture"/>
+      <xsd:enumeration value="Air"/>
+      <xsd:enumeration value="Contaminant"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="resultsTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="HeatLoad"/>
+      <xsd:enumeration value="CoolingLoad"/>
+      <xsd:enumeration value="CO2"/>
+      <xsd:enumeration value="SO2"/>
+      <xsd:enumeration value="NOx"/>
+      <xsd:enumeration value="Energy"/>
+      <xsd:enumeration value="Power"/>
+      <xsd:enumeration value="Cost"/>
+      <xsd:enumeration value="EnergyCost"/>
+      <xsd:enumeration value="DemandCost"/>
+      <xsd:enumeration value="CommodityCost"/>
+      <xsd:enumeration value="TransportationCost"/>
+      <xsd:enumeration value="DryBulbTemperature"/>
+      <xsd:enumeration value="WetBulbTemperature"/>
+      <xsd:enumeration value="DewPointTemperature"/>
+      <xsd:enumeration value="FootCandles"/>
+      <xsd:enumeration value="Humidity"/>
+      <xsd:enumeration value="MoistureContent"/>
+      <xsd:enumeration value="Flow"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="roughnessValueEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="VeryRough"/>
+      <xsd:enumeration value="MediumRough"/>
+      <xsd:enumeration value="Rough"/>
+      <xsd:enumeration value="Smooth"/>
+      <xsd:enumeration value="MediumSmooth"/>
+      <xsd:enumeration value="VerySmooth"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="scheduleTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Temp"/>
+      <xsd:enumeration value="Fraction"/>
+      <xsd:enumeration value="OnOff"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="shadeTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="InteriorInsulated"/>
+      <xsd:enumeration value="InteriorUnInsulated"/>
+      <xsd:enumeration value="ExternalInsulated"/>
+      <xsd:enumeration value="ExternalUnInsulated"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="shadeOperationEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Fixed"/>
+      <xsd:enumeration value="Operable"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="shadeScheduleTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Shade"/>
+      <xsd:enumeration value="Blind"/>
+      <xsd:enumeration value="Operation"/>
+      <xsd:enumeration value="Probability"/>
+      <xsd:enumeration value="MaxSolar"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="sinkRateUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="PoundsPerHour"/>
+      <xsd:enumeration value="KilogramsPerHour"/>
+      <xsd:enumeration value="GramsPerHour"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="spaceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Active_storage"/>
+      <xsd:enumeration value="Active_storage_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Air_or_Train_or_Bus_-_Baggage_Area"/>
+      <xsd:enumeration value="Airport_-_Concourse"/>
+      <xsd:enumeration value="Atrium_-_each_additional_floor"/>
+      <xsd:enumeration value="Atrium_-_first_three_floors"/>
+      <xsd:enumeration value="Audience_or_Seating_Area-Penitentiary"/>
+      <xsd:enumeration value="Audience_or_Seating_Area-Exercise_Center"/>
+      <xsd:enumeration value="Audience_or_Seating_Area-Gymnasium"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Sports_Arena"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Convention_Center"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Motion_Picture_Theatre"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Performing_Arts_Theatre"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Religious"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Police_or_Fire_Stations"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Court_House"/>
+      <xsd:enumeration value="Audience_or_Seating_Area_-_Auditorium"/>
+      <xsd:enumeration value="Bank_Customer_Area"/>
+      <xsd:enumeration value="Banking_Activity_Area_-_Office"/>
+      <xsd:enumeration value="Barber_and_Beauty_Parlor"/>
+      <xsd:enumeration value="Card_File_and_Cataloguing_-_Library"/>
+      <xsd:enumeration value="Classroom_or_Lecture_or_Training_-_Penitentiary"/>
+      <xsd:enumeration value="Classroom_or_Lecture_or_Training"/>
+      <xsd:enumeration value="Comfinement_Cells_-_Penitentiary"/>
+      <xsd:enumeration value="Comfinement_Cells_-_Court_House"/>
+      <xsd:enumeration value="Conference_Meeting_or_Multipurpose"/>
+      <xsd:enumeration value="Corridor_or_Transition"/>
+      <xsd:enumeration value="Corridor_or_Transition_-_Manufacturing_Facility"/>
+      <xsd:enumeration value="Corridors_with_patient_waiting_exam_-_HospitalOrHealthcare"/>
+      <xsd:enumeration value="Court_Sports_Area_-_Sports_Arena"/>
+      <xsd:enumeration value="Courtroom_-_Court_House"/>
+      <xsd:enumeration value="Department_Store_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Detailed_-_Manufacturing_Facility"/>
+      <xsd:enumeration value="Dining_Area"/>
+      <xsd:enumeration value="Dining_Area_-_Hotel"/>
+      <xsd:enumeration value="Dining_Area_-_Family_Dining"/>
+      <xsd:enumeration value="Dining_Area_-_LoungeOrLeisure_Dining"/>
+      <xsd:enumeration value="Dining_Area_-_Motel"/>
+      <xsd:enumeration value="Dining_Area_-_Transportation"/>
+      <xsd:enumeration value="Dining_Area_-_Penitentiary"/>
+      <xsd:enumeration value="Dining_Area_-_Civil_Services"/>
+      <xsd:enumeration value="Dormitory_Bedroom"/>
+      <xsd:enumeration value="Dormitory_Study_Hall"/>
+      <xsd:enumeration value="Dressing_or_Locker_or_Fitting_Room_-_Gymnasium"/>
+      <xsd:enumeration value="Dressing_or_Locker_or_Fitting_Room_-_Court_House"/>
+      <xsd:enumeration value="Dressing_or_Locker_or_Fitting_Room_-_Performing_Arts_theatre"/>
+      <xsd:enumeration value="Dressing_or_Locker_or_Fitting_Room_-_Auditorium"/>
+      <xsd:enumeration value="Dressing_or_Locker_or_Fitting_Room_-_Exercise_Center"/>
+      <xsd:enumeration value="Electrical_or_Mechanical"/>
+      <xsd:enumeration value="Elevator_Lobbies"/>
+      <xsd:enumeration value="Emergency_-_HospitalOrHealthcare"/>
+      <xsd:enumeration value="Equipment_Room_-_Manufacturing_Facility"/>
+      <xsd:enumeration value="Exam_or_Treatment_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Excercise_Area_-_Exercise_Center"/>
+      <xsd:enumeration value="Excercise_Area_-_Gymnasium"/>
+      <xsd:enumeration value="Exhibit_space_-_Convention_Center"/>
+      <xsd:enumeration value="Fellowship_Hall_-_Religious_Buildings"/>
+      <xsd:enumeration value="Fine_Material_-_Warehouse"/>
+      <xsd:enumeration value="Fine_Merchandise_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Fire_Station_Engine_room_-_Police_or_Fire_Station"/>
+      <xsd:enumeration value="Food_Preparation"/>
+      <xsd:enumeration value="Garage_Service_or_Repair_-_Automotive_Facility"/>
+      <xsd:enumeration value="General_High_Bay_-_Manufacturing_Facility"/>
+      <xsd:enumeration value="General_Low_Bay_-_Manufacturing_Facility"/>
+      <xsd:enumeration value="General_exhibition_-_Museum"/>
+      <xsd:enumeration value="Hospital_-_Nursery_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Hospital_or_Medical_supplies_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Hospital_or_Radiology_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Hotel_or_Conference_Center_-_Conference_or_Meeting"/>
+      <xsd:enumeration value="Inactive_storage"/>
+      <xsd:enumeration value="Judges_Chambers_-_Court_House"/>
+      <xsd:enumeration value="Laboratory_-_Office"/>
+      <xsd:enumeration value="Laundry-Ironing_and_Sorting"/>
+      <xsd:enumeration value="Laundry-Washing_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Library-Audio_Visual_-_Library-Audio_Visual"/>
+      <xsd:enumeration value="Living_quarters_-_Dormitory"/>
+      <xsd:enumeration value="Living_quarters_-_Motel"/>
+      <xsd:enumeration value="Living_quarters_-_Hotel"/>
+      <xsd:enumeration value="Lobby"/>
+      <xsd:enumeration value="Lobby_-_Religious_Buildings"/>
+      <xsd:enumeration value="Lobby_-_Motion_Picture_Theatre"/>
+      <xsd:enumeration value="Lobby_-_Auditorium"/>
+      <xsd:enumeration value="Lobby_-_Performing_Arts_theatre"/>
+      <xsd:enumeration value="Lobby_-_Post_Office"/>
+      <xsd:enumeration value="Lobby_-_Hotel"/>
+      <xsd:enumeration value="Lounge_or_Recreation"/>
+      <xsd:enumeration value="Mall_Concourse_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Mass_Merchandising_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Medium_or_Bulky_Material_-_Warehouse"/>
+      <xsd:enumeration value="Merchandising_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Museum_and_Gallery_-_Storage_-_Museum_and_Gallery_-_Storage"/>
+      <xsd:enumeration value="Nurse_station_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Office_-_enclosed"/>
+      <xsd:enumeration value="Office_-_open_plan"/>
+      <xsd:enumeration value="Office_Common_Activity_Areas_-_Inactive_Storage"/>
+      <xsd:enumeration value="Operating_Room_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Other_Televised_Playing_Area_-_Sports_Arena"/>
+      <xsd:enumeration value="Parking_Area_-_Attendant_only_-_Parking_Garage"/>
+      <xsd:enumeration value="Parking_Area_-_Pedestrian_-_Parking_Garage"/>
+      <xsd:enumeration value="Patient_Room_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Personal_Services_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Pharmacy_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Physical_therapy_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Playing_Area_-_Gymnasium"/>
+      <xsd:enumeration value="Police_Station_Laboratory_-_Police_or_Fire_Stations"/>
+      <xsd:enumeration value="Public_and_Staff_Lounge_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Reading_Area_-_Library"/>
+      <xsd:enumeration value="Reception_or_Waiting_-_Transportation"/>
+      <xsd:enumeration value="Reception_or_Waiting_-_Motel"/>
+      <xsd:enumeration value="Reception_or_Waiting_-_Hotel"/>
+      <xsd:enumeration value="Recovery_-_Hospital_or_Healthcare"/>
+      <xsd:enumeration value="Restoration_-_Museum"/>
+      <xsd:enumeration value="Restrooms"/>
+      <xsd:enumeration value="Ring_Sports_Area_-_Sports_Arena"/>
+      <xsd:enumeration value="Sleeping_Quarters_-_Police_or_Fire_Station"/>
+      <xsd:enumeration value="Sorting_Area_-_Post_Office"/>
+      <xsd:enumeration value="Specialty_Store_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Stacks_-_Library"/>
+      <xsd:enumeration value="Stairs_-_Inactive"/>
+      <xsd:enumeration value="Stairway"/>
+      <xsd:enumeration value="Supermarket_Sales_Area_-_Retail"/>
+      <xsd:enumeration value="Terminal_-_Ticket_counter_-_Transportation"/>
+      <xsd:enumeration value="Workshop_-_Workshop"/>
+      <xsd:enumeration value="Worship_-_pulpit_choir_-_Religious"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="specificHeatUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="JPerKgK"/>
+      <xsd:enumeration value="BTUPerLbF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="stageTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="1Stage"/>
+      <xsd:enumeration value="2Stage"/>
+      <xsd:enumeration value="Variable"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="standardsTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="DOE">
+        <xsd:annotation>
+          <xsd:documentation>Department of Energy</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ARI">
+        <xsd:annotation>
+          <xsd:documentation>Air-Conditioning and Refrigeration Institute</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ANSI">
+        <xsd:annotation>
+          <xsd:documentation>American National Standards Institute</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="NEMA">
+        <xsd:annotation>
+          <xsd:documentation>National Electical Manufacturers Association</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="surfaceTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="InteriorWall"/>
+      <xsd:enumeration value="ExteriorWall"/>
+      <xsd:enumeration value="Roof"/>
+      <xsd:enumeration value="InteriorFloor"/>
+      <xsd:enumeration value="Shade"/>
+      <xsd:enumeration value="UndergroundWall"/>
+      <xsd:enumeration value="UndergroundSlab"/>
+      <xsd:enumeration value="Ceiling"/>
+      <xsd:enumeration value="Air"/>
+      <xsd:enumeration value="UndergroundCeiling"/>
+      <xsd:enumeration value="RaisedFloor"/>
+      <xsd:enumeration value="SlabOnGrade"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="temperatureUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="F"/>
+      <xsd:enumeration value="C"/>
+      <xsd:enumeration value="K"/>
+      <xsd:enumeration value="R"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="tempTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Max"/>
+      <xsd:enumeration value="Min"/>
+      <xsd:enumeration value="Design"/>
+      <xsd:enumeration value="CoolDesign"/>
+      <xsd:enumeration value="HeatDesign"/>
+      <xsd:enumeration value="Throttle"/>
+      <xsd:enumeration value="Range"/>
+      <xsd:enumeration value="Approach"/>
+      <xsd:enumeration value="EnteringWetBulb"/>
+      <xsd:enumeration value="LeavingDryBulb"/>
+      <xsd:enumeration value="EnteringDryBulb"/>
+      <xsd:enumeration value="LeavingWetBulb"/>
+      <xsd:enumeration value="ChilledWaterSupply"/>
+      <xsd:enumeration value="CondenserWaterSupply"/>
+      <xsd:enumeration value="LeavingChilledWater"/>
+      <xsd:enumeration value="LeavingCondenserWater"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="timePeriodEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Annual"/>
+      <xsd:enumeration value="Jan"/>
+      <xsd:enumeration value="Feb"/>
+      <xsd:enumeration value="Mar"/>
+      <xsd:enumeration value="Apr"/>
+      <xsd:enumeration value="May"/>
+      <xsd:enumeration value="Jun"/>
+      <xsd:enumeration value="Jul"/>
+      <xsd:enumeration value="Aug"/>
+      <xsd:enumeration value="Sep"/>
+      <xsd:enumeration value="Oct"/>
+      <xsd:enumeration value="Nov"/>
+      <xsd:enumeration value="Dec"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="timeUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Year"/>
+      <xsd:enumeration value="Month"/>
+      <xsd:enumeration value="Week"/>
+      <xsd:enumeration value="Day"/>
+      <xsd:enumeration value="Hour"/>
+      <xsd:enumeration value="Minute"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="transportationTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Bus"/>
+      <xsd:enumeration value="Train"/>
+      <xsd:enumeration value="Car"/>
+      <xsd:enumeration value="LightRail"/>
+      <xsd:enumeration value="Ferry"/>
+      <xsd:enumeration value="Airplane"/>
+      <xsd:enumeration value="Monorail"/>
+      <xsd:enumeration value="Bike"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="unitlessSmallUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Percent"/>
+      <xsd:enumeration value="PartPerMillionByVolume"/>
+      <xsd:enumeration value="milliGramsPerCubicMeter"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="unitlessUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Percent"/>
+      <xsd:enumeration value="Fraction"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="valueTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Historical"/>
+      <xsd:enumeration value="Simulated"/>
+      <xsd:enumeration value="Rated"/>
+      <xsd:enumeration value="Measured"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="vegetationTypeEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Trees"/>
+      <xsd:enumeration value="Bushes"/>
+      <xsd:enumeration value="Plants"/>
+      <xsd:enumeration value="Grass"/>
+      <xsd:enumeration value="Moss"/>
+      <xsd:enumeration value="EvergreenTrees"/>
+      <xsd:enumeration value="EvergreenShrubs"/>
+      <xsd:enumeration value="DeciduousTrees"/>
+      <xsd:enumeration value="DeciduousShrubs"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="velocityUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="MetersPerSecond"/>
+      <xsd:enumeration value="MilesPerHour"/>
+      <xsd:enumeration value="Knots"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="viscosityUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="KgPerMSec"/>
+      <xsd:enumeration value="PoundPerFootSec"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="viscosityFofTUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="KgPerMSecK"/>
+      <xsd:enumeration value="PoundPerFootSecF"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="volumeUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="CubicKilometers"/>
+      <xsd:enumeration value="CubicMeters"/>
+      <xsd:enumeration value="CubicCentimeters"/>
+      <xsd:enumeration value="CubicMillimeters"/>
+      <xsd:enumeration value="CubicMiles"/>
+      <xsd:enumeration value="CubicYards"/>
+      <xsd:enumeration value="CubicFeet"/>
+      <xsd:enumeration value="CubicInches"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="waterUseUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="CubicMeters"/>
+      <xsd:enumeration value="Gallons"/>
+      <xsd:enumeration value="Tons"/>
+      <xsd:enumeration value="Kilograms"/>
+      <xsd:enumeration value="Liters"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="weightUnitEnum">
+    <xsd:restriction base="xsd:NMTOKEN">
+      <xsd:enumeration value="Pounds"/>
+      <xsd:enumeration value="Kilograms"/>
+      <xsd:enumeration value="Tons"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:annotation>
+    <xsd:documentation>Elements with simple content</xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="aecXML"/>
+  <xsd:element name="AirChangesPerHour" type="xsd:decimal"/>
+  <xsd:element name="AverageNumberOfFloors" type="xsd:decimal"/>
+  <xsd:element name="Azimuth">
+    <xsd:annotation>
+      <xsd:documentation>The number of degrees from north the outside of the surfaces is rotated in relation to the bottom-left corner.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:double">
+        <xsd:minInclusive value="0"/>
+        <xsd:maxInclusive value="360"/>
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Ballast" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Type of ballast used</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="BeginDate" type="xsd:date">
+    <xsd:annotation>
+      <xsd:documentation>Month and day year scedule begins</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="CADObjectId" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>The CADObjectId Element is used to map unique CAD object identifiers to gbXML elements.  Allows CAD tools to read results from a gbXML file and map them to their CAD objects.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="CDDValue" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Cooling degree day value</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="City" type="xsd:string"/>
+  <xsd:element name="CompanyName" type="xsd:string"/>
+  <xsd:element name="Country" type="xsd:string"/>
+  <xsd:element name="CyclesPerWeek" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Number of operation cycles per week.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DaylightSavings" type="xsd:boolean">
+    <xsd:annotation>
+      <xsd:documentation>Allows for including daylight savings time</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDDayCool" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day dry bulb temperature range</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDDayHeat" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Day of the month that the heating design day occurs on</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDDaylightCool" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Flag for daylight savings on the cooling design day</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDDaylightHeat" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Flag for daylight savings for the heating design day</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDHiHrCool" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day hour of high temperature</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDHiHrHeat" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day hour of high temperature</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDLoHrCool" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day hour of low temperature</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDLoHrHeat" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day hour of low temperature</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDMonthCool" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Month the cooling design day lands on.  1=Jan, 12=Dec</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDMonthHeat" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Month that the heating design day occurs on.  1=Jan, 12=Dec</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDRainCool" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Flag for rain on the cooling design day.  0=no rain, 1=rain</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDRainHeat" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day rain flag.  0=no rain, 1=rain</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDSnowCool" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Flag for snow on the cooling design day.  0=not snowing, 1=snowing</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DDSnowHeat" type="xsd:integer">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day snow flag.  0=not snowing, 1=snowing</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="DependantValue" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Value of a dependant variable for this data point</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Description" type="xsd:string"/>
+  <xsd:element name="Email1Address" type="xsd:string"/>
+  <xsd:element name="EndDate" type="xsd:date">
+    <xsd:annotation>
+      <xsd:documentation>Month and day year schedule ends</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Expression" type="xsd:string"/>
+  <xsd:element name="FirstName" type="xsd:string"/>
+  <xsd:element name="GroundTempValue" type="xsd:decimal"/>
+  <xsd:element name="HDDValue" type="xsd:decimal"/>
+  <xsd:element name="IndependantValue" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Value of the independant variable for this data point</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Lamp" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Type of lamp used</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="LastName" type="xsd:string"/>
+  <xsd:element name="Latitude" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Degrees east of Greenwich, in decimal degrees.  Locations west of Greenwich are negative.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Longitude" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Degrees north of the equator, in decimal degrees.  Locations south of the equator are negative.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="LumensPerLamp" type="xsd:decimal"/>
+  <xsd:element name="Luminaire" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Type of luminaire used</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Manufacturer" type="xsd:string"/>
+  <xsd:element name="MiddleName" type="xsd:string"/>
+  <xsd:element name="Model" type="xsd:string"/>
+  <xsd:element name="Name" type="xsd:string"/>
+  <xsd:element name="NaturalVentOccDep" type="xsd:boolean">
+    <xsd:annotation>
+      <xsd:documentation>Occupancy dependence of natural ventilation.  If true, then natural ventalation only occurs when people are present.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="NumberOfLamps" type="xsd:integer"/>
+  <xsd:element name="ObjectId" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Indicates which object or objects the results apply to, if any</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Platform" type="xsd:string"/>
+  <xsd:element name="PrandtlNumber" type="xsd:decimal"/>
+  <xsd:element name="ProductName" type="xsd:string"/>
+  <xsd:element name="Reference" type="xsd:string"/>
+  <xsd:element name="RefrigerantType" type="xsd:string"/>
+  <xsd:element name="ScheduleValue" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Value for one block of time.  Divides a day evenly into number of ScheduleValue elements defined in DaySchedule.
+Example: If 12 ScheduleValue elements are defined, each will represent two hours</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="StateOrProvince" type="xsd:string"/>
+  <xsd:element name="StreetAddress" type="xsd:string"/>
+  <xsd:element name="Tilt">
+    <xsd:annotation>
+      <xsd:documentation>The number of degrees from up that the outside of the surface is tilted in relation to the bottom-left corner.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:double">
+        <xsd:minInclusive value="0"/>
+        <xsd:maxInclusive value="180"/>
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Value" type="xsd:decimal">
+    <xsd:annotation>
+      <xsd:documentation>Contains the actual numerical result value. If series result type each Value element contains the one value and is in sequential order for the series.</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Version" type="xsd:string"/>
+  <xsd:element name="WebPage" type="xsd:string"/>
+  <xsd:element name="YearModeled" type="xsd:date">
+    <xsd:annotation>
+      <xsd:documentation>Year of simulation to use</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="ZipcodeOrPostalCode" type="xsd:string"/>
+  <xsd:annotation>
+    <xsd:documentation>Elements with complex content.</xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="gbXML">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="aecXML" minOccurs="0"/>
+        <xsd:element ref="Campus"/>
+        <xsd:element ref="LightingSystem" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Lighting" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="LightingControl" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Construction" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Layer" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Material" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="WindowType" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Schedule" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="WeekSchedule" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="DaySchedule" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Zone" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="AirLoop" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="HydronicLoop" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="IntEquip" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="ExtEquip" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Weather" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Meter" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Results" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="DocumentHistory" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="engine">
+        <xsd:annotation>
+          <xsd:documentation>Analysis engine used</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="DOE-2.1e"/>
+            <xsd:enumeration value="DOE-2.2"/>
+            <xsd:enumeration value="EnergyPlus"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="temperatureUnit" type="temperatureUnitEnum" use="required">
+        <xsd:annotation>
+          <xsd:documentation>This attribute specifies the default temperature unit for the entire gbXML document, wherever the temperatureUnit simple type is used.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="lengthUnit" type="lengthUnitEnum" use="required">
+        <xsd:annotation>
+          <xsd:documentation>This attribute specifies the default length unit for the entire gbXML document, wherever the lengthUnit simple type is used.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="areaUnit" type="areaUnitEnum" use="required">
+        <xsd:annotation>
+          <xsd:documentation>This attribute specifies the default area unit for the entire gbXML document, wherever the areaUnit simple type is used.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="volumeUnit" type="volumeUnitEnum" use="required">
+        <xsd:annotation>
+          <xsd:documentation>This attribute specifies the default volume unit for the entire gbXML document, wherever the volumeUnit simple type is used.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="useSIUnitsForResults" type="xsd:boolean" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Results will be given in SI or IP units.  True = SI units, which is the implied default.  If False, results will be in english units.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Absorptance">
+    <xsd:annotation>
+      <xsd:documentation>Absorptance of the outside surface</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+          <xsd:attribute name="type" type="absorptanceUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AdjacentSpaceId">
+    <xsd:complexType>
+      <xsd:attribute name="spaceIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for a space that is bounded by this surface.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Age">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="unit" use="required">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:NMTOKEN">
+                <xsd:enumeration value="Years"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AirLoop">
+    <xsd:annotation>
+      <xsd:documentation>The AirLoop element represents the equipment serving one path of air</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="AirLoopEquipment" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="TemperatureControl" minOccurs="0"/>
+        <xsd:element ref="PressureControl" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="controlZoneIdRef" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AirLoopEquipment">
+    <xsd:annotation>
+      <xsd:documentation>A piece of equipment serving an air-loop. 
+This is generalized to be able to contain any type of air loop equipment.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Manufacturer" minOccurs="0"/>
+        <xsd:element ref="Model" minOccurs="0"/>
+        <xsd:element ref="RatedFlow" minOccurs="0"/>
+        <xsd:element ref="MinFlow" minOccurs="0"/>
+        <xsd:element ref="OperationSchedule" minOccurs="0"/>
+        <xsd:element ref="Temp" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="DeltaP" minOccurs="0"/>
+        <xsd:element ref="DeltaT" minOccurs="0"/>
+        <xsd:element ref="MinRelativeHumidity" minOccurs="0"/>
+        <xsd:element ref="MaxRelativeHumidity" minOccurs="0"/>
+        <xsd:element ref="Power" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Capacity" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Control" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Efficiency" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Performance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Weight" minOccurs="0"/>
+        <xsd:element ref="Life" minOccurs="0"/>
+        <xsd:element ref="WaterLoss" minOccurs="0"/>
+        <xsd:element ref="Energy" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="HydronicLoopId" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="RefrigerantType" minOccurs="0"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="equipmentType" type="equipmentTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AirLoopId">
+    <xsd:complexType>
+      <xsd:attribute name="airLoopIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to an air loop</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AirTemperature">
+    <xsd:annotation>
+      <xsd:documentation>Minimum air temperature before shades are closed.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum" use="required"/>
+          <xsd:attribute name="type" type="airTemperatureTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Albedo">
+    <xsd:annotation>
+      <xsd:documentation>Reflectance of solar radiation</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="AltEnergySource">
+    <xsd:annotation>
+      <xsd:documentation>Alternative energy source</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="MeterId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="altEnergyType" use="required">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="Solar"/>
+            <xsd:enumeration value="Wind"/>
+            <xsd:enumeration value="Geothermal"/>
+            <xsd:enumeration value="HeatRecovery"/>
+            <xsd:enumeration value="NaturalGas"/>
+            <xsd:enumeration value="Electrical"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="resourceType" type="resourceTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Area">
+    <xsd:annotation>
+      <xsd:documentation>Specifies the area of the space or building.  This value should be equal to the area enclosed by the physical boundries of the space, as defined by the intersection of the horizontal plane at the highest floor height and the volumetric model's vertical interior surface planes.  Building area should be the sum of space areas whose PeopleNumber element values are greater than zero.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="areaUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Blind">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Transmittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reflectance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Emittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Thickness" minOccurs="0"/>
+        <xsd:element ref="Conductivity" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="BlowerDoorValue">
+    <xsd:annotation>
+      <xsd:documentation>Leakage value obtained from blower door test.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="blowerDoorUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Building">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="StreetAddress" minOccurs="0"/>
+        <xsd:element ref="Area"/>
+        <xsd:element ref="Space" maxOccurs="unbounded"/>
+        <xsd:element ref="AverageNumberOfFloors" minOccurs="0"/>
+        <xsd:element ref="InfiltrationFlow" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Use this element to define the shell of the building.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element ref="LightId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="IntEquipId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="MeterId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="buildingType" type="buildingTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CADMaterialId">
+    <xsd:complexType>
+      <xsd:attribute name="CADMaterialIdRef" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID used by a CAD program to reference its internal materials library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Campus">
+    <xsd:annotation>
+      <xsd:documentation>The Campus element should be used as the base for all physical objects.  On a campus, place one or more buildings.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Location" minOccurs="0"/>
+        <xsd:element ref="Building" maxOccurs="unbounded"/>
+        <xsd:element ref="Surface" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="YearModeled" minOccurs="0"/>
+        <xsd:element ref="DaylightSavings" minOccurs="0"/>
+        <xsd:element ref="Life" minOccurs="0"/>
+        <xsd:element ref="AltEnergySource" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="Vegetation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Transportation" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="MeterId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="ExtEquipId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="LightId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="LightControlId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="designHeatWeathIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the weather data used for a heating design day</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="designCoolWeathIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the weather data used for a cooling design day</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Capacity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="capacityUnitEnum" use="required"/>
+          <xsd:attribute name="capacityType" type="capacityTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CartesianPoint">
+    <xsd:annotation>
+      <xsd:documentation>This is the x, y, and z distances from the origin.  This element must have three Coordinate elements, which represent x, y, and z in order.</xsd:documentation>
+      <xsd:appinfo>
+        <xhtml:a href="http://cig.bre.co.uk/iai_uk/documentation/IfcR2x_Final/ifcgeometryresource/lexical/ifccartesianpoint.html">IfcCartesianPoint</xhtml:a>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Coordinate" minOccurs="3" maxOccurs="3"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CDD">
+    <xsd:annotation>
+      <xsd:documentation>Cooling degree days.  CDD is calculated as the number of degrees a mean daily temperature is above a value (specified as the Temperature element), for each day. 
+For example, if the mean temperature in a region rises to 77 degrees for three days during a year, the rest of the time staying below 75, and the Temperature element is set at 75, then CDD = 6.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Temperature"/>
+        <xsd:element ref="CDDValue"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ClosedShell">
+    <xsd:annotation>
+      <xsd:documentation>This is an element from ifcXML that describes a collection of faces that make up a closed shell.</xsd:documentation>
+      <xsd:appinfo>
+        <xhtml:a href="http://cig.bre.co.uk/iai_uk/documentation/IfcR2x_Final/IFCTOPOLOGYRESOURCE/lexical/ifcclosedshell">IfcClosedShell</xhtml:a>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="PolyLoop" minOccurs="4" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CoefficientOfUtilization">
+    <xsd:annotation>
+      <xsd:documentation>The coefficient of utilization is the ratio of luminous flux on a workplane to the luminous flux emitted by the lamps alone.  
+</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="wallReflectance" type="xsd:decimal"/>
+          <xsd:attribute name="ceilingCavityReflectance" type="xsd:decimal"/>
+          <xsd:attribute name="floorReflectance" type="xsd:decimal"/>
+          <xsd:attribute name="roomCavityRatio" type="xsd:decimal">
+            <xsd:annotation>
+              <xsd:documentation>Room cavity ratio is a measure of the room cavity proportions.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Conductivity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="conductivityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ConductivityFofT">
+    <xsd:annotation>
+      <xsd:documentation>Conductivity as a function of temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="conductivityFofTUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Construction">
+    <xsd:annotation>
+      <xsd:documentation>A Construction is a combination of layers, such as a wall or a roof</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="U-value" minOccurs="0"/>
+        <xsd:element ref="Absorptance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Roughness" minOccurs="0"/>
+        <xsd:element ref="Albedo" minOccurs="0"/>
+        <xsd:element ref="Reflectance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Transmittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Emittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="PercentExisting" minOccurs="0"/>
+        <xsd:element ref="LayerId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Control">
+    <xsd:annotation>
+      <xsd:documentation>The Control element should be used for describing how this equipment is controlled.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="controlType" type="controlTypeEnum"/>
+      <xsd:attribute name="stages" type="stageTypeEnum" use="optional"/>
+      <xsd:attribute name="minPowerRatio" type="xsd:float"/>
+      <xsd:attribute name="performanceIdRef" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Coordinate">
+    <xsd:annotation>
+      <xsd:documentation>This is the an x, y, or z length measurement from the origin.</xsd:documentation>
+      <xsd:appinfo>
+        <xhtml:a href="http://cig.bre.co.uk/iai_uk/documentation/IfcR2x_Final/ifcmeasureresource/lexical/ifclengthmeasure.html">IfcLengthMeasure</xhtml:a>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal"/>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Cost">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="CostValue"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="costType" type="costTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CostValue">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="currency" type="currencyTypeEnum"/>
+          <xsd:attribute name="unit" type="xsd:string" use="optional"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="CreatedBy">
+    <xsd:annotation>
+      <xsd:documentation>Denotes the time this file has been created, as well as the person and program used to create this file.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="personId" type="xsd:IDREF" use="required"/>
+      <xsd:attribute name="programId" type="xsd:IDREF" use="required"/>
+      <xsd:attribute name="date" type="xsd:dateTime" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Data">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="IndependantValue" maxOccurs="2"/>
+        <xsd:element ref="DependantValue" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Day">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="dayScheduleIdRef" type="xsd:IDREF" use="required">
+            <xsd:annotation>
+              <xsd:documentation>ID for operation schedules</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="dayType" type="dayTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DaySchedule">
+    <xsd:annotation>
+      <xsd:documentation>Set of values that define the profile of one 24 hour period divided equally to the number of values entered.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="ScheduleValue" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="type" type="scheduleTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDDBCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day dry bulb temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDDBHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day dry bulb temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDDBRangeCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day dry bulb temperature range</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDDBRangeHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day dry bulb temperature range</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDGroundTCool">
+    <xsd:annotation>
+      <xsd:documentation>Ground temperature on the cooling design day</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDGroundTHeat">
+    <xsd:annotation>
+      <xsd:documentation>Ground temperature for the heating design day</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDPressureCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day atmospheric pressure</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="pressureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDPressureHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day atmospheric pressure</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="pressureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDSkyClearnessCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day sky clearness</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDSkyClearnessHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day sky clearness</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWBCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day wet bulb temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWBHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day wet bulb temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWindDirCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooing design day wind direction</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="directionUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWindDirHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day wind direction</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="directionUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWindSpeedCool">
+    <xsd:annotation>
+      <xsd:documentation>Cooling design day wind speed</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="velocityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DDWindSpeedHeat">
+    <xsd:annotation>
+      <xsd:documentation>Heating design day wind speed</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="velocityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DeltaP">
+    <xsd:annotation>
+      <xsd:documentation>Difference in pressure</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="deltaPUnitEnum" use="required"/>
+          <xsd:attribute name="hydronicLoopType" type="loopTypeEnum"/>
+          <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF"/>
+          <xsd:attribute name="conditioningType" type="conditioningTypeEnum">
+            <xsd:annotation>
+              <xsd:documentation>Use this attribute for conditioning units with both heating and cooling.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="performanceId" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>Use this attribute to point to a performance curve, if one is provided</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DeltaT">
+    <xsd:annotation>
+      <xsd:documentation>Difference in temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+          <xsd:attribute name="conditioningType" type="conditioningTypeEnum">
+            <xsd:annotation>
+              <xsd:documentation>Use this attribute for conditioning units with both heating and cooling.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Density">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="densityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DensityFofT">
+    <xsd:annotation>
+      <xsd:documentation>Density as a function of temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="densityFofTUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DependantVariable">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="unit" type="xsd:string" use="required"/>
+      <xsd:attribute name="dataType" type="xsd:string" use="required"/>
+      <xsd:attribute name="minValue" type="xsd:decimal">
+        <xsd:annotation>
+          <xsd:documentation>Use minValue and maxValue to define constraints on the curve.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="maxValue" type="xsd:decimal"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DesignCoolT">
+    <xsd:annotation>
+      <xsd:documentation>Design temperature for cooling</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DesignFlow">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DesignHeatT">
+    <xsd:annotation>
+      <xsd:documentation>Design temperature for heating</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DesignPressure">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="pressureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DesignTemp">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Dimensions">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Height" minOccurs="0"/>
+        <xsd:element ref="Width" minOccurs="0"/>
+        <xsd:element ref="Length" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="DocumentHistory">
+    <xsd:annotation>
+      <xsd:documentation>Contains details about people and programs that created and modified this file</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="ProgramInfo" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="PersonInfo" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CreatedBy" minOccurs="0"/>
+        <xsd:element ref="ModifiedBy" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Efficiency">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="standardsType" type="standardsTypeEnum">
+            <xsd:annotation>
+              <xsd:documentation>Use the standardsType attribute when the efficiency is measured at standard conditions.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="efficiencyType" type="efficiencyTypeEnum" use="required"/>
+          <xsd:attribute name="operationType" type="conditioningTypeEnum">
+            <xsd:annotation>
+              <xsd:documentation>Use this attribute for conditioning units with both heating and cooling.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="performanceId" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>Use this attribute to point to a performance curve, if one is provided</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ElecLoad">
+    <xsd:annotation>
+      <xsd:documentation>Electric load</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Elevation">
+    <xsd:annotation>
+      <xsd:documentation>Height above sea level</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="EmissionRate">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="emissionUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Emittance">
+    <xsd:annotation>
+      <xsd:documentation>Infra-red emmisivity</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+          <xsd:attribute name="type" type="emittanceTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Energy">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="energyUnitEnum" use="required"/>
+          <xsd:attribute name="valueType" type="valueTypeEnum" use="required"/>
+          <xsd:attribute name="timePeriod" type="timePeriodEnum" use="required"/>
+          <xsd:attribute name="resourceType" type="resourceTypeEnum" use="required"/>
+          <xsd:attribute name="meterIdRef" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>ID for a resource meter</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Equation">
+    <xsd:annotation>
+      <xsd:documentation>The Equation element allows data for n-dimensional algebraic data to be entered.  
+The Expression element should contain an indepentant variable followed by an = sign and an equation containing dependant variables.
+The independant and dependant variables are then defined by their respective tags.  
+The only mathmatical operations allowed are ^ (power), + (addition), - (subtraction), / (division), and * (multiplication). 
+
+Example: z=x+2*y^2 would have an IndependantVariable with a name = z, and two DependantVariables with names of x and y. 
+Descriptions would be included for each variable, along with unit and dataType information identifying the variable and its role.
+</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Expression"/>
+        <xsd:element ref="IndepentantVariable" maxOccurs="2"/>
+        <xsd:element ref="DependantVariable" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="EquipPowerPerArea">
+    <xsd:annotation>
+      <xsd:documentation>Amount of power used by equipment in a given area</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ExtEquip">
+    <xsd:annotation>
+      <xsd:documentation>External equipment.
+This is generalized to be able to contain any type of external equipment.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Manufacturer" minOccurs="0"/>
+        <xsd:element ref="Model" minOccurs="0"/>
+        <xsd:element ref="ElecLoad" minOccurs="0"/>
+        <xsd:element ref="FuelLoad" minOccurs="0"/>
+        <xsd:element ref="LatentLoad" minOccurs="0"/>
+        <xsd:element ref="Efficiency" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Performance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="WasteWaterHREff" minOccurs="0"/>
+        <xsd:element ref="WaterUsePerCycle" minOccurs="0"/>
+        <xsd:element ref="RatedFlow" minOccurs="0"/>
+        <xsd:element ref="Power" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CyclesPerWeek" minOccurs="0"/>
+        <xsd:element ref="Energy" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="IndoorAirQuality" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Age" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="waterTempScheduleIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to a hydronic loop </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="waterScheduleIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="waterMeterIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="type" type="extEquipTypeEnum" use="required"/>
+      <xsd:attribute name="airLoopIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to an air loop</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ExtEquipId">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="extEquipIdRef" type="xsd:IDREF"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Flow">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="FlowControl">
+    <xsd:annotation>
+      <xsd:documentation>Use this element to describe how the fluid flow is controlled. The temperatures specified in this element should be measured just upstream of the chiller.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="DesignFlow" minOccurs="0"/>
+        <xsd:element ref="MinimumFlow" minOccurs="0"/>
+        <xsd:element ref="MaximumFlow" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="FlowPerArea">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="FlowPerPerson">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Frame">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Width" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="type" type="frameTypeEnum" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="FuelLoad">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="fuelLoadUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Gap">
+    <xsd:annotation>
+      <xsd:documentation>Space between window panes</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Thickness" minOccurs="0"/>
+        <xsd:element ref="Density" minOccurs="0"/>
+        <xsd:element ref="DensityFofT" minOccurs="0"/>
+        <xsd:element ref="Conductivity" minOccurs="0"/>
+        <xsd:element ref="ConductivityFofT" minOccurs="0"/>
+        <xsd:element ref="Viscosity" minOccurs="0"/>
+        <xsd:element ref="ViscosityFofT" minOccurs="0"/>
+        <xsd:element ref="PrandtlNumber" minOccurs="0"/>
+        <xsd:element ref="PrandtlNumberFofT" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="gas" type="gasTypeEnum" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GapId">
+    <xsd:complexType>
+      <xsd:attribute name="gapIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID for a gap between window panes</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GeneralGeometry">
+    <xsd:annotation>
+      <xsd:documentation>This element has been left open for use with other geometry definitions, such as X3D or BLISXML.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Glare">
+    <xsd:annotation>
+      <xsd:documentation>Minimum amount of glare to trigger the shades to close</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Glaze">
+    <xsd:annotation>
+      <xsd:documentation>Properties of one layer of a window</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Transmittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reflectance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Emittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Thickness" minOccurs="0"/>
+        <xsd:element ref="Conductivity" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GlazeConductivity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="conductivityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GlazeId">
+    <xsd:complexType>
+      <xsd:attribute name="glazeIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID indicating the type of glaze used</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GroundTemp">
+    <xsd:annotation>
+      <xsd:documentation>Monthly ground temperatures, 12 values</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HDD">
+    <xsd:annotation>
+      <xsd:documentation>Heating degree days.  HDD is calculated as the number of degrees a mean daily temperature is below a value (specified as the Temperature element), for each day. 
+For example, if the mean temperature in a region drops to 64 degrees for four days during a year, the rest of the time staying above 65, and the Temperature element is set at 65, then HDD = 4.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Temperature"/>
+        <xsd:element ref="HDDValue"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Height">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HighLimit">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessSmallUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HighValue">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="conditioningUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HorizontalSolar">
+    <xsd:annotation>
+      <xsd:documentation>Amount of horizontal solar radiation striking the opening before a shade is closed.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HydronicLoop">
+    <xsd:annotation>
+      <xsd:documentation>The HydronicLoop element represents the equipment serving one path of water, or other liquid</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="HydronicLoopEquipment" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="FlowControl" minOccurs="0"/>
+        <xsd:element ref="TemperatureControl" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="loopType" type="loopTypeEnum" use="required"/>
+      <xsd:attribute name="controlZoneIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="fluidType" type="fluidTypeEnum" use="required"/>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HydronicLoopEquipment">
+    <xsd:annotation>
+      <xsd:documentation>A piece of equipment serving a hydronic loop (most commonly a water loop).
+This is generalized to be able to contain any type of hydronic loop equipment.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Manufacturer" minOccurs="0"/>
+        <xsd:element ref="Model" minOccurs="0"/>
+        <xsd:element ref="OperationSchedule" minOccurs="0"/>
+        <xsd:element ref="Temp" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="HydronicLoopId" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Use this element to point to another loop.  For instance, if this is a chiller and is a child of a chilled water loop, use this element to point at a cooling water loop.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element ref="RatedFlow" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="MinFlow" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="DeltaT" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="DeltaP" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="Power" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Capacity" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Efficiency" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Control" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Performance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Weight" minOccurs="0"/>
+        <xsd:element ref="Life" minOccurs="0"/>
+        <xsd:element ref="RefrigerantType" minOccurs="0"/>
+        <xsd:element ref="Energy" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Age" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="equipmentType" type="hydronicEquipTypeEnum" use="required"/>
+      <xsd:attribute name="waterMeterIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="waterScheduleIdRef" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="HydronicLoopId">
+    <xsd:complexType>
+      <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to a hydronic loop </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="hydronicLoopType" type="loopTypeEnum" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Type of hydronic loop </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Illuminance">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="illuminanceUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ImageTexture">
+    <xsd:annotation>
+      <xsd:documentation>This is an X3D element to map a texture to this material.
+From X3D specification:
+The ImageTexture node defines a texture map by specifying an image file and general parameters for mapping to geometry. 
+Texture maps are defined in a 2D coordinate system (s, t) that ranges from [0.0, 1.0] in both directions. 
+The bottom edge of the image corresponds to the S-axis of the texture map, and left edge of the image corresponds to the T-axis of the texture map. 
+The lower-left pixel of the image corresponds to s=0, t=0, and the top-right pixel of the image corresponds to s=1, t=1. <!--When fixed: add type="x3d:ImageTexture"-->
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="url" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Specifies location of the image.
+From X3D specification:
+The texture is read from the URL specified by the url field. 
+When the url field contains no values, texturing is disabled. 
+Browsers shall support the JPEG and PNG image file formats. 
+In addition, browsers may support other image formats (e.g. CGM) which can be rendered into a 2D image. 
+Support for the GIF format is also recommended (including transparency). </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="repeatS" type="xsd:boolean" use="required">
+        <xsd:annotation>
+          <xsd:documentation>From X3D specification:
+If repeatS is TRUE, the texture map is repeated outside the [0.0, 1.0] texture coordinate range in the S direction so that it fills the shape. 
+If repeatS is FALSE, the texture coordinates are clamped in the S direction to lie within the [0.0, 1.0] range. </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="repeatT" type="xsd:boolean" use="required">
+        <xsd:annotation>
+          <xsd:documentation>From X3D specification:
+If repeatT is TRUE, the texture map is repeated outside the [0.0, 1.0] texture coordinate range in the T direction so that it fills the shape. 
+If repeatT is FALSE, the texture coordinates are clamped in the T direction to lie within the [0.0, 1.0] range. </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="IndepentantVariable">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="unit" type="xsd:string" use="required"/>
+      <xsd:attribute name="dataType" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="IndoorAirQuality">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="EmissionRate" minOccurs="0"/>
+        <xsd:element ref="SinkRate" minOccurs="0"/>
+        <xsd:element ref="HighLimit" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="InfiltrationFlow">
+    <xsd:annotation>
+      <xsd:documentation>Flow of air through building envelope</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="BlowerDoorValue" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="type" type="infiltrationTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="InputWatts">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="InsideAirFilmResistance">
+    <xsd:annotation>
+      <xsd:documentation>Thermal resistance of the internal air film in a layer</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="resistanceUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="IntEquip">
+    <xsd:annotation>
+      <xsd:documentation>Interior equipment.
+This is generalized to be able to contain any type of internal equipment.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Manufacturer" minOccurs="0"/>
+        <xsd:element ref="Model" minOccurs="0"/>
+        <xsd:element ref="ElecLoad" minOccurs="0"/>
+        <xsd:element ref="FuelLoad" minOccurs="0"/>
+        <xsd:element ref="LatentLoad" minOccurs="0"/>
+        <xsd:element ref="Efficiency" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Performance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="WasteWaterHREff" minOccurs="0"/>
+        <xsd:element ref="WaterUsePerCycle" minOccurs="0"/>
+        <xsd:element ref="RatedFlow" minOccurs="0"/>
+        <xsd:element ref="Power" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CyclesPerWeek" minOccurs="0"/>
+        <xsd:element ref="Energy" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="IndoorAirQuality" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Age" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="waterTempScheduleIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to a hydronic loop </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="waterScheduleIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="waterMeterIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="type" type="intEquipTypeEnum" use="required"/>
+      <xsd:attribute name="airLoopIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing to an air loop</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="IntEquipId">
+    <xsd:complexType>
+      <xsd:attribute name="intEquipIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID pointing at an interior equipment object</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LatentLoad">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="loadUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Layer">
+    <xsd:annotation>
+      <xsd:documentation>A Layer is a combination of one of more materials</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="InsideAirFilmResistance" minOccurs="0"/>
+        <xsd:element ref="MaterialId" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LayerId">
+    <xsd:complexType>
+      <xsd:attribute name="layerIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID identifying a layer in this construction.  Multiple layers in Constructions are in order from outside to inside.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Length">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Life">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lifeUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LightControlId">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LightId">
+    <xsd:complexType>
+      <xsd:attribute name="lightIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Identifier pointing at a light object</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Lighting">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="lightingSystemIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="meterIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for a resource meter</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LightingControl">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="Illuminance" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="type" type="lightControlTypeEnum" use="required"/>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="lightingSystemIdRef" type="xsd:IDREF"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LightingSystem">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Manufacturer" minOccurs="0"/>
+        <xsd:element ref="NumberOfLamps" minOccurs="0"/>
+        <xsd:element ref="LumensPerLamp" minOccurs="0"/>
+        <xsd:element ref="Dimensions" minOccurs="0"/>
+        <xsd:element ref="InputWatts" minOccurs="0"/>
+        <xsd:element ref="Ballast" minOccurs="0"/>
+        <xsd:element ref="Lamp" maxOccurs="unbounded"/>
+        <xsd:element ref="Luminaire" minOccurs="0"/>
+        <xsd:element ref="CoefficientOfUtilization" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LightPowerPerArea">
+    <xsd:annotation>
+      <xsd:documentation>Amount of power used by lighting in a given area</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Location">
+    <xsd:annotation>
+      <xsd:documentation>The Location element describes the location of the global origin for this campus.  This element can be used in a general sense by using the Name and Description elements for a physical address or landmark, or Location can be made precise by specifying the Elevation, Longitude, and Latitude of the origin.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="ZipcodeOrPostalCode" minOccurs="0"/>
+        <xsd:element ref="Longitude" minOccurs="0"/>
+        <xsd:element ref="Latitude" minOccurs="0"/>
+        <xsd:element ref="Elevation" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="LowValue">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="conditioningUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Material">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="ImageTexture" minOccurs="0"/>
+        <xsd:element ref="R-value" minOccurs="0"/>
+        <xsd:element ref="Thickness" minOccurs="0"/>
+        <xsd:element ref="Conductivity" minOccurs="0"/>
+        <xsd:element ref="Density" minOccurs="0"/>
+        <xsd:element ref="SpecificHeat" minOccurs="0"/>
+        <xsd:element ref="Permeance" minOccurs="0"/>
+        <xsd:element ref="Porosity" minOccurs="0"/>
+        <xsd:element ref="RecycledContent" minOccurs="0"/>
+        <xsd:element ref="Cost" minOccurs="0"/>
+        <xsd:element ref="IndoorAirQuality" minOccurs="0"/>
+        <xsd:element ref="CADMaterialId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MaterialId">
+    <xsd:complexType>
+      <xsd:attribute name="materialIdRef" type="xsd:IDREF" use="required">
+        <xsd:annotation>
+          <xsd:documentation>ID identifying a material in this layer.  Multiple materials in layers are in order from outside to inside.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MaxPressure">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="pressureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MaxRelativeHumidity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MaxTemp">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MaximumFlow">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Meter">
+    <xsd:annotation>
+      <xsd:documentation>Description of a resource measurement</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="UtilityRate" minOccurs="0"/>
+        <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="resourceType" type="resourceTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MeterId">
+    <xsd:complexType>
+      <xsd:attribute name="meterIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for a resource meter</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MinFlow">
+    <xsd:annotation>
+      <xsd:documentation>Minimum flow</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" use="required">
+            <xsd:simpleType>
+              <xsd:union memberTypes="flowUnitEnum unitlessUnitEnum"/>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF"/>
+          <xsd:attribute name="hydronicLoopType" type="loopTypeEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MinimumFlow">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MinRelativeHumidity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MinPressure">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="pressureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="MinTemp">
+    <xsd:complexType>
+      <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ModifiedBy">
+    <xsd:annotation>
+      <xsd:documentation>Denotes the time this file has been modified, as well as the person and program used to modify this file.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="personId" type="xsd:IDREF" use="required"/>
+      <xsd:attribute name="programId" type="xsd:IDREF" use="required"/>
+      <xsd:attribute name="date" type="xsd:dateTime" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="NaturalVentHiTemp">
+    <xsd:annotation>
+      <xsd:documentation>Natural ventilation does not occur above this temperature.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="NaturalVentLoTemp">
+    <xsd:annotation>
+      <xsd:documentation>Natural ventilation does not occur below this temperature.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OAFlowPerArea">
+    <xsd:annotation>
+      <xsd:documentation>Outside air flow per area</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OAFlowPerPerson">
+    <xsd:annotation>
+      <xsd:documentation>Outside air flow per person</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Opening">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="ShadeControl" minOccurs="0"/>
+        <xsd:element ref="U-value" minOccurs="0"/>
+        <xsd:element ref="ShadingCoeff" minOccurs="0"/>
+        <xsd:element ref="SolarHeatGainCoeff" minOccurs="0"/>
+        <xsd:element ref="Transmittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reflectance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="GlazeConductivity" minOccurs="0"/>
+        <xsd:element ref="Emittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Setback" minOccurs="0"/>
+        <xsd:element ref="NaturalVentHiTemp" minOccurs="0"/>
+        <xsd:element ref="NaturalVentLoTemp" minOccurs="0"/>
+        <xsd:element ref="NaturalVentOccDep" minOccurs="0"/>
+        <xsd:element ref="RectangularGeometry"/>
+        <xsd:element ref="PlanarGeometry"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="interiorShadeType" type="shadeOperationEnum"/>
+      <xsd:attribute name="exteriorShadeType" type="shadeOperationEnum"/>
+      <xsd:attribute name="windowTypeIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="constructionIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>Identifier pointing to a construction</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="openingType" type="openingTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OperationRange">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="LowValue"/>
+        <xsd:element ref="HighValue"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="OperationSchedule">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="OperationRange"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PeopleNumber">
+    <xsd:annotation>
+      <xsd:documentation>Occupancy of the space</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="peopleNumberUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PeopleSensibleHeatGain">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="peopleHeatGainUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PercentExisting">
+    <xsd:annotation>
+      <xsd:documentation>Percent of original building shell used in renovation</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Performance">
+    <xsd:annotation>
+      <xsd:documentation>Used to represent part load performance</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="PointData" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Equation" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="performanceType" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Permeance">
+    <xsd:annotation>
+      <xsd:documentation>The rate water vapor is allowed through a surface</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="permUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PersonInfo">
+    <xsd:annotation>
+      <xsd:documentation>Contains information about people that created and modified this file</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="FirstName"/>
+        <xsd:element ref="LastName"/>
+        <xsd:element ref="MiddleName" minOccurs="0"/>
+        <xsd:element ref="Email1Address" minOccurs="0"/>
+        <xsd:element ref="WebPage" minOccurs="0"/>
+        <xsd:element ref="CompanyName" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PlanarGeometry">
+    <xsd:annotation>
+      <xsd:documentation>Geometry data in ifcXML format.  All data is global, with the assumption that positive X is East, positive Y is North, and positive Z is up.  If geometry is to be precise, use Longitude, Latitude, and Elevation in the Location element to define the origin.  Otherwise the origin is an arbitrary point.  Use PlanarGeometry to define a three dimensional polygon that lies on a plane.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="PolyLoop"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="unit" type="lengthUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PointData">
+    <xsd:annotation>
+      <xsd:documentation>The PointData element allows for graph or tabular information to be entered. 
+The data type and units of the independent and dependant variables are defined in their respective elements.  Each Data element represent a data point, with each Value element representing the value of a variable - starting with the independant variable, then each dependant variable listed in the order defined.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="IndepentantVariable" maxOccurs="2"/>
+        <xsd:element ref="DependantVariable" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Data" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PolyLoop">
+    <xsd:annotation>
+      <xsd:documentation>This is a list of coordinates that make up a polygon in three-dimensional space.  All coordinates must lie on the same plane.  The right-hand rule applies for defining the outward normal of a surface: For every surface, points must be defined in order, such that the direction of (the average cross-product between (any point, the centroid of the surface, and the next point)) points in the direction of the outward normal, which is a vector pointing away from the associated space.  Of course, this must only hold for surfaces touching the exterior (only one SpaceId element).</xsd:documentation>
+      <xsd:appinfo>
+        <xhtml:a href="http://cig.bre.co.uk/iai_uk/documentation/IfcR2x_Final/ifctopologyresource/lexical/ifcpolyloop.html">IfcPolyLoop</xhtml:a>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="CartesianPoint" minOccurs="3" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Porosity">
+    <xsd:annotation>
+      <xsd:documentation>the ratio of the total amount of void space in a material (due to poses, small channels, and so on) to the bulk volume occupied by the material.  </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Power">
+    <xsd:annotation>
+      <xsd:documentation>Maximum consumption of energy (power input)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerUnitEnum" use="required"/>
+          <xsd:attribute name="powerType" type="powerTypeEnum" use="required"/>
+          <xsd:attribute name="useType" type="powerUseTypeEnum" use="required"/>
+          <xsd:attribute name="meterIdRef" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>ID for a resource meter</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PrandtlNumberFofT">
+    <xsd:annotation>
+      <xsd:documentation>Prandtl number as a function of temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="inverseTempUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="PressureControl">
+    <xsd:annotation>
+      <xsd:documentation>Use this element to describe how the air pressure is controlled. The temperatures specified in this element should be measured just upstream of the air handlers.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="DesignPressure" minOccurs="0"/>
+        <xsd:element ref="MinPressure" minOccurs="0"/>
+        <xsd:element ref="MaxPressure" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ProgramInfo">
+    <xsd:annotation>
+      <xsd:documentation>Contains information about programs that created and modified this file</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="CompanyName" minOccurs="0"/>
+        <xsd:element ref="ProductName" minOccurs="0"/>
+        <xsd:element ref="Version" minOccurs="0"/>
+        <xsd:element ref="Platform" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="RatedFlow">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+          <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF"/>
+          <xsd:attribute name="hydronicLoopType" type="loopTypeEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="RectangularGeometry">
+    <xsd:annotation>
+      <xsd:documentation>Geometry data in a form typically used in simulation engines.  For surfaces, specify the location of the bottom-left corner with the CartesianPoint element when facing it from the outside.  Also for surfaces, Tilt and Azimuth must be specified.  For openings, the third Coordinate should be zero.  These Coordinates represent the distance of the bottom-left of the opening starting at the bottom-left corner of the parent surface.  Azimuth and Tilt should not be specified for opening.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Azimuth"/>
+        <xsd:element ref="CartesianPoint"/>
+        <xsd:element ref="Tilt"/>
+        <xsd:element ref="Height"/>
+        <xsd:element ref="Width"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="unit" type="lengthUnitEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="RecycledContent">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Reflectance">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+          <xsd:attribute name="type" type="reflectanceTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Results">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Value"/>
+        <xsd:element ref="ObjectId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="unit" use="required">
+        <xsd:simpleType>
+          <xsd:union memberTypes="loadUnitEnum unitlessSmallUnitEnum energyUnitEnum powerUnitEnum temperatureUnitEnum unitlessUnitEnum illuminanceUnitEnum flowUnitEnum"/>
+        </xsd:simpleType>
+      </xsd:attribute>
+      <xsd:attribute name="currency" type="currencyTypeEnum"/>
+      <xsd:attribute name="resultsType" type="resultsTypeEnum" use="required"/>
+      <xsd:attribute name="resourceType" type="resourceTypeEnum" use="required"/>
+      <xsd:attribute name="startTime" type="xsd:dateTime" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Use the startTime attribute to define the start of the first Value element.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="timeIncrement" type="xsd:duration" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>This specifies the duration of time between each Value element. This is required if more than one Value element exists in a this Results element.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Roughness">
+    <xsd:annotation>
+      <xsd:documentation>Roughness of the outside surface</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="value" type="roughnessValueEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="R-value">
+    <xsd:annotation>
+      <xsd:documentation>Resistance of material</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="resistanceUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ShadeControl">
+    <xsd:complexType>
+      <xsd:annotation>
+        <xsd:documentation>The ShadeControl element is a bit complex, as shading control is handled differently in different simulation engines.  Each child of ShadeControl represents a criteria to help determine if the shades will be open or closed.  The resulting shade action should be a union of these.  
+
+Example: You have included a ShadeSchedule, which is a 1 on weekdays and a 0 on weekends, and a SolarOnOpening.  The shade will be drawn when the solar radiation on this opening is greater than SolarOnOpening and it is a weekday.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:sequence>
+        <xsd:element ref="ShadeSchedule" minOccurs="0"/>
+        <xsd:element ref="SolarOnOpening" minOccurs="0"/>
+        <xsd:element ref="HorizontalSolar" minOccurs="0"/>
+        <xsd:element ref="AirTemperature" minOccurs="0"/>
+        <xsd:element ref="ZoneCoolingLoad" minOccurs="0"/>
+        <xsd:element ref="Glare" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="type" type="shadeTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ShadeSchedule">
+    <xsd:annotation>
+      <xsd:documentation>Use this element to define schedules for a shade.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="scheduleIdRef" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Schedule">
+    <xsd:annotation>
+      <xsd:documentation>List of year schedules that make up an entire calendar year.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="YearSchedule" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="type" type="scheduleTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Setback">
+    <xsd:annotation>
+      <xsd:documentation>Distance from outside surface of window to outside surface of wall</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ShadingCoeff">
+    <xsd:annotation>
+      <xsd:documentation>Shading coefficient</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ShellGeometry">
+    <xsd:annotation>
+      <xsd:documentation>Geometry data in ifcXML format.  All data is global, with the assumption that positive X is East, positive Y is North, and positive Z is up.  If geometry is to be precise, use Longitude, Latitude, and Elevation in the Location element to define the origin.  Otherwise the origin is an arbitrary point.  ShellGeometry is used to define a closed shell.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="ClosedShell"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="unit" type="lengthUnitEnum" default="Meters"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SinkRate">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="sinkRateUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SolarHeatGainCoeff">
+    <xsd:annotation>
+      <xsd:documentation>Solar heat gain coefficient</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SolarOnOpening">
+    <xsd:annotation>
+      <xsd:documentation>Amount of solar radiation striking the opening before a shade is closed.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="powerPerAreaUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Space">
+    <xsd:annotation>
+      <xsd:documentation>A space represents a volume enclosed by surfaces.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Lighting" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="LightingControl" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="InfiltrationFlow" minOccurs="0"/>
+        <xsd:element ref="PeopleNumber" minOccurs="0"/>
+        <xsd:element ref="TotalPeopleHeatGain" minOccurs="0"/>
+        <xsd:element ref="PeopleSensibleHeatGain" minOccurs="0"/>
+        <xsd:element ref="LightPowerPerArea" minOccurs="0"/>
+        <xsd:element ref="EquipPowerPerArea" minOccurs="0"/>
+        <xsd:element ref="Area" minOccurs="0"/>
+        <xsd:element ref="Temperature" minOccurs="0"/>
+        <xsd:element ref="Volume" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Use this element to define the shell of the space.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element ref="AirLoopId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="HydronicLoopId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="MeterId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="IntEquipId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="spaceType" type="spaceTypeEnum">
+        <xsd:annotation>
+          <xsd:documentation>spaceType represents how a space is used.</xsd:documentation>
+          <xsd:appinfo>
+            <xhtml:a href="http://206.55.31.90/cgi-bin/lpd/ShowSpaceTypes.pl">IfcPolyLoop</xhtml:a>, an IESNA and ASHRAE project for determining lighting power density for individual spaces. </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="zoneIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="lightScheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID of the schedule for lights contained in this space</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="equipmentScheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for schedule of equipment use</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="peopleScheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for schedule of people in this space</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="conditionType" type="conditionTypeEnum"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="SpecificHeat">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="specificHeatUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Surface">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="AdjacentSpaceId" minOccurs="0" maxOccurs="2"/>
+        <xsd:element ref="RectangularGeometry"/>
+        <xsd:element ref="PlanarGeometry"/>
+        <xsd:element ref="Opening" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CADObjectId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="surfaceType" type="surfaceTypeEnum" use="required"/>
+      <xsd:attribute name="constructionIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>Identifier pointing to a construction</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="scheduleShadeIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="exposedToSun" type="xsd:boolean" default="true">
+        <xsd:annotation>
+          <xsd:documentation>This attribute specifies whether or not direct beam radiation from the sun will ever hit this surface.  Only relevant to exterior surface types.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Temp">
+    <xsd:annotation>
+      <xsd:documentation>Temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum" use="required"/>
+          <xsd:attribute name="tempType" type="tempTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Temperature">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="temperatureUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="TemperatureControl">
+    <xsd:annotation>
+      <xsd:documentation>Use this element to describe how the temperature is controlled.  The temperatures specified in this element should be measured just upstream of the most critical piece of equipment (air handlers for a chilled water and hot water loops, the chiller for the cooling water loop).</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="DesignTemp" minOccurs="0"/>
+        <xsd:element ref="MinTemp" minOccurs="0"/>
+        <xsd:element ref="MaxTemp" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Thickness">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="TimeIncrement">
+    <xsd:annotation>
+      <xsd:documentation>Time or period that results represent.  Example: if timeType = Month and TimeIncrement = 1 the Value would be for the month of January or if timeType = Hour and TimeIncrement = 4 the 81st the Value would be for January 14 at noon.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="timeUnit" type="timeUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="TotalPeopleHeatGain">
+    <xsd:annotation>
+      <xsd:documentation>Amount of heat added to the space by people</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="peopleHeatGainUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Transmittance">
+    <xsd:annotation>
+      <xsd:documentation>Transmittance of shading surface</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+          <xsd:attribute name="type" type="radiationWavelengthTypeEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Transportation">
+    <xsd:annotation>
+      <xsd:documentation>Public transportation</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="transportationType" type="transportationTypeEnum" use="required"/>
+      <xsd:attribute name="scheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID for the schedule of transmittance of a shading surface</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="UtilityRate">
+    <xsd:annotation>
+      <xsd:documentation>We have left the UtilityRate element open to allow for use with billing schemas.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType/>
+  </xsd:element>
+  <xsd:element name="U-value">
+    <xsd:annotation>
+      <xsd:documentation>Overall conductance</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="uValueUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Vegetation">
+    <xsd:annotation>
+      <xsd:documentation>Plants, trees, etc. on a campus</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="GeneralGeometry" minOccurs="0"/>
+        <xsd:element ref="ShellGeometry" minOccurs="0"/>
+        <xsd:element ref="WaterRate" minOccurs="0"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="vegetationType" type="vegetationTypeEnum" use="required"/>
+      <xsd:attribute name="waterScheduleIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="waterMeterIdRef" type="xsd:IDREF"/>
+      <xsd:attribute name="shadeScheduleIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>Refers to a building-level surface.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Viscosity">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="viscosityUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ViscosityFofT">
+    <xsd:annotation>
+      <xsd:documentation>Viscosity as a function of temperature</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="viscosityFofTUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Volume">
+    <xsd:annotation>
+      <xsd:documentation>Specifies the volume of the space.  This value should be equal to the volume enclosed by the actual physical boundries of the space, as defined by the volumetric model's interior surfaces bounding that space.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="volumeUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WasteWaterHREff">
+    <xsd:annotation>
+      <xsd:documentation>Waste water heat recovery efficiency</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+          <xsd:attribute name="airLoopIdRef" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>ID pointing to an air loop</xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="hydronicLoopIdRef" type="xsd:IDREF">
+            <xsd:annotation>
+              <xsd:documentation>ID pointing to a hydronic loop </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WaterLoss">
+    <xsd:annotation>
+      <xsd:documentation>This includes blowdown (draining a cooling tower to clean), drift (water loss from water sprayed), and evaporation in cooling towers.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="unitlessUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WaterRate">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="flowUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WaterUsePerCycle">
+    <xsd:annotation>
+      <xsd:documentation>Amount of water used for water using equipment per cycle of operation.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="waterUseUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Weather">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="City" minOccurs="0"/>
+        <xsd:element ref="StateOrProvince" minOccurs="0"/>
+        <xsd:element ref="Country" minOccurs="0"/>
+        <xsd:element ref="HDD" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="CDD" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="DDDBCool" minOccurs="0"/>
+        <xsd:element ref="DDHiHrCool" minOccurs="0"/>
+        <xsd:element ref="DDWBCool" minOccurs="0"/>
+        <xsd:element ref="DDDBRangeCool" minOccurs="0"/>
+        <xsd:element ref="DDLoHrCool" minOccurs="0"/>
+        <xsd:element ref="DDPressureCool" minOccurs="0"/>
+        <xsd:element ref="DDWindSpeedCool" minOccurs="0"/>
+        <xsd:element ref="DDWindDirCool" minOccurs="0"/>
+        <xsd:element ref="DDSkyClearnessCool" minOccurs="0"/>
+        <xsd:element ref="DDRainCool" minOccurs="0"/>
+        <xsd:element ref="DDSnowCool" minOccurs="0"/>
+        <xsd:element ref="DDMonthCool" minOccurs="0"/>
+        <xsd:element ref="DDDayCool" minOccurs="0"/>
+        <xsd:element ref="DDDaylightCool" minOccurs="0"/>
+        <xsd:element ref="DDGroundTCool" minOccurs="0"/>
+        <xsd:element ref="DDDBHeat" minOccurs="0"/>
+        <xsd:element ref="DDHiHrHeat" minOccurs="0"/>
+        <xsd:element ref="DDWBHeat" minOccurs="0"/>
+        <xsd:element ref="DDDBRangeHeat" minOccurs="0"/>
+        <xsd:element ref="DDLoHrHeat" minOccurs="0"/>
+        <xsd:element ref="DDPressureHeat" minOccurs="0"/>
+        <xsd:element ref="DDWindSpeedHeat" minOccurs="0"/>
+        <xsd:element ref="DDWindDirHeat" minOccurs="0"/>
+        <xsd:element ref="DDSkyClearnessHeat" minOccurs="0"/>
+        <xsd:element ref="DDRainHeat" minOccurs="0"/>
+        <xsd:element ref="DDSnowHeat" minOccurs="0"/>
+        <xsd:element ref="DDMonthHeat" minOccurs="0"/>
+        <xsd:element ref="DDDayHeat" minOccurs="0"/>
+        <xsd:element ref="DDDaylightHeat" minOccurs="0"/>
+        <xsd:element ref="DDGroundTHeat" minOccurs="0"/>
+        <xsd:element ref="GroundTemp" minOccurs="0"/>
+        <xsd:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WeekSchedule">
+    <xsd:annotation>
+      <xsd:documentation>Set of day schedules all assigned to a unique particular period of the week using the day type attribute. Do not schedule conflicting day types to the same week schedule.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Day" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="type" type="scheduleTypeEnum" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WeekScheduleId">
+    <xsd:complexType>
+      <xsd:attribute name="weekScheduleIdRef" type="xsd:IDREF" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Weight">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="weightUnitEnum" use="required"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Width">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="lengthUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="WindowType">
+    <xsd:annotation>
+      <xsd:documentation>One WindowType should be created for each type of window.  
+Create a Blind, Frame, and Cost for each OpeningType, and then add as many Glaze and Gaps as exist in the window.
+Place these Glaze and Gap elements in order from outside to inside.  
+For instance, a two pane window will have Glaze Gap Glaze, where the first Glaze represents the outside surface.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="U-value" minOccurs="0"/>
+        <xsd:element ref="ShadingCoeff" minOccurs="0"/>
+        <xsd:element ref="SolarHeatGainCoeff" minOccurs="0"/>
+        <xsd:element ref="Transmittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Reflectance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Emittance" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Blind" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Frame" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Gap" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Glaze" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="Cost" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="DOELibIdRef" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Use this attribute to reference objects in the DOE2 library</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="XAxis">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="unit" type="xsd:string" use="required"/>
+      <xsd:attribute name="dataType" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="YAxis">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+      </xsd:sequence>
+      <xsd:attribute name="unit" type="xsd:string" use="required"/>
+      <xsd:attribute name="dataType" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="YearSchedule">
+    <xsd:annotation>
+      <xsd:documentation>Set of week schedules all assigned for a particular time period during the year defined by the begin and end date elements. These must not span more than one calendar year.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="BeginDate"/>
+        <xsd:element ref="EndDate"/>
+        <xsd:element ref="WeekScheduleId"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Zone">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="Name" minOccurs="0"/>
+        <xsd:element ref="Description" minOccurs="0"/>
+        <xsd:element ref="Flow" minOccurs="0"/>
+        <xsd:element ref="AirChangesPerHour" minOccurs="0"/>
+        <xsd:element ref="FlowPerArea" minOccurs="0"/>
+        <xsd:element ref="FlowPerPerson" minOccurs="0"/>
+        <xsd:element ref="OAFlowPerArea" minOccurs="0"/>
+        <xsd:element ref="OAFlowPerPerson" minOccurs="0"/>
+        <xsd:element ref="DesignHeatT" minOccurs="0"/>
+        <xsd:element ref="DesignCoolT" minOccurs="0"/>
+        <xsd:element ref="IndoorAirQuality" minOccurs="0"/>
+        <xsd:element ref="HydronicLoopId" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="AirLoopId" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="id" type="xsd:ID" use="required"/>
+      <xsd:attribute name="heatSchedIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID of heating schedule</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="coolSchedIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>Design temperature for cooling</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="outAirSchedIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>Outside air schedule ID</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="fanSchedIdRef" type="xsd:IDREF">
+        <xsd:annotation>
+          <xsd:documentation>ID of the fan schedule for this zone</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ZoneCoolingLoad">
+    <xsd:annotation>
+      <xsd:documentation>Minimum cooling load that triggers the shades to close</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:decimal">
+          <xsd:attribute name="unit" type="loadUnitEnum"/>
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
