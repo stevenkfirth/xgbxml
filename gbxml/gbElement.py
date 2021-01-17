@@ -218,6 +218,9 @@ class gbElement(etree.ElementBase):
         elif xsd_type=='xsd:decimal':
             return float
         
+        elif xsd_type=='xsd:IDREF':
+            return str
+        
         else:
             raise Exception(xsd_type)
         
@@ -320,11 +323,22 @@ class gbElement(etree.ElementBase):
         
         """
         if child_id is None:
-            return self.find('gbxml:%s' % child_nntag,namespaces=self._ns)        
+            
+            result=self.find('gbxml:%s' % child_nntag,namespaces=self._ns)        
+            if result is None:
+                raise KeyError('Child element with nntag "%s" does not exist' % child_nntag)
+            else:
+                return result
+        
         else:
-            return self.find(r'./gbxml:%s[@id="%s"]' % (child_nntag,child_id), 
+            
+            result=self.find(r'./gbxml:%s[@id="%s"]' % (child_nntag,child_id), 
                              namespaces=self._ns)
-    
+            if result is None:
+                raise KeyError('Child element with nntag "%s" and id "%s" does not exist' % (child_nntag,child_id))
+            else:
+                return result
+        
     
     def get_children(self,child_nntag):
         """Returns child elements with a specified tag.

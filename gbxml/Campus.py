@@ -1,44 +1,19 @@
 # -*- coding: utf-8 -*-
 
-#from .gbElement import gbElement
-
-
 class Campus():
     ""
     
-    # @property
-    # def designHeatWeathIdRef(self):
-    #     ""
-    #     return self.get_attribute('designHeatWeathIdRef')
-    
-    # @designHeatWeathIdRef.setter
-    # def designHeatWeathIdRef(self,value):
-    #     ""
-    #     self.set_attribute('designHeatWeathIdRef',value)
+    def get_Space(self,id):
+        """Returns a Space element belonging to the Campus.
         
-    # @property
-    # def designCoolWeathIdRef(self):
-    #     ""
-    #     return self.get_attribute('designCoolWeathIdRef')
-    
-    # @designCoolWeathIdRef.setter
-    # def designCoolWeathIdRef(self,value):
-    #     ""
-    #     self.set_attribute('designCoolWeathIdRef',value)
+        :raises KeyError: If the space does not exist.
         
-    # @property
-    # def ifcGUID(self):
-    #     ""
-    #     return self.get_attribute('ifcGUID')
-    
-    # @ifcGUID.setter
-    # def ifcGUID(self,value):
-    #     ""
-    #     self.set_attribute('ifcGUID',value)
+        :rtype: Space
         
-    # @property
-    # def Location(self):
-    #     ""
-    #     return self.get_children('Location')[0]
-    
+        """
+        try:
+            return self.xpath(r'./gbxml:Building/gbxml:Space[@id="%s"]' % (id),
+                              namespaces=self._ns)[0]
+        except IndexError:
+            raise KeyError('Element with id="%s" does not exist in the xml tree.' % id)
     
