@@ -4,7 +4,7 @@ class ClosedShell():
     ""
     
     def create_PolyLoops(self,*polyloops_points_coordinates):
-        """Creates PolyLoop child elements with CartesianPoint ans Coordinate subelements.
+        """Creates PolyLoop child elements with CartesianPoint and Coordinate subelements.
         
         :param polyloop_points_coordinates: An argument list of tuple where each tuple is 
             the vertex_values of a PolyLoop.
