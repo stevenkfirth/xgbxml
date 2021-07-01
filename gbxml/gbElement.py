@@ -137,12 +137,15 @@ class gbElement(etree.ElementBase):
         :rtype: str
         
         """
+        #print(self._schema_element_dict)
         type_=self._schema_element_dict['type']
         if type_ is not None:
             return type_
         else:
-            return self._schema_element_dict['extension']['base']
-    
+            try:
+                return self._schema_element_dict['extension']['base']
+            except KeyError:
+                return self._schema_element_dict['simpleType']['restriction']['base']
     
     @property
     def _getroot(self):
@@ -225,6 +228,25 @@ class gbElement(etree.ElementBase):
             raise Exception(xsd_type)
         
         
+    def add_child(self,child_nntag,**kwargs):
+        """Adds a new child element to the element.
+        
+        :param child_nntag: The 'no namespace' tag of the child element.
+        :type child_nntag: str
+        :param kwargs: Attributes to be set for the child element.
+        
+        :returns: The newly created child element.
+        :rtype: (subclass of) gbElement
+        
+        """
+        self.append(etree.Element('{http://www.gbxml.org/schema}%s' % child_nntag))
+        child=self.get_children(child_nntag)[-1]
+        for k,v in kwargs.items():
+            if v is not None:
+                child.set_attribute(k,v)
+        return child
+        
+        
     @property
     def attributes(self):
         """The attributes of the element.
@@ -237,6 +259,13 @@ class gbElement(etree.ElementBase):
         """
         return {k:self.get_attribute(k) for k in self.attrib}
         
+    
+    def display(self):
+        """Displays the xml of the element.
+        
+        """
+        print(etree.tostring(self, pretty_print=True).decode())
+    
     
     @property
     def id(self):
@@ -256,23 +285,7 @@ class gbElement(etree.ElementBase):
         self.set_attribute('id',value)
         
     
-    def add_child(self,child_nntag,**kwargs):
-        """Adds a new child element to the element.
-        
-        :param child_nntag: The 'no namespace' tag of the child element.
-        :type child_nntag: str
-        :param kwargs: Attributes to be set for the child element.
-        
-        :returns: The newly created child element.
-        :rtype: (subclass of) gbElement
-        
-        """
-        self.append(etree.Element('{http://www.gbxml.org/schema}%s' % child_nntag))
-        child=self.get_children(child_nntag)[-1]
-        for k,v in kwargs.items():
-            if v is not None:
-                child.set_attribute(k,v)
-        return child
+    
         
     
     def get_attribute(self,attribute_name):

@@ -8,6 +8,7 @@ from lxml import etree
 
 from . import schema_dicts
 from .gbElement import gbElement
+from . import gbxml  # not the gbxml package but the gbxml module...
 
 
 def get_parser(version='6.01'):
@@ -49,11 +50,13 @@ def get_parser(version='6.01'):
             # add custom written element class in gbxml directory if it exists
             try:
             
-                module = importlib.import_module('.'+element_name,'gbxml')
-                kls=module.__dict__[element_name]
+                #module = importlib.import_module('.'+element_name,'gbxml')
+                #kls=module.__dict__[element_name]
+                kls=gbxml.__dict__[element_name]
                 base_classes.append(kls)
                 
-            except ModuleNotFoundError:
+            #except ModuleNotFoundError:
+            except KeyError:
                 
                 pass
                 
