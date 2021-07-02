@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from crossproduct import Point, Vector, SimplePolygon
+from crossproduct import Point, Vector, SimplePolygon, SimplePolygons
 import math
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from mpl_toolkits.mplot3d.art3d import Line3DCollection,Poly3DCollection
 
 
 class gbXML():
@@ -31,6 +31,7 @@ class Campus():
     
     def plot_surfaces(self,
                       ax=None,
+                      surfaceType=None,
                       **kwargs):
         """Plots the surface.
         
@@ -41,16 +42,82 @@ class Campus():
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
         
+        
+        
+        stdict={'Roof':'tab:gray',
+                'ExteriorWall':'tab:gray',
+                'Shade':'tab:gray',
+                'InteriorWall':'tab:cyan',
+                'InteriorFloor':'tab:gray',
+                'RaisedFloor':'tab:gray',
+                'SlabOnGrade':'tab:gray',
+                'Ceiling':'tab:pink',
+                'Air':'tab:gray',
+                'UndergroundSlab':'tab:gray'
+                }
+        
+        sulines=[]
+        oplines=[]
+        verts=[]
+        edgecolors=[]
+        facecolors=[]
+        
+        
         for su in self.Surfaces:
-            #print(su)
-            su.plot(ax,
-                    set_axis_limits=False,
-                    alpha=0.5,
-                    **kwargs)
-            su.PlanarGeometry.plot(ax,
-                                   set_axis_limits=False,
-                                   linewidth=0.5,
-                                   color='white')
+            
+            # if su.surfaceType in ['Roof',
+            #                       'ExteriorWall',
+            #                       'Shade',
+            #                       'SlabOnGrade',
+            #                       'RaisedFloor'
+            #                                 ]:
+                     
+            sulines.append(su.get_SimplePolygon().polyline.to_tuple())
+            pgs=su.get_SimplePolygons_without_openings()
+            verts.extend([pg.to_tuple() for pg in pgs])
+            edgecolors.append(stdict[su.surfaceType])
+            facecolors.append(stdict[su.surfaceType])
+            
+            for op in su.Openings:
+                
+                oplines.append(op.get_SimplePolygon().polyline.to_tuple())
+        
+        # surface polygon fill
+        ax.add_collection3d(Poly3DCollection(verts,
+                                             #edgecolors='black',#edgecolors,
+                                             linewidths=0,
+                                             facecolors=facecolors,
+                                             alpha=0.75,
+                                             **kwargs))
+        
+        # surface perimeter lines
+        ax.add_collection3d(Line3DCollection(sulines,
+                                             color='black',
+                                             alpha=0.5,
+                                             linewidths=0.25))
+        
+        # opening perimeter lines
+        ax.add_collection3d(Line3DCollection(oplines,
+                                             color='tab:gray',
+                                             linewidths=0.25))
+        
+        
+        
+        # for su in self.Surfaces:
+        #     #print(su)
+            
+        #     if not surfaceType is None:
+        #         #print(su.surfaceType)
+        #         if not su.surfaceType==surfaceType:
+        #             continue
+            
+        #     su.plot(ax,
+        #             set_axis_limits=False,
+        #             **kwargs)
+        #     su.PlanarGeometry.PolyLoop.plot(ax,
+        #                                     linewidth=0.5,
+        #                                     color='white',
+        #                                     alpha=0.5)
             
             #break
         
@@ -61,10 +128,18 @@ class Campus():
             y_values.extend([c[1] for c in cs])
             z_values.extend([c[2] for c in cs])
         
+        x_range=max(x_values)-min(x_values)
+        y_range=max(y_values)-min(y_values)
+        z_range=max(z_values)-min(z_values)
+        t_range=max([x_range,y_range,z_range])
         
-        ax.set_xlim(min(x_values),max(x_values))
-        ax.set_ylim(min(y_values),max(y_values))
-        ax.set_zlim(min(z_values),max(z_values))
+        x_mean=(max(x_values)+min(x_values))/2.0
+        y_mean=(max(y_values)+min(y_values))/2.0
+        z_mean=(max(z_values)+min(z_values))/2.0
+        
+        ax.set_xlim(x_mean-t_range/2,x_mean+t_range/2)
+        ax.set_ylim(y_mean-t_range/2,y_mean+t_range/2)
+        ax.set_zlim(z_mean-t_range/2,z_mean+t_range/2)
         
         return ax
         
@@ -398,10 +473,10 @@ class Surface():
             return self.PlanarGeometry.get_coordinates()
         except KeyError:
             try:
-                self.RectangularGeoemetry.get_coordinates_from_polyloop()
+                return self.RectangularGeoemetry.get_coordinates_from_polyloop()
             except KeyError:
-                self.RectangularGeometry.get_coordinates_from_height_and_width()
-                
+                return self.RectangularGeometry.get_coordinates_from_height_and_width()
+               
                 
     def get_SimplePolygon(self):
         """Returns a SimplePolygon of the outer polyloop of the surface.
@@ -416,6 +491,21 @@ class Surface():
         """
         return SimplePolygon(*[Point(*c) for c in self.get_coordinates()])
     
+    
+    def get_SimplePolygons_without_openings(self):
+        """
+        
+        :rtype: SimplePolygons
+
+        """
+        sp=self.get_SimplePolygon()
+        opening_polygons=[op.get_SimplePolygon() for op in self.Openings]
+        if opening_polygons:
+            dpgs=sp.difference_simple_polygons(opening_polygons)
+        else:
+            dpgs=SimplePolygons(sp)
+        return dpgs
+               
     
     def plot(self,
              ax=None,
@@ -444,29 +534,35 @@ class Surface():
              kwargs['alpha']=0.25
         
         
-        #if self.Openings:
-            #print(self.id)
-            #print(self.Openings)
-            #raise Exception
+        
         
         
         sp=self.get_SimplePolygon()
-        print(sp)
+        #print(sp)
         opening_polygons=[op.get_SimplePolygon() for op in self.Openings]
-        print(opening_polygons)
+        #print(opening_polygons)
         
+        # if self.Openings:
+        #     print(self.id)
+        #     print(self.Openings)
+        #     raise Exception
         
         if opening_polygons:
-            print('test')
-            print(self)
+            #print('test')
+            #print(self)
             dpgs=sp.difference_simple_polygons(opening_polygons)
-            print('done')
+            #print(sp)
+            #print(opening_polygons)
+            #print(dpgs)
+            #print('done')
         else:
             dpgs=[sp]
-            
-        ax.add_collection3d(Poly3DCollection([dpg.to_tuple() for dpg in dpgs],
-                                              #linewidths=0,
-                                              **kwargs))
+        
+        if len(dpgs)>0:
+        
+            ax.add_collection3d(Poly3DCollection([dpg.to_tuple() for dpg in dpgs],
+                                                 #linewidths=0,
+                                                 **kwargs))
         
         # for pg in opening_polygons:
         #     pg.plot(ax)

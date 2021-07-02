@@ -65,9 +65,13 @@ class Test_Campus(unittest.TestCase):
     def test_plot_surfaces(self):
         ""
         #return
+        #fp=r'files\ExerciseFacility (Older).xml'
+        fp=r'files\gbXMLStandardv Retail Big Box.xml'
+        parser=get_parser(version='0.37')
+        tree = etree.parse(fp,parser)
         gbXML=tree.getroot()
         ca=gbXML.Campus
-        ca.plot_surfaces()
+        ca.plot_surfaces(surfaceType='Roof')
         
         
 
