@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from crossproduct import Point, Vector, SimplePolygon, SimplePolygons
+from crossproduct import Point, Vector, Polygon, Polygons
 import math
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Line3DCollection,Poly3DCollection
 
+import vpython
 
 class gbXML():
     ""
@@ -144,6 +145,36 @@ class Campus():
         return ax
         
     
+    def render_surfaces(self,
+                        scene=None,
+                        color=vpython.color.blue,
+                        opacity=0.5
+                        ):
+        ""
+        
+        if scene is None:
+            scene=vpython.canvas(background=vpython.color.gray(0.95))
+            
+            scene.camera.rotate(angle=vpython.pi/2, axis=vpython.vector(1,0,0), origin=vpython.vector(0,0,0))
+            scene.camera.rotate(angle=vpython.pi/8, axis=vpython.vector(0,0,1), origin=vpython.vector(0,0,0))
+            
+            length=100
+            
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(length,0,0), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(length+1,0,0), text='X', color=vpython.color.black, box=False , opacity=0)
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,length,0), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(0,length+1,0), text='Y', color=vpython.color.black, box=False , opacity=0)
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,0,length+1), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(0,0,length+1), text='Z', color=vpython.color.black, box=False , opacity=0)
+        
+    
+        for i, su in enumerate(self.Surfaces):
+            print(i, end=' ')
+            try:
+                su.render(scene=scene)
+            except: 
+                print(su)
+    
     
 class CartesianPoint():
     ""
@@ -242,14 +273,14 @@ class PlanarGeometry():
         return self.PolyLoop.get_coordinates()
     
     
-    def get_SimplePolygon(self):
-        """Returns a SimplePolygon of the polyloop child element.
+    def get_Polygon(self):
+        """Returns a Polygon of the polyloop child element.
         
-        :rtype: crossproduct.SimplePolygon
+        :rtype: crossproduct.Polygon
         
         """
         
-        return self.PolyLoop.get_SimplePolygon()
+        return self.PolyLoop.get_Polygon()
     
 
     def plot(self,
@@ -291,6 +322,58 @@ class PlanarGeometry():
         return ax
     
     
+    def render(self,
+               scene=None,
+               color=vpython.color.blue,
+               opacity=0.5
+               ):
+        ""
+        
+        pg=self.get_SimplePolygon()
+        print(pg.bounding_box)
+        return
+        
+        if scene is None:
+            scene=vpython.canvas(background=vpython.color.gray(0.95))
+            
+            scene.camera.rotate(angle=vpython.pi/2, axis=vpython.vector(1,0,0), origin=vpython.vector(0,0,0))
+            scene.camera.rotate(angle=vpython.pi/8, axis=vpython.vector(0,0,1), origin=vpython.vector(0,0,0))
+            
+            # length=max(*pg[0])
+            
+            # vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(length,0,0), shaftwidth=length/100, color=vpython.color.black)
+            # vpython.label( pos=vpython.vec(length+1,0,0), text='X', color=vpython.color.black, box=False , opacity=0)
+            # vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,length,0), shaftwidth=length/100, color=vpython.color.black)
+            # vpython.label( pos=vpython.vec(0,length+1,0), text='Y', color=vpython.color.black, box=False , opacity=0)
+            # vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,0,length+1), shaftwidth=length/100, color=vpython.color.black)
+            # vpython.label( pos=vpython.vec(0,0,length+1), text='Z', color=vpython.color.black, box=False , opacity=0)
+        
+        triangles=pg.triangles
+        
+        render_triangles(triangles,scene,color=color,opacity=opacity)
+        
+        #print(triangles)
+        #return scene
+        
+        
+        return scene
+        
+
+def render_triangles(triangles,scene,**kwargs):
+    ""
+    vtris=[]
+    for t in triangles:
+        
+        vs=[vpython.vertex(pos=vpython.vec(*pt),**kwargs) for pt in t]
+        vtri=vpython.triangle(vs=vs)
+        vtris.append(vtri)
+        
+    vpython.compound(vtris)
+    
+    return scene
+    
+    
+
     
 class PolyLoop():
     ""
@@ -322,14 +405,14 @@ class PolyLoop():
         return tuple([cp.get_coordinates() for cp in self.CartesianPoints])
     
     
-    def get_SimplePolygon(self):
-        """Returns a SimplePolygon of the polyloop.
+    def get_Polygon(self):
+        """Returns a Polygon of the polyloop.
         
-        :rtype: crossproduct.SimplePolygon
+        :rtype: crossproduct.Polygon
         
         """
         
-        return SimplePolygon(*[cp.get_Point() for cp in self.CartesianPoints])
+        return Polygon(*[cp.get_Point() for cp in self.CartesianPoints])
     
 
     def plot(self,ax=None,**kwargs):
@@ -583,6 +666,45 @@ class Surface():
             ax.set_zlim(min(z_values),max(z_values))
         
         return ax
+    
+    
+    
+    def render(self,
+               scene=None,
+               color=vpython.color.blue,
+               opacity=0.5
+               ):
+        ""
+        
+        pgs=[self.get_SimplePolygon()]
+        
+        if scene is None:
+            scene=vpython.canvas(background=vpython.color.gray(0.95))
+            
+            scene.camera.rotate(angle=vpython.pi/2, axis=vpython.vector(1,0,0), origin=vpython.vector(0,0,0))
+            scene.camera.rotate(angle=vpython.pi/8, axis=vpython.vector(0,0,1), origin=vpython.vector(0,0,0))
+            
+            length=max(*pgs[0][0])
+            
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(length,0,0), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(length+1,0,0), text='X', color=vpython.color.black, box=False , opacity=0)
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,length,0), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(0,length+1,0), text='Y', color=vpython.color.black, box=False , opacity=0)
+            vpython.arrow(pos=vpython.vector(0,0,0), axis=vpython.vector(0,0,length+1), shaftwidth=length/100, color=vpython.color.black)
+            vpython.label( pos=vpython.vec(0,0,length+1), text='Z', color=vpython.color.black, box=False , opacity=0)
+        
+        for pg in pgs:
+            triangles=pg.triangles
+            l=[]
+            for t in triangles:
+                vs=[vpython.vertex(pos=vpython.vec(*pt),
+                                   color=color,
+                                   opacity=opacity) for pt in t]
+                l.append(vpython.triangle(vs=vs))
+            vpython.compound(l)
+            
+        return scene
+        
     
     
     

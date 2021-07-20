@@ -64,7 +64,7 @@ class Test_Campus(unittest.TestCase):
         
     def test_plot_surfaces(self):
         ""
-        #return
+        return
         #fp=r'files\ExerciseFacility (Older).xml'
         fp=r'files\gbXMLStandardv Retail Big Box.xml'
         parser=get_parser(version='0.37')
@@ -142,12 +142,20 @@ class Test_PlanarGeometry(unittest.TestCase):
         
     def test_plot(self):
         ""
-        return
+        #return
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
         ax=pg.plot()
         print(type(ax))
     
+    
+    def test_render(self):
+        gbXML=tree.getroot()
+        pg=gbXML.Campus.Surface.PlanarGeometry
+        scene=pg.render()
+        print(scene)
+
+
 
 
 class Test_RectangularGeometry(unittest.TestCase):
