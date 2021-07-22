@@ -3,6 +3,7 @@
 import unittest
 
 from xgbxml import get_parser, create_gbXML
+from xgbxml.gbElement import gbCollection
 from lxml import etree
 from crossproduct import Point, Vector, Polyline, Polygon
 
@@ -10,9 +11,16 @@ fp=r'files\gbXMLStandard.xml'
 parser=get_parser(version='0.37')
 tree = etree.parse(fp,parser)
 
-class Test_get_parser(unittest.TestCase):
+class Test_parser(unittest.TestCase):
     ""
-   
+    
+    def test_create_gbXML(self):
+        ""
+        gbXML=create_gbXML()
+        self.assertEqual(gbXML.__class__.__name__,
+                         'gbXML')
+
+
     def test_get_parser(self):
         ""
         parser=get_parser(version='0.37')
@@ -24,17 +32,49 @@ class Test_get_parser(unittest.TestCase):
         self.assertIsInstance(tree,etree._ElementTree)
         
         
+### gbElement
         
-class Test_create_gbXML(unittest.TestCase):
+class Test_gbElement(unittest.TestCase):
     ""
-        
-    def test_create_gbXML(self):
+    
+    def test_get_children(self):
         ""
-        gbXML=create_gbXML()
-        self.assertEqual(gbXML.__class__.__name__,
-                         'gbXML')
-
-
+        gbXML=tree.getroot()
+        self.assertIsInstance(gbXML.Campuss,
+                              gbCollection)
+    
+    
+class Test_gbCollection(unittest.TestCase):
+    ""
+    
+    def test___getattr__(self):
+        ""
+        gbXML=tree.getroot()
+        
+        cs=gbXML.Campuss
+        
+        print(cs.id)
+        
+        
+        print(gbXML.Campuss.Surfaces[:10])
+        
+        
+        print(gbXML.Campus.Surfaces.PlanarGeometrys[:10].get_Polygon)
+        
+        print(gbXML.Campus.Surfaces.PlanarGeometrys[:10].get_Polygon())
+    
+    
+    def test___get_item__(self):
+        ""
+        gbXML=tree.getroot()
+        
+        # test slice
+        self.assertIsInstance(gbXML.Campuss[:],
+                              gbCollection)
+    
+    
+    
+### CUSTOM BASES
 
 class Test_gbXML(unittest.TestCase):
     ""

@@ -4,6 +4,10 @@
 
 from lxml import etree
 
+import collections.abc
+
+from crossproduct import Point, Points, Polyline, Polylines, Polygon, Polygons
+
 
 class gbElement(etree.ElementBase):
     """The default element class for the gbxml parser.
@@ -363,8 +367,8 @@ class gbElement(etree.ElementBase):
         :rtype: list ??
 
         """
-        return self.findall('gbxml:%s' % child_nntag,
-                            namespaces=self._ns)
+        return gbCollection(*self.findall('gbxml:%s' % child_nntag,
+                                          namespaces=self._ns))
     
     
     def set_attribute(self,attribute_name,value):
@@ -456,6 +460,75 @@ class gbElement(etree.ElementBase):
     
     
     
+import inspect
+    
+class gbCollection(collections.abc.Sequence):
+    """
+    """
+    
+    def __getattr__(self,key):
+        ""
+        #print('__getattr__', key)
+        
+        result=[]
+        
+        for x in self:
+            y=getattr(x,key)
+            if isinstance(y,gbCollection):
+                result.extend(y)
+            else:
+                result.append(y)
+                
+        if isinstance(result[0],gbElement):  # if result is a collection of elements
+            
+            return gbCollection(*result)
+        
+        elif inspect.ismethod(result[0]):  # if result is a collection of methods
+            
+            def boundmethods(*args,**kwargs):
+                y=[x(*args,**kwargs) for x in result]
+                if isinstance(y[0],gbElement):
+                    return gbCollection(*y)
+                elif isinstance(y[0],Polygon):
+                    return Polygons(*y)
+                elif isinstance(y[0],Polyline):
+                    return Polylines(*y)
+                elif isinstance(y[0],Point):
+                    return Points(*y)
+                else:
+                    return tuple(y)
+                
+            return boundmethods
+        
+        else:
+            
+            return tuple(result)
+    
+    
+    def __getitem__(self,index):
+        ""
+        if isinstance(index, slice):
+            indices = range(*index.indices(len(self._items)))
+            return gbCollection(*[self._items[i] for i in indices])
+        else:
+            return self._items[index]
+    
+   
+    def __init__(self,*items):
+        ""
+        
+        self._items=tuple(items)
+        
+
+    def __len__(self):
+        ""
+        return len(self._items)
+    
+    
+    def __repr__(self):
+        ""
+        return '%s(%s)' % (self.__class__.__name__,
+                           ', '.join([str(c) for c in self]))
         
     
         

@@ -9,7 +9,8 @@ Welcome to xgbxml's documentation!
    Overview
    get_parser
    create_gbXML
-   shared_methods
+   gbElement
+   gbCollection
    
 .. toctree::
    :maxdepth: 2
