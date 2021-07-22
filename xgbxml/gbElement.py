@@ -252,7 +252,8 @@ class gbElement(etree.ElementBase):
         """The attributes of the element.
         
         :returns: A dictionary of attributes where the attribute values
-        have been converted to the correct python types according to the schema.
+            have been converted to the correct python types according to the 
+            schema.
         
         :rtype: dict
         

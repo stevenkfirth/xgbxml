@@ -2,9 +2,9 @@
 
 import unittest
 
-from gbxml import get_parser, create_gbXML
+from xgbxml import get_parser, create_gbXML
 from lxml import etree
-from crossproduct import Point, Vector, SimplePolygon
+from crossproduct import Point, Vector, Polyline, Polygon
 
 fp=r'files\gbXMLStandard.xml'
 parser=get_parser(version='0.37')
@@ -129,18 +129,18 @@ class Test_PlanarGeometry(unittest.TestCase):
                           (47.90424, 106.0994, 474.0)))
     
     
-    def test_get_SimplePolygon(self):
+    def test_get_Polygon(self):
         ""
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
-        self.assertEqual(pg.get_SimplePolygon(),
-                         SimplePolygon(Point(47.90424,75.55779,474.0),
+        self.assertEqual(pg.get_Polygon(),
+                         Polygon(Point(47.90424,75.55779,474.0),
                                        Point(47.90424,75.55779,484.5),
                                        Point(47.90424,106.0994,484.5),
                                        Point(47.90424,106.0994,474.0)))
         
         
-    def test_plot(self):
+    def _test_plot(self):
         ""
         #return
         gbXML=tree.getroot()
@@ -149,7 +149,7 @@ class Test_PlanarGeometry(unittest.TestCase):
         print(type(ax))
     
     
-    def test_render(self):
+    def _test_render(self):
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
         scene=pg.render()
@@ -207,8 +207,8 @@ class Test_RectangularGeometry(unittest.TestCase):
         ""
         gbXML=tree.getroot()
         rg=gbXML.Campus.Surface.RectangularGeometry
-        self.assertEqual(rg.get_SimplePolygon_from_height_and_width(),
-                         SimplePolygon(Point(47.90423999343799,75.5578,474.0),
+        self.assertEqual(rg.get_Polygon_from_height_and_width(),
+                         Polygon(Point(47.90423999343799,75.5578,474.0),
                                        Point(47.90423999343799,75.5578,484.5),
                                        Point(47.904239993438,106.0994,484.5),
                                        Point(47.904239993438,106.0994,474.0)))
@@ -229,15 +229,15 @@ class Test_PolyLoop(unittest.TestCase):
                           (47.90424, 106.0994, 474.0)))
     
     
-    def test_get_SimplePolygon(self):
+    def test_get_Polyline(self):
         ""
         gbXML=tree.getroot()
         pl=gbXML.Campus.Surface.PlanarGeometry.PolyLoop
-        self.assertEqual(pl.get_SimplePolygon(),
-                         SimplePolygon(Point(47.90424,75.55779,474.0),
-                                       Point(47.90424,75.55779,484.5),
-                                       Point(47.90424,106.0994,484.5),
-                                       Point(47.90424,106.0994,474.0)))
+        self.assertEqual(pl.get_Polyline(),
+                         Polyline(Point(47.90424,75.55779,474.0),
+                                  Point(47.90424,75.55779,484.5),
+                                  Point(47.90424,106.0994,484.5),
+                                  Point(47.90424,106.0994,474.0)))
         
         
     def test_plot(self):
@@ -262,18 +262,18 @@ class Test_Surface(unittest.TestCase):
         gbXML=tree.getroot()
         su=gbXML.Campus.Surface
         self.assertEqual(su.get_coordinates(),
-                         ((47.90424, 75.55779, 474.0), 
+                         (((47.90424, 75.55779, 474.0), 
                           (47.90424, 75.55779, 484.5), 
                           (47.90424, 106.0994, 484.5), 
-                          (47.90424, 106.0994, 474.0)))
+                          (47.90424, 106.0994, 474.0)),))
     
     
     def test_get_SimplePolygon(self):
         ""
         gbXML=tree.getroot()
         su=gbXML.Campus.Surface
-        self.assertEqual(su.get_SimplePolygon(),
-                         SimplePolygon(Point(47.90424,75.55779,474.0),
+        self.assertEqual(su.get_Polygon(),
+                         Polygon(Point(47.90424,75.55779,474.0),
                                        Point(47.90424,75.55779,484.5),
                                        Point(47.90424,106.0994,484.5),
                                        Point(47.90424,106.0994,474.0)))
@@ -319,12 +319,12 @@ class Test_Opening(unittest.TestCase):
                           (97.35217, 67.50311, 497.0)))
         
         
-    def test_get_SimplePolygon(self):
+    def test_get_Polygon(self):
         ""
         gbXML=tree.getroot()
         op=gbXML.Campus.get_child('Surface',child_id='aim12670').Opening
-        self.assertEqual(op.get_SimplePolygon(),
-                         SimplePolygon(Point(97.35217,67.50311,490.0),
+        self.assertEqual(op.get_Polygon(),
+                         Polygon(Point(97.35217,67.50311,490.0),
                                        Point(97.35217,70.50311,490.0),
                                        Point(97.35217,70.50311,497.0),
                                        Point(97.35217,67.50311,497.0)))
