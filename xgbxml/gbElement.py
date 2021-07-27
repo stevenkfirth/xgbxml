@@ -422,6 +422,14 @@ class gbElement(etree.ElementBase):
         
         return value2
         
+    
+    def tostring(self,pretty_print=True,**kwargs):
+        ""
+        return etree.tostring(self,
+                              pretty_print=pretty_print,
+                              **kwargs).decode()
+    
+    
         
     @property
     def nntag(self):
