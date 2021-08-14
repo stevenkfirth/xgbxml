@@ -53,6 +53,8 @@ class Test_gbCollection(unittest.TestCase):
         
         cs=gbXML.Campuss
         
+        
+        return
         print(cs.id)
         
         
@@ -182,7 +184,7 @@ class Test_PlanarGeometry(unittest.TestCase):
         
     def _test_plot(self):
         ""
-        #return
+        return
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
         ax=pg.plot()
@@ -190,6 +192,8 @@ class Test_PlanarGeometry(unittest.TestCase):
     
     
     def _test_render(self):
+        ""
+        return
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
         scene=pg.render()
@@ -377,6 +381,22 @@ class Test_Opening(unittest.TestCase):
         op.plot()
 
 
+
+
+class Test_Material(unittest.TestCase):
+    ""
+    
+    def test_add_R_value(self):
+        ""
+        gbXML=create_gbXML()
+        m=gbXML.add_Material()
+        print(m)
+        z=gbXML.add_Zone()
+        print(z)
+        rv=m.add_R_value(unit='W')
+        print(rv)
+        
+        
 
 
 

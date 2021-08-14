@@ -61,9 +61,10 @@ def get_parser(version='6.01'):
                 pass
                 
             # add class for element into namespace
-            namespace[element_name]=type(element_name,
-                                         tuple(base_classes),
-                                         dict(_class_schema_dict=schema_dict))
+            namespace[element_name.replace('_','-')]=\
+                type(element_name,
+                     tuple(base_classes),
+                     dict(_class_schema_dict=schema_dict))
             
     
     parser = etree.XMLParser()
