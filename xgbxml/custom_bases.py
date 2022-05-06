@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from crossproduct import Point, Vector, Polyline, Polylines, Polygon, Polygons
+#from crossproduct import Point, Vector, Polyline, Polylines, Polygon, Polygons
 import math
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Line3DCollection,Poly3DCollection
 
-import vpython
+from . import render_functions
+from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
+
+#import vpython
 
 class gbXML():
     ""
@@ -49,28 +52,47 @@ class Campus():
         return self.xpath(r'./gbxml:Surface/gbxml:Opening',
                           namespaces=self._ns)
         
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        """
+        """
+        #print(self)
+        for su in self.Surfaces:
+            try:
+                ax=su.render(ax=ax)
+            except Exception as err:
+                print(su)
+                print(type(err))
+                
+        return ax
+    
+    # def get_Surface_polygons(self):
+    #     """
+    #     :rtype: crossproduct.Polygons
+    #     """
+    #     return Polygons(*[su.get_Polygon() for su in self.Surfaces])
+    
+    # def get_Surface_PlanarGeometry_polygons(self):
+    #     """
+    #     :rtype: crossproduct.Polygons
+    #     """
+    #     return Polygons(*[su.PlanarGeometry.get_Polygon() for su in self.Surfaces])
+    
+    # def get_Opening_polygons(self):
+    #     """
+    #     :rtype: crossproduct.Polygons
+    #     """
+    #     result=[]
+    #     for op in self.get_Openings():
+    #         result.append(op.get_Polygon())
+    #     return Polygons(*result)
     
     
-    def get_Surface_polygons(self):
-        """
-        :rtype: crossproduct.Polygons
-        """
-        return Polygons(*[su.get_Polygon() for su in self.Surfaces])
     
-    def get_Surface_PlanarGeometry_polygons(self):
-        """
-        :rtype: crossproduct.Polygons
-        """
-        return Polygons(*[su.PlanarGeometry.get_Polygon() for su in self.Surfaces])
     
-    def get_Opening_polygons(self):
-        """
-        :rtype: crossproduct.Polygons
-        """
-        result=[]
-        for op in self.get_Openings():
-            result.append(op.get_Polygon())
-        return Polygons(*result)
     
     
     # def plot_surfaces(self,
@@ -244,16 +266,16 @@ class CartesianPoint():
         :rtype: tuple(float)
         
         """
-        return tuple([co.value for co in self.Coordinates])
+        return self.Coordinates.value
     
     
-    def get_Point(self):
-        """Returns a Point for the cartesian point.
+    # def get_point(self):
+    #     """Returns a Point for the cartesian point.
         
-        :rtype: crossproduct.Point
+    #     :rtype: crossproduct.Point
         
-        """
-        return Point(*self.get_coordinates())
+    #     """
+    #     return (*self.get_coordinates())
     
     
     # def plot(self,ax=None,**kwargs):
@@ -316,14 +338,31 @@ class PlanarGeometry():
         return self.PolyLoop.get_coordinates()
     
     
-    def get_Polygon(self):
+    def get_shell(self):
         """Returns a Polygon of the polyloop child element.
         
         :rtype: crossproduct.Polygon
         
         """
         
-        return Polygon(*self.PolyLoop.get_Polyline())
+        return self.PolyLoop.get_shell()
+    
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        ax=self.PolyLoop.render(
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        return ax
+    
     
 
     # def plot(self,
@@ -448,13 +487,34 @@ class PolyLoop():
         return tuple([cp.get_coordinates() for cp in self.CartesianPoints])
     
     
-    def get_Polyline(self):
-        """Returns a Polyline of the polyloop.
-        
-        :rtype: crossproduct.Polyline
-        
+    def get_shell(self):
         """
-        return Polyline(*[Point(*x) for x in self.get_coordinates()])
+        """
+        x = [cp.get_coordinates() for cp in self.CartesianPoints]
+        x.append(x[0])
+        return tuple(x)
+        
+    
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        ax=render_functions.render_polygon_3d(
+            polygon=(self.get_shell(),[]),
+            polygon_triangles=None,
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        return ax
+    
+    
+    
     
 
     # def plot(self,ax=None,**kwargs):
@@ -477,9 +537,9 @@ class RectangularGeometry():
         azimuth=self.Azimuth.value
         sin_azimuth=math.sin(math.radians(azimuth))
         cos_azimuth=math.cos(math.radians(azimuth))
-        return Vector(cos_azimuth,
-                      sin_azimuth,
-                      0).normalise
+        return vector_normalize_3d(cos_azimuth,
+                                   sin_azimuth,
+                                   0)
     
         
     def _get_y_vector(self):
@@ -488,13 +548,13 @@ class RectangularGeometry():
         tilt=self.Tilt.value
         sin_tilt=math.sin(math.radians(tilt))
         cos_tilt=math.cos(math.radians(tilt))
-        return Vector(x_vector[0]*cos_tilt,
-                      x_vector[1]*cos_tilt,
-                      sin_tilt).normalise
+        return vector_normalize_3d(x_vector[0]*cos_tilt,
+                                   x_vector[1]*cos_tilt,
+                                   sin_tilt)
     
     
     
-    def get_coordinates(self):
+    def get_shell(self):
         """Returns the coordinates of the rectangular geometry.
         
         The following sources are tried in order:
@@ -505,13 +565,13 @@ class RectangularGeometry():
             
         """
         try:
-            return self.RectangularGeoemetry.get_coordinates_from_polyloop()
+            return self.get_shell_from_polyloop()
         except KeyError:
-            return self.RectangularGeometry.get_coordinates_from_height_and_width()
+            return self.get_shell_from_height_and_width()
                
     
     
-    def get_coordinates_from_height_and_width(self):
+    def get_shell_from_height_and_width(self):
         """Returns the coordintes from the rectangular data using the height and width.
         
         :rtype: tuple(tuple(float))
@@ -521,69 +581,114 @@ class RectangularGeometry():
             
             x_vector=self._get_x_vector()
             y_vector=self._get_y_vector()
-            start_point=self.CartesianPoint.get_Point()
+            start_point=self.CartesianPoint.get_coordinates()
             height=self.Height.value
             width=self.Width.value        
             
-            return ((start_point+x_vector*width).coordinates,
-                    (start_point+x_vector*width+y_vector*height).coordinates,
-                    (start_point+y_vector*height).coordinates,
-                    (start_point).coordinates)
+            return (
+                vector_addition_3d(*start_point,
+                                   *vector_multiplication_3d(*x_vector,
+                                                             width)),
+                vector_addition_3d(
+                    *vector_addition_3d(*start_point,
+                                        *vector_multiplication_3d(*x_vector,
+                                                                  width)),
+                    *vector_multiplication_3d(*y_vector,
+                                              height)),
+                vector_addition_3d(*start_point,
+                                   *vector_multiplication_3d(*y_vector,
+                                                             height)),
+                start_point,
+                vector_addition_3d(*start_point,
+                                   *vector_multiplication_3d(*x_vector,
+                                                             width))
+                )
+            
+            
         
         else:
             raise Exception('To do')  # i.e. for openings
     
     
-    def get_coordinates_from_polyloop(self):
+    def get_shell_from_polyloop(self):
         """Returns the coordintes from the rectangular data using the polyloop.
         
         :rtype: tuple(tuple(float))
 
         """
+        
         if self.getparent().nntag=='Surface':
             
             x_vector=self._get_x_vector()
             y_vector=self._get_y_vector()
-            start_point=self.CartesianPoint.get_Point()
-            c2d=self.PolyLoop.get_coordinates()     
+            start_point=self.CartesianPoint.get_coordinates()
+            c2d=self.PolyLoop.get_shell()     
             
-            return tuple((start_point+x_vector*c[0]+y_vector*c[1]).coordinates for c in c2d)
+            return tuple(vector_addition_3d(
+                            *vector_addition_3d(*start_point,
+                                                *vector_multiplication_3d(*x_vector,
+                                                                          c[0])),
+                            *vector_multiplication_3d(*y_vector,
+                                                      c[1])) 
+                        for c in c2d)
     
         else:
             raise Exception('To do')  # i.e. for openings
             
-    
-    def get_Polygon(self):
-        """Returns a Polygon of the rectangular eometry.
-        
-        The following sources are tried in order:
-            - RectangularGeometry/PolyLoop
-            - RectangularGeometry... from height and width
             
-        :rtype: crossproduct.Polygon
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        
+        ax=render_functions.render_polygon_3d(
+            polygon=(self.get_shell(),[]),
+            polygon_triangles=None,
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        return ax
             
-        """
-        return Polygon(*[Point(*c) for c in self.get_coordinates()])
+            
+            
     
-    
-    def get_Polygon_from_height_and_width(self):
-        """Returns a Polygon derived from the rectangular data using the height and width.
+    # def get_Polygon(self):
+    #     """Returns a Polygon of the rectangular eometry.
         
-        :rtype: crossproduct.Polygon
+    #     The following sources are tried in order:
+    #         - RectangularGeometry/PolyLoop
+    #         - RectangularGeometry... from height and width
+            
+    #     :rtype: crossproduct.Polygon
+            
+    #     """
+    #     return Polygon(*[Point(*c) for c in self.get_coordinates()])
+    
+    
+    # def get_Polygon_from_height_and_width(self):
+    #     """Returns a Polygon derived from the rectangular data using the height and width.
+        
+    #     :rtype: crossproduct.Polygon
 
-        """
-        return Polygon(*[Point(*c) for c in self.get_coordinates_from_height_and_width()])
+    #     """
+    #     return Polygon(*[Point(*c) for c in self.get_coordinates_from_height_and_width()])
     
     
-    def get_Polygon_from_polyloop(self):
-        """Returns a Polygon derived from the rectangular data using the polyloop.
+    # def get_Polygon_from_polyloop(self):
+    #     """Returns a Polygon derived from the rectangular data using the polyloop.
         
-        The child polyloop data is not used.
+    #     The child polyloop data is not used.
         
-        :rtype: crossproduct.Polygon
+    #     :rtype: crossproduct.Polygon
 
-        """
-        return Polygon(*[Point(*c) for c in self.get_coordinates_from_polyloop()])
+    #     """
+    #     return Polygon(*[Point(*c) for c in self.get_coordinates_from_polyloop()])
 
 
 
@@ -596,6 +701,30 @@ class Space():
 class Surface():
     ""
 
+
+    def get_holes(self):
+        """
+        """
+        return [o.get_shell() for o in self.Openings]
+        
+
+    def get_shell(self):
+        """Returns a Polygon of the outer polyloop of the opening.
+        
+        The following sources are tried in order:
+            - PlanarGeometry
+            - RectangularGeometry/PolyLoop
+            - RectangularGeoemetry... from height and width
+            
+        :rtype: crossproduct.Polygon
+            
+        """
+        try:
+            return self.PlanarGeometry.get_shell()
+        except KeyError:
+            self.RectangularGeometry.get_shell()
+
+
     def get_Spaces(self):
         """Returns the space elements adjacent to the surface.
         
@@ -604,30 +733,7 @@ class Surface():
         return [campus.get_Space(AdjacentSpaceId.spaceIdRef) for AdjacentSpaceId in self.AdjacentSpaceIds]
         
     
-    def get_coordinates(self):
-        """Returns the coordinates of the exterior and any holes.
-        
-        The following sources are tried in order:
-            - PlanarGeometry
-            - RectangularGeometry/PolyLoop
-            - RectangularGeometry... from height and width
-            
-        :rtype: tuple(tuple(tuple(float)))
-            
-        """
-        result=[]
-        # exterior
-        try:
-            result.append(self.PlanarGeometry.get_coordinates())
-        except KeyError:
-            result.append(RectangularGeometry.get_coordinates())
-        # holes (openings)
-        for o in self.Openings:
-            result.append(o.get_coordinates())
-        return tuple(result)
-              
-                
-    def get_Polygon(self):
+    def get_polygon(self):
         """Returns a Polygon of the outer polyloop of the surface.
         
         The following sources are tried in order:
@@ -638,11 +744,31 @@ class Surface():
         :rtype: crossproduct.Polygon
             
         """
-        coords=self.get_coordinates()
-        return Polygon(*[Point(*c) for c in coords[0]],
-                       holes=[Polygon(*[Point(*c) for c in x]) for x in coords[1:]])
+        
+        return (self.get_shell(), self.get_holes())
     
     
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        
+        ax=render_functions.render_polygon_3d(
+            polygon=self.get_polygon(),
+            polygon_triangles=None,
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        for op in self.Openings:
+            ax=op.render(ax=ax)
+        
+        return ax
     
     
     # def plot(self,
@@ -783,7 +909,7 @@ class Opening():
             self.RectangularGeometry.get_coordinates()
                 
                 
-    def get_Polygon(self):
+    def get_shell(self):
         """Returns a Polygon of the outer polyloop of the opening.
         
         The following sources are tried in order:
@@ -794,7 +920,44 @@ class Opening():
         :rtype: crossproduct.Polygon
             
         """
-        return Polygon(*[Point(*c) for c in self.get_coordinates()])
+        try:
+            return self.PlanarGeometry.get_shell()
+        except KeyError:
+            self.RectangularGeometry.get_shell()
+        
+        
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        x=dict(color='green')
+        if outline_kwargs is None:
+            outline_kwargs=x
+        else:
+            for k,v in x.items:
+                if not k in outline_kwargs:
+                    outline_kwargs[k]=v
+            
+        x=dict(color='green')
+        if surface_kwargs is None:
+            surface_kwargs=x
+        else:
+            for k,v in x.items:
+                if not k in surface_kwargs:
+                    surface_kwargs[k]=v
+        
+        ax=render_functions.render_polygon_3d(
+            polygon=(self.get_shell(),[]),
+            polygon_triangles=None,
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        return ax
         
     
     # def plot(self,ax=None,**kwargs):

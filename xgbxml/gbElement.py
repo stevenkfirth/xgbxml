@@ -6,7 +6,9 @@ from lxml import etree
 
 import collections.abc
 
-from crossproduct import Point, Points, Polyline, Polylines, Polygon, Polygons
+import inspect
+
+#from crossproduct import Point, Points, Polyline, Polylines, Polygon, Polygons
 
 
 class gbElement(etree.ElementBase):
@@ -265,11 +267,11 @@ class gbElement(etree.ElementBase):
         return {k:self.get_attribute(k) for k in self.attrib}
         
     
-    def display(self):
+    def tostring(self):
         """Displays the xml of the element.
         
         """
-        print(etree.tostring(self, pretty_print=True).decode())
+        return etree.tostring(self, pretty_print=True).decode()
     
     
     @property
@@ -423,8 +425,14 @@ class gbElement(etree.ElementBase):
         return value2
         
     
-    def tostring(self,pretty_print=True,**kwargs):
+    def xmlstring(self,pretty_print=True,**kwargs):
         ""
+        
+        # for some reason this isn't working.
+        # It also returns further xml below the object self
+        # Perhaps this is caused by the extra attributes added here?
+        
+        
         return etree.tostring(self,
                               pretty_print=pretty_print,
                               **kwargs).decode()
@@ -468,7 +476,7 @@ class gbElement(etree.ElementBase):
     
     
     
-import inspect
+
     
 class gbCollection(collections.abc.Sequence):
     """
@@ -487,7 +495,12 @@ class gbCollection(collections.abc.Sequence):
             else:
                 result.append(y)
                 
-        if isinstance(result[0],gbElement):  # if result is a collection of elements
+                
+        if len(result)==0:
+            
+            return []
+                
+        elif isinstance(result[0],gbElement):  # if result is a collection of elements
             
             return gbCollection(*result)
         
