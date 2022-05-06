@@ -3,9 +3,9 @@
 #from crossproduct import Point, Vector, Polyline, Polylines, Polygon, Polygons
 import math
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from mpl_toolkits.mplot3d.art3d import Line3DCollection,Poly3DCollection
+#import matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d.art3d import Line3DCollection,Poly3DCollection
 
 from . import render_functions
 from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
