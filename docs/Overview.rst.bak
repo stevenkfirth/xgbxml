@@ -7,5 +7,5 @@ In the *lxml* documentation, there is a section on `Using custom Element classes
 This describes how the standard classes in lxml can be extended to include custom methods and properties.
 
 *xgbxml* (this package) uses these custom element classes to provide a more user-friendly way of using *lxml* to work with gbXML files. 
-By using the parser provided by *xgbxml*, a user gains access to additional methods and functions to read, edit and create gbXML files and elements.
+By using the parser provided by *xgbxml*, a user  with many gains access to additional methods and functions to read, edit and create gbXML files and elements.
 

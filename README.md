@@ -3,5 +3,7 @@ lxml parser for gbXML files - create and edit gbXML files with custom python Ele
 
 UNDER DEVELOPMENT
 
-Draft documentation here: 
+Draft documentation here: https://xgbxml.readthedocs.io/en/latest/
+
+
 
