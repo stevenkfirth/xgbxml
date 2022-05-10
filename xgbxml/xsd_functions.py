@@ -102,23 +102,25 @@ def get_type_from_xsd_element(xsd_element):
 def get_xsd_element_from_xsd_schema(xsd_schema,name):
     """
     """
-    try:
-        return xsd_schema.xpath('./xsd:element[@name="%s"]' % name, 
-                                namespaces=ns)[0]
-    except IndexError:
-        raise Exception
-        
+    
+    gen=xsd_schema.iterchildren('{http://www.w3.org/2001/XMLSchema}element')
+    for xsd_element in gen:
+        if xsd_element.attrib['name']==name:
+            return xsd_element
+    raise Exception
+    
+    
         
 def get_xsd_simple_type_from_xsd_schema(xsd_schema,name):
     """
     """
-    try:
-        return xsd_schema.xpath('./xsd:simpleType[@name="%s"]' % name, 
-                                namespaces=ns)[0]
-    except IndexError:
-        raise Exception
+    gen=xsd_schema.iterchildren('{http://www.w3.org/2001/XMLSchema}simpleType')
+    for xsd_simple_type in gen:
+        if xsd_simple_type.attrib['name']==name:
+            return xsd_simple_type
+    raise Exception
     
-
+    
 
     
 #%% xsd_simple_content

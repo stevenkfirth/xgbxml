@@ -645,7 +645,8 @@ class Surface():
     def get_holes(self):
         """
         """
-        return [o.get_shell() for o in self.Openings]
+        return gbxml_functions.get_holes_of_Surface(self,
+                                                    self.xsd_schema)
         
 
     def get_shell(self):
@@ -659,18 +660,15 @@ class Surface():
         :rtype: tuple(tuple(float))
             
         """
-        try:
-            return self.PlanarGeometry.get_shell()
-        except KeyError:
-            self.RectangularGeometry.get_shell()
+        return gbxml_functions.get_shell_of_Surface(self,
+                                                    self.xsd_schema)
 
 
     def get_Spaces(self):
         """Returns the space elements adjacent to the surface.
         
         """
-        campus=self.getparent()
-        return [campus.get_Space(AdjacentSpaceId.spaceIdRef) for AdjacentSpaceId in self.AdjacentSpaceIds]
+        return gbxml_functions.get_Spaces_of_Surface(self)
         
     
     def get_polygon(self):
@@ -684,8 +682,8 @@ class Surface():
         :rtype: tuple(tuple(float))
             
         """
-        
-        return (self.get_shell(), self.get_holes())
+        return gbxml_functions.get_polygon_of_Surface(self,
+                                                      self.xsd_schema)
     
     
     
@@ -715,23 +713,7 @@ class Surface():
 class Opening():
     ""
     
-    def get_coordinates(self):
-        """Returns the coordinates of the outer polyloop of the opening.
-        
-        The following sources are tried in order:
-            - PlanarGeometry
-            - RectangularGeometry/PolyLoop
-            - RectangularGeoemetry... from height and width
-            
-        :rtype: tuple(tuple(float))
-            
-        """
-        try:
-            return self.PlanarGeometry.get_coordinates()
-        except KeyError:
-            self.RectangularGeometry.get_coordinates()
-                
-                
+    
     def get_shell(self):
         """Returns a Polygon of the outer polyloop of the opening.
         
@@ -743,10 +725,8 @@ class Opening():
         :rtype: tuple(tuple(float))
             
         """
-        try:
-            return self.PlanarGeometry.get_shell()
-        except KeyError:
-            self.RectangularGeometry.get_shell()
+        return gbxml_functions.get_shell_of_Opening(self,
+                                                    self.xsd_schema)
         
         
     def render(self,

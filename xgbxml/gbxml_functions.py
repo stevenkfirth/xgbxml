@@ -362,40 +362,7 @@ def get_shell_of_PolyLoop(gbxml_poly_loop,
 
 ### needs updating if the RectangularGeometry is for an Opening
 
-def get_azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
-                                             xsd_schema):
-    ""
-    gbxml_azimuth=get_child_of_gbxml_element(gbxml_rectangular_geometry,
-                                             'Azimuth')
-    return get_value_of_gbxml_element(gbxml_azimuth,
-                                      xsd_schema)
 
-
-def get_height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
-                                            xsd_schema):
-    ""
-    gbxml_height=get_child_of_gbxml_element(gbxml_rectangular_geometry,
-                                            'Height')
-    return get_value_of_gbxml_element(gbxml_height,
-                                      xsd_schema)
-
-
-def get_tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
-                                          xsd_schema):
-    ""
-    gbxml_tilt=get_child_of_gbxml_element(gbxml_rectangular_geometry,
-                                          'Tilt')
-    return get_value_of_gbxml_element(gbxml_tilt,
-                                      xsd_schema)
-
-
-def get_width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
-                                           xsd_schema):
-    ""
-    gbxml_width=get_child_of_gbxml_element(gbxml_rectangular_geometry,
-                                           'Width')
-    return get_value_of_gbxml_element(gbxml_width,
-                                      xsd_schema)
 
 
 def get_shell_of_RectangularGeometry(gbxml_rectangular_geometry,
@@ -439,9 +406,9 @@ def get_shell_from_height_and_width_of_RectangularGeometry(gbxml_rectangular_geo
                                        'CartesianPoint'),
             xsd_schema
             )
-        height=get_height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+        height=get_Height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                        xsd_schema)
-        width=get_width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+        width=get_Width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                      xsd_schema)      
         
         return (
@@ -508,7 +475,7 @@ def get_shell_from_polyloop_of_RectangularGeometry(gbxml_rectangular_geometry,
 def get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
                                         xsd_schema):
     "Returns the 3D vector for the x direction in the rectangular coordinate system"
-    azimuth=get_azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+    azimuth=get_Azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                      xsd_schema)
     sin_azimuth=math.sin(math.radians(azimuth))
     cos_azimuth=math.cos(math.radians(azimuth))
@@ -522,7 +489,7 @@ def get_y_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
     "Returns the 3D vector for the y direction in the rectangular coordinate system"
     x_vector=get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                  xsd_schema)
-    tilt=get_tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+    tilt=get_Tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                xsd_schema)
     sin_tilt=math.sin(math.radians(tilt))
     cos_tilt=math.cos(math.radians(tilt))
@@ -531,13 +498,135 @@ def get_y_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
                                sin_tilt)
 
 
+def get_Azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                             xsd_schema):
+    ""
+    gbxml_azimuth=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                             'Azimuth')
+    return get_value_of_gbxml_element(gbxml_azimuth,
+                                      xsd_schema)
+
+
+def get_Height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                            xsd_schema):
+    ""
+    gbxml_height=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                            'Height')
+    return get_value_of_gbxml_element(gbxml_height,
+                                      xsd_schema)
+
+
+def get_Tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                          xsd_schema):
+    ""
+    gbxml_tilt=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                          'Tilt')
+    return get_value_of_gbxml_element(gbxml_tilt,
+                                      xsd_schema)
+
+
+def get_Width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                           xsd_schema):
+    ""
+    gbxml_width=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                           'Width')
+    return get_value_of_gbxml_element(gbxml_width,
+                                      xsd_schema)
+
 
 #%% Surface
 
 
+def get_holes_of_Surface(gbxml_surface,
+                         xsd_schema):
+    """
+    """
+    return [get_shell_of_Opening(gbxml_opening,
+                                 xsd_schema) 
+            for gbxml_opening in get_children_of_gbxml_element(gbxml_surface, 
+                                                               'Opening')]
+    
+
+def get_shell_of_Surface(gbxml_surface,
+                         xsd_schema):
+    """Returns a Polygon of the outer polyloop of the opening.
+    
+    The following sources are tried in order:
+        - PlanarGeometry
+        - RectangularGeometry/PolyLoop
+        - RectangularGeoemetry... from height and width
+        
+    :rtype: tuple(tuple(float))
+        
+    """
+    try:
+        gbxml_planar_geometry=get_child_of_gbxml_element(gbxml_surface,
+                                                         'PlanarGeometry')
+        return get_shell_of_PlanarGeometry(gbxml_planar_geometry,
+                                           xsd_schema)
+    except KeyError:
+        gbxml_rectangular_geometry=get_child_of_gbxml_element(gbxml_surface,
+                                                              'RectangularGeometry')
+        return get_shell_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                xsd_schema)
+
+
+def get_Spaces_of_Surface(gbxml_surface):
+    """Returns the space elements adjacent to the surface.
+    
+    """
+    campus=gbxml_surface.getparent()
+    return [campus.xpath('.//Space[@id="%s"]' % AdjacentSpaceId,
+                         namespaces=ns)[0]
+            for AdjacentSpaceId in get_children_of_gbxml_element(gbxml_surface,
+                                                                 'AdjacentSpaceIds')]
+
+
+def get_polygon_of_Surface(gbxml_surface,
+                           xsd_schema):
+    """Returns a Polygon of the outer polyloop of the surface.
+    
+    The following sources are tried in order:
+        - PlanarGeometry
+        - RectangularGeometry/PolyLoop
+        - RectangularGeoemetry... from height and width
+        
+    :rtype: tuple(tuple(float))
+        
+    """
+    
+    return (get_shell_of_Surface(gbxml_surface,
+                                 xsd_schema), 
+            get_holes_of_Surface(gbxml_surface,
+                                 xsd_schema))
+
+
+
 #%% Opening
     
+               
+def get_shell_of_Opening(gbxml_opening,
+                         xsd_schema):
+    """Returns a Polygon of the outer polyloop of the opening.
     
+    The following sources are tried in order:
+        - PlanarGeometry
+        - RectangularGeometry/PolyLoop
+        - RectangularGeoemetry... from height and width
+        
+    :rtype: tuple(tuple(float))
+        
+    """
+    try:
+        gbxml_planar_geometry=get_child_of_gbxml_element(gbxml_opening,
+                                                         'PlanarGeometry')
+        return get_shell_of_PlanarGeometry(gbxml_planar_geometry,
+                                           xsd_schema)
+    except KeyError:
+        gbxml_rectangular_geometry=get_child_of_gbxml_element(gbxml_opening,
+                                                              'RectangularGeometry')
+        return get_shell_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                xsd_schema)
     
     
     

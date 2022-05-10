@@ -59,7 +59,6 @@ class Test_gbCollection(unittest.TestCase):
     
     
     
-### CUSTOM BASES
 
 class Test_gbXML(unittest.TestCase):
     ""
@@ -98,18 +97,6 @@ class Test_Campus(unittest.TestCase):
         campus.render()
         
         
-    def test_plot_surfaces(self):
-        ""
-        return
-        #fp=r'files\ExerciseFacility (Older).xml'
-        fp=r'files\gbXMLStandardv Retail Big Box.xml'
-        parser=get_parser(version='0.37')
-        tree = etree.parse(fp,parser)
-        gbXML=tree.getroot()
-        ca=gbXML.Campus
-        ca.plot_surfaces(surfaceType='Roof')
-        
-        
 
 class Test_CartesianPoint(unittest.TestCase):
     ""
@@ -119,63 +106,15 @@ class Test_CartesianPoint(unittest.TestCase):
         ""
         gbXML=tree.getroot()
         cp=gbXML.Campus.Surface.PlanarGeometry.PolyLoop.CartesianPoint
-        self.assertEqual(cp.get_coordinates(),
-                         (47.90424, 75.55779, 474.0))
-        
-
-    # def xtest_get_point(self):
-    #     ""
-    #     gbXML=tree.getroot()
-    #     cp=gbXML.Campus.Surface.PlanarGeometry.PolyLoop.CartesianPoint
-    #     self.assertEqual(cp.get_point(),
-    #                      (47.90424, 75.55779, 474.0))
-        
+        self.assertEqual(
+            cp.get_coordinates(),
+            (47.90424, 75.55779, 474.0)
+            )
         
     
-
-class Test_ClosedShell(unittest.TestCase):
-    ""
-    
-    
-    
-class Test_Location(unittest.TestCase):
-    ""
-
-
 
 class Test_PlanarGeometry(unittest.TestCase):
-    ""
-    
-    def xtest_get_coordinates(self):
-        ""
-        gbXML=tree.getroot()
-        pg=gbXML.Campus.Surface.PlanarGeometry
-        self.assertEqual(pg.get_coordinates(),
-                         ((47.90424, 75.55779, 474.0), 
-                          (47.90424, 75.55779, 484.5), 
-                          (47.90424, 106.0994, 484.5), 
-                          (47.90424, 106.0994, 474.0)))
-    
-    
-    def xtest_get_Polygon(self):
-        ""
-        gbXML=tree.getroot()
-        pg=gbXML.Campus.Surface.PlanarGeometry
-        self.assertEqual(pg.get_Polygon(),
-                         Polygon(Point(47.90424,75.55779,474.0),
-                                       Point(47.90424,75.55779,484.5),
-                                       Point(47.90424,106.0994,484.5),
-                                       Point(47.90424,106.0994,474.0)))
-        
-        
-    def _test_plot(self):
-        ""
-        return
-        gbXML=tree.getroot()
-        pg=gbXML.Campus.Surface.PlanarGeometry
-        ax=pg.plot()
-        print(type(ax))
-    
+    ""    
     
     def _test_render(self):
         ""
@@ -263,48 +202,6 @@ class Test_Surface(unittest.TestCase):
     
     
     
-    def test_get_holes(self):
-       ""
-       gbXML=tree.getroot()
-       su=gbXML.Campus.get_child('Surface',child_id='aim12670')
-       #print(su.get_holes())
-       self.assertEqual(su.get_holes(),
-                        [((97.35217, 67.50311, 490.0), 
-                          (97.35217, 70.50311, 490.0), 
-                          (97.35217, 70.50311, 497.0), 
-                          (97.35217, 67.50311, 497.0), 
-                          (97.35217, 67.50311, 490.0))])
-    
-    
-    def test_get_shell(self):
-       ""
-       gbXML=tree.getroot()
-       su=gbXML.Campus.get_child('Surface',child_id='aim12670')
-       #print(su.get_shell())
-       self.assertEqual(su.get_shell(),
-                        ((97.35217, 67.50311, 490.0), 
-                         (97.35217, 70.50311, 490.0), 
-                         (97.35217, 70.50311, 497.0), 
-                         (97.35217, 67.50311, 497.0), 
-                         (97.35217, 67.50311, 490.0)))
-    
-    
-    def test_get_polygon(self):
-       ""
-       gbXML=tree.getroot()
-       su=gbXML.Campus.get_child('Surface',child_id='aim12670')
-       #print(su.get_polygon())
-       self.assertEqual(su.get_polygon(),
-                        (((97.35217, 67.50311, 490.0), 
-                          (97.35217, 70.50311, 490.0), 
-                          (97.35217, 70.50311, 497.0), 
-                          (97.35217, 67.50311, 497.0), 
-                          (97.35217, 67.50311, 490.0)), 
-                         [((97.35217, 67.50311, 490.0), 
-                           (97.35217, 70.50311, 490.0), 
-                           (97.35217, 70.50311, 497.0), 
-                           (97.35217, 67.50311, 497.0), 
-                           (97.35217, 67.50311, 490.0))]))
     
     
     def test_render(self):
@@ -321,57 +218,17 @@ class Test_Surface(unittest.TestCase):
         su.render()
         
         
-    def test_plot(self):
-        ""
-        gbXML=tree.getroot()
-        
-        return
-        su=gbXML.Campus.get_child('Surface',child_id='aim89302')
-        su.PlanarGeometry.plot()
-        su.Opening.plot()
-        print(len(su.get_coordinates()))
-        
-        # surface with opening (here opening is the whole od the surface)
-        return
-        su=gbXML.Campus.get_child('Surface',child_id='aim12670')
-        su.plot()
-        
-        # surface with no opening
-        return
-        su=gbXML.Campus.Surface
-        ax=su.plot()
-        print(type(ax))
-        
-        
+    
     
 
 
 class Test_Opening(unittest.TestCase):
     ""
     
-    def test_get_coordinates(self):
-        ""
-        gbXML=tree.getroot()
-        op=gbXML.Campus.get_child('Surface',child_id='aim12670').Opening
-        self.assertEqual(op.get_coordinates(),
-                         ((97.35217, 67.50311, 490.0), 
-                          (97.35217, 70.50311, 490.0), 
-                          (97.35217, 70.50311, 497.0), 
-                          (97.35217, 67.50311, 497.0)))
+    
         
         
-        
-        
-    def test_get_shell(self):
-        ""
-        gbXML=tree.getroot()
-        op=gbXML.Campus.get_child('Surface',child_id='aim12670').Opening
-        self.assertEqual(op.get_shell(),
-                         ((97.35217, 67.50311, 490.0), 
-                          (97.35217, 70.50311, 490.0), 
-                          (97.35217, 70.50311, 497.0), 
-                          (97.35217, 67.50311, 497.0),
-                          (97.35217, 67.50311, 490.0)))
+    
         
         
     def test_render(self):
