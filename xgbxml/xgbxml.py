@@ -642,6 +642,20 @@ class Surface():
     ""
 
 
+    def copy_opening(self,
+                     opening,
+                     tolerance=0.01):
+        """
+        """
+        
+        return gbxml_functions.copy_Opening_to_Surface(
+            opening,
+            self,
+            self.xsd_schema,
+            tolerance=tolerance
+            )
+
+
     def get_holes(self):
         """
         """

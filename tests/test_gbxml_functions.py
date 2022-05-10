@@ -8,6 +8,7 @@ Created on Mon May  9 09:39:02 2022
 import unittest
 
 from lxml import etree
+from copy import copy
 
 import xgbxml.gbxml_functions as gbxml_functions
 
@@ -152,6 +153,18 @@ class Test_RectangularGeometry(unittest.TestCase):
 class Test_Surface(unittest.TestCase):
     ""
     
+    def test_copy_Opening_to_Surface(self):
+        ""
+        #print(etree.tostring(copy(op)).decode())
+        x=gbxml_functions.copy_Opening_to_Surface(
+            gbxml_opening=copy(op),
+            gbxml_surface=copy(su), 
+            xsd_schema=xsd_schema,
+            tolerance=0.01)
+        
+        
+    
+    
     def test_get_holes_of_Surface(self):
        ""
        self.assertEqual(
@@ -211,6 +224,29 @@ class Test_Opening(unittest.TestCase):
              (97.35217, 70.50311, 497.0), 
              (97.35217, 67.50311, 497.0),
              (97.35217, 67.50311, 490.0))
+            )
+    
+    
+    def test_set_shell_of_opening(self):
+        ""
+        op2=copy(op)
+        x=gbxml_functions.set_shell_of_Opening(
+            op2,
+            ((97.35217, 67.50311, 491.0), 
+             (97.35217, 70.50311, 491.0), 
+             (97.35217, 70.50311, 496.0), 
+             (97.35217, 67.50311, 496.0),
+             (97.35217, 67.50311, 491.0)),
+            xsd_schema
+            )
+        self.assertEqual(
+            gbxml_functions.get_shell_of_Opening(op2,
+                                                 xsd_schema),
+            ((97.35217, 67.50311, 491.0), 
+             (97.35217, 70.50311, 491.0), 
+             (97.35217, 70.50311, 496.0), 
+             (97.35217, 67.50311, 496.0),
+             (97.35217, 67.50311, 491.0))
             )
     
         

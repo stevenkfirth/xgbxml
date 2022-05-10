@@ -574,7 +574,7 @@ def polygon_contains_3d(shell1, holes1, shell2, holes2,
     W0,O=plane_of_polygon_3d(shell2, abs_tol=abs_tol)
     
     if planes_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
-    
+        
         coordinate_index=index_largest_absolute_coordinate_3d(*N)
         shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
         shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)

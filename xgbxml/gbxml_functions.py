@@ -7,10 +7,12 @@ Created on Mon May  9 09:38:15 2022
 
 from lxml import etree
 import math
+from copy import copy
 
 import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 import xgbxml.xml_functions as xml_functions
 from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
+import xgbxml.geometry_functions as geometry_functions
 
 ns={'gbxml':'http://www.gbxml.org/schema'}
 
@@ -358,6 +360,32 @@ def get_shell_of_PolyLoop(gbxml_poly_loop,
     return tuple(x)
 
 
+def set_shell_of_PolyLoop(gbxml_poly_loop,
+                          shell,
+                          xsd_schema):
+    """
+    """
+    # removes cartesian points
+    gbxml_cartesian_points=get_children_of_gbxml_element(gbxml_poly_loop,
+                                                         'CartesianPoint')
+    for gbxml_cartesian_point in gbxml_cartesian_points:
+        gbxml_poly_loop.remove(gbxml_cartesian_point)
+    
+    # add new cartesian points
+    gbxml_cartesian_points=[]
+    for xyz in shell[:-1]:
+        gbxml_cartesian_point=add_child_to_gbxml_element(gbxml_poly_loop,
+                                                         'CartesianPoint',
+                                                         xsd_schema)
+        add_Coordinates_to_CartesianPoint(gbxml_cartesian_point,
+                                          xsd_schema,
+                                          *xyz)
+        gbxml_cartesian_points.append(gbxml_cartesian_point)
+    
+    return gbxml_cartesian_points
+
+
+
 #%% RectangularGeometry
 
 ### needs updating if the RectangularGeometry is for an Opening
@@ -537,6 +565,79 @@ def get_Width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
 #%% Surface
 
 
+def copy_Opening_to_Surface(gbxml_opening,
+                            gbxml_surface,
+                            xsd_schema,
+                            tolerance=0.01
+                            ):
+    """Adds an existing opening to an existing surface.
+    
+    
+    :param tolerance: The distance which an opening can be 'snapped' to a surface.
+    
+    
+    """
+    
+    #return
+    
+    surface_shell=get_shell_of_Surface(gbxml_surface,
+                                       xsd_schema)  # tuple
+    #print('surface_shell', surface_shell)
+    surface_plane=geometry_functions.plane_of_polygon_3d(surface_shell)  # (V,N)
+    #print(surface_plane)
+    
+    opening_shell=get_shell_of_Opening(gbxml_opening,
+                                       xsd_schema)
+    
+    #print('opening_shell',opening_shell)
+    
+    opening_shell_on_plane=[]
+    for xyz in opening_shell:
+        distance, base_point=geometry_functions.dist_point_to_plane_3d(
+            xyz,
+            *surface_plane
+            )
+        
+        if distance>tolerance:
+            raise ValueError('Distance between Opening and Surface is greater than the tolerance value')
+        
+        opening_shell_on_plane.append(base_point)
+        
+    #print('opening_shell_on_plane',opening_shell_on_plane)
+    
+    # check if opening shell is contained by the surface shell + holes
+    
+    surface_holes=get_holes_of_Surface(gbxml_surface,
+                                       xsd_schema)
+    #print('surface_holes',surface_holes)
+    
+    if not geometry_functions.polygon_contains_3d(surface_shell, 
+                                                  surface_holes, 
+                                                  opening_shell_on_plane, 
+                                                  []
+                                                  ):
+        raise ValueError('New opening does not fit onto surface')
+    
+    
+    
+    gbxml_opening2=copy(gbxml_opening)
+    
+    set_shell_of_Opening(gbxml_opening2,
+                         opening_shell_on_plane,
+                         xsd_schema)
+    
+    gbxml_surface.append(gbxml_opening2)
+    
+    
+    return gbxml_opening2
+    
+    
+    
+    
+    
+    
+
+
 def get_holes_of_Surface(gbxml_surface,
                          xsd_schema):
     """
@@ -603,6 +704,10 @@ def get_polygon_of_Surface(gbxml_surface,
 
 
 #%% Opening
+
+
+
+
     
                
 def get_shell_of_Opening(gbxml_opening,
@@ -628,6 +733,44 @@ def get_shell_of_Opening(gbxml_opening,
         return get_shell_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                 xsd_schema)
     
+    
+
+def set_shell_of_Opening(gbxml_opening,
+                         shell,
+                         xsd_schema):
+    """
+    """
+    # removes rectangular geometry
+    try:
+        gbxml_rectangular_geometry=get_child_of_gbxml_element(gbxml_opening,
+                                                               'RectangularGeometry')
+        gbxml_opening.remove(gbxml_rectangular_geometry)
+    except KeyError:
+        pass
+    
+    # removes planar geometry
+    try:
+        gbxml_planar_geometry=get_child_of_gbxml_element(gbxml_opening,
+                                                               'PlanarGeometry')
+        gbxml_opening.remove(gbxml_planar_geometry)
+    except KeyError:
+        pass
+    
+    # adds new elements
+    gbxml_planar_geometry=add_child_to_gbxml_element(gbxml_opening,
+                                                     'PlanarGeometry',
+                                                     xsd_schema)
+    gbxml_poly_loop=add_child_to_gbxml_element(gbxml_planar_geometry,
+                                               'PolyLoop',
+                                               xsd_schema)
+    
+    set_shell_of_PolyLoop(gbxml_poly_loop,
+                          shell,
+                          xsd_schema)
+
+    #print(etree.tostring(copy(gbxml_opening),pretty_print=True).decode())
+    
+    return gbxml_planar_geometry
     
     
     
