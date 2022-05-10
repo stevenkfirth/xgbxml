@@ -70,11 +70,6 @@ def get_xsd_attributes_from_xsd_element(xsd_element):
                              namespaces=ns)
     
 
-
-    
-
-
-
 def get_type_from_xsd_element(xsd_element):
     """
     

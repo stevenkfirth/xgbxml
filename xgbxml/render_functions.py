@@ -68,18 +68,10 @@ def render_polygon_3d(polygon,
     ax.plot(*zip(*shell), 
             **outline_kwargs)
     
-    # for opening_uriref in get_opening_urirefs_of_surface_uriref(graph,
-    #                                                             surface_uriref):
-    #     plot_opening_uriref(graph,
-    #                         opening_uriref,
-    #                         ax=ax,
-    #                         set_lims=False)
-    
     if set_lims:
         ax=set_ax_lims(ax)    
 
     return ax
-
 
 
 

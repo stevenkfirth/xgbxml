@@ -4,15 +4,15 @@
 import unittest
 
 from xgbxml import get_parser, create_gbXML
-from xgbxml.common_bases import gbCollection
+from xgbxml.xgbxml import gbCollection
 from lxml import etree
-#from crossproduct import Point, Vector, Polyline, Polygon
+
 
 fp=r'files\gbXMLStandard.xml'
 parser=get_parser(version='0.37')
 tree = etree.parse(fp,parser)
         
-### gbElement
+
         
 class Test_gbElement(unittest.TestCase):
     ""
@@ -191,49 +191,7 @@ class Test_PlanarGeometry(unittest.TestCase):
 class Test_RectangularGeometry(unittest.TestCase):
     ""
     
-    def test__get_x_vector(self):
-        ""
-        gbXML=tree.getroot()
-        rg=gbXML.Campus.Surface.RectangularGeometry
-        self.assertEqual(rg._get_x_vector(),
-                         (-1.8369701987210297e-16,
-                          -1.0,
-                          0.0))
-        
-        
-    def test__get_y_vector(self):
-        ""
-        gbXML=tree.getroot()
-        rg=gbXML.Campus.Surface.RectangularGeometry
-        self.assertEqual(rg._get_y_vector(),
-                         (-1.1248198369963932e-32,
-                          -6.123233995736766e-17,
-                          1.0))
     
-    
-    def test_get_shell_from_height_and_width(self):
-        ""
-        gbXML=tree.getroot()
-        rg=gbXML.Campus.Surface.RectangularGeometry
-        self.assertEqual(rg.get_shell_from_height_and_width(),
-                         ((47.90423999343799, 75.5578, 474.0), 
-                          (47.90423999343799, 75.5578, 484.5), 
-                          (47.904239993438, 106.0994, 484.5), 
-                          (47.904239993438, 106.0994, 474.0),
-                          (47.90423999343799, 75.5578, 474.0)))
-    
-    
-    def test_get_shell_from_polyloop(self):
-        ""
-        gbXML=tree.getroot()
-        rg=gbXML.Campus.Surface.RectangularGeometry
-        self.assertEqual(rg.get_shell_from_polyloop(),
-                         ((47.90423999343799, 75.557789993438, 474.0), 
-                          (47.90423999343799, 75.557789993438, 484.5), 
-                          (47.904239993438, 106.0994, 484.5), 
-                          (47.904239993438, 106.0994, 474.0),
-                          (47.90423999343799, 75.557789993438, 474.0)))
-        
         
     def test_render(self):
         ""

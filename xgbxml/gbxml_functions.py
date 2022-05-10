@@ -6,9 +6,11 @@ Created on Mon May  9 09:38:15 2022
 """
 
 from lxml import etree
+import math
 
 import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 import xgbxml.xml_functions as xml_functions
+from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
 
 ns={'gbxml':'http://www.gbxml.org/schema'}
 
@@ -142,6 +144,29 @@ def get_child_of_gbxml_element(gbxml_element,
             return result
         
         
+def get_children_of_gbxml_element(gbxml_element,
+                                  child_nntag):
+    """
+    """
+    return gbxml_element.findall('gbxml:%s' % child_nntag,
+                                 namespaces=ns)  
+        
+
+def get_value_of_gbxml_element(gbxml_element,
+                               xsd_schema):
+    """
+    """
+    xsd_type=gbxml_xsd_functions.get_xsd_type_of_text_of_xsd_element(
+        xml_functions.nntag(gbxml_element),
+        xsd_schema
+        )
+    #print(xsd_type)
+    python_type=xml_functions.xsd_type_to_python_type(xsd_type)
+    #print(python_type)
+    
+    text=gbxml_element.text
+    
+    return python_type(text)
 
 
 def set_attribute_on_gbxml_element(gbxml_element,
@@ -261,8 +286,6 @@ def add_Coordinates_to_CartesianPoint(gbxml_element,
         
     return result
         
-    
-
 
 def get_Coordinate_values_from_CartesianPoint(gbxml_cartesian_point,
                                               xsd_schema):
@@ -271,18 +294,13 @@ def get_Coordinate_values_from_CartesianPoint(gbxml_cartesian_point,
     :param xsd_schema: schema root node
     
     """
-    x=gbxml_cartesian_point.xpath('./gbxml:Coordinate/text()',
-                                  namespaces=ns)
-    #print(x)
-    xsd_type=gbxml_xsd_functions.get_xsd_type_of_text_of_xsd_element(
-        'Coordinate',
-        xsd_schema
-        )
-    #print(xsd_type)
-    python_type=xml_functions.xsd_type_to_python_type(xsd_type)
-    #print(python_type)
+    gbxml_coordinates=get_children_of_gbxml_element(gbxml_cartesian_point,
+                                                    'Coordinate')
     
-    return tuple(python_type(y) for y in x)
+    return tuple(get_value_of_gbxml_element(gbxml_coordinate,
+                                            xsd_schema) 
+                 for gbxml_coordinate in gbxml_coordinates)
+    
 
 
 #%% PlanarGeometry
@@ -341,6 +359,176 @@ def get_shell_of_PolyLoop(gbxml_poly_loop,
 
 
 #%% RectangularGeometry
+
+### needs updating if the RectangularGeometry is for an Opening
+
+def get_azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                             xsd_schema):
+    ""
+    gbxml_azimuth=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                             'Azimuth')
+    return get_value_of_gbxml_element(gbxml_azimuth,
+                                      xsd_schema)
+
+
+def get_height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                            xsd_schema):
+    ""
+    gbxml_height=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                            'Height')
+    return get_value_of_gbxml_element(gbxml_height,
+                                      xsd_schema)
+
+
+def get_tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                          xsd_schema):
+    ""
+    gbxml_tilt=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                          'Tilt')
+    return get_value_of_gbxml_element(gbxml_tilt,
+                                      xsd_schema)
+
+
+def get_width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                           xsd_schema):
+    ""
+    gbxml_width=get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                           'Width')
+    return get_value_of_gbxml_element(gbxml_width,
+                                      xsd_schema)
+
+
+def get_shell_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                     xsd_schema):
+    """Returns the coordinates of the rectangular geometry.
+    
+    The following sources are tried in order:
+        - RectangularGeometry/PolyLoop
+        - RectangularGeoemetry... from height and width
+        
+    :rtype: tuple(tuple(float))
+        
+    """
+    try:
+        return get_shell_from_polyloop_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+    except KeyError:  # is it a KeyError now?
+        return get_shell_from_height_and_width_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+           
+
+def get_shell_from_height_and_width_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                           xsd_schema):
+    """Returns the coordintes from the rectangular data using the height and width.
+    
+    :rtype: tuple(tuple(float))
+
+    """
+    if xml_functions.nntag(gbxml_rectangular_geometry.getparent())=='Surface':
+        
+        x_vector=get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)
+        y_vector=get_y_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)
+        start_point=get_Coordinate_values_from_CartesianPoint(
+            get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                       'CartesianPoint'),
+            xsd_schema
+            )
+        height=get_height_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                       xsd_schema)
+        width=get_width_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)      
+        
+        return (
+            vector_addition_3d(*start_point,
+                               *vector_multiplication_3d(*x_vector,
+                                                         width)),
+            vector_addition_3d(
+                *vector_addition_3d(*start_point,
+                                    *vector_multiplication_3d(*x_vector,
+                                                              width)),
+                *vector_multiplication_3d(*y_vector,
+                                          height)),
+            vector_addition_3d(*start_point,
+                               *vector_multiplication_3d(*y_vector,
+                                                         height)),
+            start_point,
+            vector_addition_3d(*start_point,
+                               *vector_multiplication_3d(*x_vector,
+                                                         width))
+            )
+        
+        
+    else:
+        raise Exception('To do')  # i.e. for openings
+
+
+def get_shell_from_polyloop_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                   xsd_schema):
+    """Returns the coordintes from the rectangular data using the polyloop.
+    
+    :rtype: tuple(tuple(float))
+
+    """
+    
+    if xml_functions.nntag(gbxml_rectangular_geometry.getparent())=='Surface':
+        
+        x_vector=get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)
+        y_vector=get_y_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)
+        start_point=get_Coordinate_values_from_CartesianPoint(
+            get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                       'CartesianPoint'),
+            xsd_schema
+            )
+        c2d=get_shell_of_PolyLoop(
+            get_child_of_gbxml_element(gbxml_rectangular_geometry,
+                                       'PolyLoop'),
+            xsd_schema
+            )
+        
+        return tuple(vector_addition_3d(
+                        *vector_addition_3d(*start_point,
+                                            *vector_multiplication_3d(*x_vector,
+                                                                      c[0])),
+                        *vector_multiplication_3d(*y_vector,
+                                                  c[1])) 
+                    for c in c2d)
+
+    else:
+        raise Exception('To do')  # i.e. for openings
+        
+        
+def get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                        xsd_schema):
+    "Returns the 3D vector for the x direction in the rectangular coordinate system"
+    azimuth=get_azimuth_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                     xsd_schema)
+    sin_azimuth=math.sin(math.radians(azimuth))
+    cos_azimuth=math.cos(math.radians(azimuth))
+    return vector_normalize_3d(cos_azimuth,
+                               sin_azimuth,
+                               0)
+
+    
+def get_y_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                        xsd_schema):
+    "Returns the 3D vector for the y direction in the rectangular coordinate system"
+    x_vector=get_x_vector_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                                 xsd_schema)
+    tilt=get_tilt_value_of_RectangularGeometry(gbxml_rectangular_geometry,
+                                               xsd_schema)
+    sin_tilt=math.sin(math.radians(tilt))
+    cos_tilt=math.cos(math.radians(tilt))
+    return vector_normalize_3d(x_vector[0]*cos_tilt,
+                               x_vector[1]*cos_tilt,
+                               sin_tilt)
 
 
 
