@@ -10,6 +10,12 @@ import math
 from . import render_functions
 from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
 
+import xgbxml.gbxml_functions as gbxml_functions
+import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
+import xgbxml.xml_functions as xml_functions
+from .common_bases import gbCollection
+
+
 #import vpython
 
 class gbXML():
@@ -18,40 +24,6 @@ class gbXML():
 class Campus():
     ""
     
-    def get_Space(self,id):
-        """Returns a Space element belonging to the Campus.
-        
-        :raises KeyError: If the space does not exist.
-        
-        :rtype: Space
-        
-        """
-        try:
-            return self.xpath(r'./gbxml:Building/gbxml:Space[@id="%s"]' % (id),
-                              namespaces=self._ns)[0]
-        except IndexError:
-            raise KeyError('Element with id="%s" does not exist in the xml tree.' % id)
-    
-    
-    def get_Spaces(self):
-        """Returns all Space elements belonging to the Campus.
-        
-        :rtype: list
-        
-        """
-        return self.xpath(r'./gbxml:Building/gbxml:Space',
-                          namespaces=self._ns)
-    
-    
-    def get_Openings(self):
-        """Returns all Opening elements belonging to the Campus.
-        
-        :rtype: list
-        
-        """
-        return self.xpath(r'./gbxml:Surface/gbxml:Opening',
-                          namespaces=self._ns)
-        
     def render(self,
                ax=None, 
                set_lims=True, 
@@ -69,31 +41,7 @@ class Campus():
                 
         return ax
     
-    # def get_Surface_polygons(self):
-    #     """
-    #     :rtype: crossproduct.Polygons
-    #     """
-    #     return Polygons(*[su.get_Polygon() for su in self.Surfaces])
-    
-    # def get_Surface_PlanarGeometry_polygons(self):
-    #     """
-    #     :rtype: crossproduct.Polygons
-    #     """
-    #     return Polygons(*[su.PlanarGeometry.get_Polygon() for su in self.Surfaces])
-    
-    # def get_Opening_polygons(self):
-    #     """
-    #     :rtype: crossproduct.Polygons
-    #     """
-    #     result=[]
-    #     for op in self.get_Openings():
-    #         result.append(op.get_Polygon())
-    #     return Polygons(*result)
-    
-    
-    
-    
-    
+
     
     # def plot_surfaces(self,
     #                   ax=None,
@@ -247,17 +195,20 @@ class CartesianPoint():
     def create_Coordinates(self,*coordinates):
         """Creates Coordinate child elements and sets their value.
         
-        :param coordinatess: The values of the x,y,(z) coordinates as an argument list.
+        :param coordinates: The values of the x,y,(z) coordinates as an argument list.
         :type coordinates: int, float
         
         :returns: The newly creeated Coordinate elements.
         :rtype: list(Coordinate)
         
         """
-        #print(coordinates)
-        for coordinate in coordinates:
-            self.add_Coordinate().value=coordinate
-        return self.Coordinates
+        return gbCollection(
+            *gbxml_functions.add_Coordinates_to_CartesianPoint(
+                gbxml_element=self,
+                xsd_schema=self.xsd_schema,
+                *coordinates
+                )
+            )
             
             
     def get_coordinates(self):
@@ -266,25 +217,11 @@ class CartesianPoint():
         :rtype: tuple(float)
         
         """
-        return self.Coordinates.value
-    
-    
-    # def get_point(self):
-    #     """Returns a Point for the cartesian point.
         
-    #     :rtype: crossproduct.Point
-        
-    #     """
-    #     return (*self.get_coordinates())
-    
-    
-    # def plot(self,ax=None,**kwargs):
-    #     """Plots the cartesian point
-        
-    #     :rtype: matplotlib.axes._subplots.Axes3DSubplot
-        
-    #     """
-    #     return self.get_Point().plot(ax=ax,**kwargs)
+        return gbxml_functions.get_Coordinate_values_from_CartesianPoint(
+            self,
+            self.xsd_schema
+            )
     
     
     
@@ -335,8 +272,11 @@ class PlanarGeometry():
         :rtype: tuple(tuple(float))
         
         """
-        return self.PolyLoop.get_coordinates()
-    
+        return gbxml_functions.get_coordinate_values_from_PlanarGeometry(
+            self,
+            self.xsd_schema
+            )
+        
     
     def get_shell(self):
         """Returns a Polygon of the polyloop child element.
@@ -344,8 +284,10 @@ class PlanarGeometry():
         :rtype: tuple
         
         """
-        
-        return self.PolyLoop.get_shell()
+        return gbxml_functions.get_shell_of_PlanarGeometry(
+            self,
+            self.xsd_schema
+            )
     
     
     def render(self,
@@ -484,15 +426,19 @@ class PolyLoop():
         :rtype: tuple(tuple(float))
         
         """
-        return tuple([cp.get_coordinates() for cp in self.CartesianPoints])
-    
+        return gbxml_functions.get_coordinate_values_from_PolyLoop(
+            self,
+            self.xsd_schema
+            )
+        
     
     def get_shell(self):
         """
         """
-        x = [cp.get_coordinates() for cp in self.CartesianPoints]
-        x.append(x[0])
-        return tuple(x)
+        return gbxml_functions.get_shell_of_PolyLoop(
+            self,
+            self.xsd_schema
+            )
         
     
     

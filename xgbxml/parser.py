@@ -7,7 +7,8 @@ import importlib
 from lxml import etree
 
 from . import schema_dicts
-from .gbElement import gbElement
+from . import schemas
+from .common_bases import gbElement
 from . import custom_bases  # not the gbxml package but the gbxml module...
 
 
@@ -26,6 +27,12 @@ def get_parser(version='6.01'):
     namespace = lookup.get_namespace('http://www.gbxml.org/schema')
     #set default element
     namespace[None]=gbElement
+    
+    # load xsd_schema
+    xsd_schema_text=pkg_resources.read_text(schemas, 
+                                            'GreenBuildingXML_Ver%s.xsd' % version)
+    xsd_schema=etree.fromstring(xsd_schema_text.encode())#.getroot()
+    
     
     # load schema_dict
     schema_text = pkg_resources.read_text(schema_dicts, 
@@ -64,7 +71,11 @@ def get_parser(version='6.01'):
             namespace[element_name.replace('_','-')]=\
                 type(element_name,
                      tuple(base_classes),
-                     dict(_class_schema_dict=schema_dict))
+                     dict(
+                         _class_schema_dict=schema_dict,
+                         _xsd_schema=xsd_schema
+                         )
+                     )
             
     
     parser = etree.XMLParser()

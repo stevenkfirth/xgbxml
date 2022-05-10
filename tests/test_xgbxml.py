@@ -1,36 +1,16 @@
 # -*- coding: utf-8 -*-
 
+
 import unittest
 
 from xgbxml import get_parser, create_gbXML
-from xgbxml.gbElement import gbCollection
+from xgbxml.common_bases import gbCollection
 from lxml import etree
 #from crossproduct import Point, Vector, Polyline, Polygon
 
 fp=r'files\gbXMLStandard.xml'
 parser=get_parser(version='0.37')
 tree = etree.parse(fp,parser)
-
-class Test_parser(unittest.TestCase):
-    ""
-    
-    def test_create_gbXML(self):
-        ""
-        gbXML=create_gbXML()
-        self.assertEqual(gbXML.__class__.__name__,
-                         'gbXML')
-
-
-    def test_get_parser(self):
-        ""
-        parser=get_parser(version='0.37')
-        self.assertIsInstance(parser,etree.XMLParser)
-        
-        
-    def test_parse(self):
-        ""
-        self.assertIsInstance(tree,etree._ElementTree)
-        
         
 ### gbElement
         
@@ -99,19 +79,20 @@ class Test_gbXML(unittest.TestCase):
 class Test_Campus(unittest.TestCase):
     ""
 
-    def test_get_Space(self):
-        ""
-        gbXML=tree.getroot()
-        campus=gbXML.Campus
-        space=campus.get_Space('aim0119')
-        self.assertEqual(space.nntag,
-                         'Space')
-        self.assertEqual(space.id,
-                         'aim0119')
+    # def test_get_Space(self):
+    #     ""
+    #     gbXML=tree.getroot()
+    #     campus=gbXML.Campus
+    #     space=campus.get_Space('aim0119')
+    #     self.assertEqual(space.nntag,
+    #                      'Space')
+    #     self.assertEqual(space.id,
+    #                      'aim0119')
         
         
     def test_render(self):
         ""
+        return
         gbXML=tree.getroot()
         campus=gbXML.Campus
         campus.render()
@@ -467,6 +448,7 @@ class Test_Material(unittest.TestCase):
 
     
 if __name__=='__main__':
+    ""
     
     unittest.main()
     
