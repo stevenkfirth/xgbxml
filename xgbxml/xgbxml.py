@@ -479,6 +479,62 @@ class CartesianPoint():
             self,
             self.xsd_schema
             )
+   
+    
+class Opening():
+    ""
+    
+    
+    def get_shell(self):
+        """Returns a Polygon of the outer polyloop of the opening.
+        
+        The following sources are tried in order:
+            - PlanarGeometry
+            - RectangularGeometry/PolyLoop
+            - RectangularGeoemetry... from height and width
+            
+        :rtype: tuple(tuple(float))
+            
+        """
+        return gbxml_functions.get_shell_of_Opening(self,
+                                                    self.xsd_schema)
+        
+        
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               surface_kwargs=None):
+        ""
+        x=dict(color='green')
+        if outline_kwargs is None:
+            outline_kwargs=x
+        else:
+            for k,v in x.items:
+                if not k in outline_kwargs:
+                    outline_kwargs[k]=v
+            
+        x=dict(color='green')
+        if surface_kwargs is None:
+            surface_kwargs=x
+        else:
+            for k,v in x.items:
+                if not k in surface_kwargs:
+                    surface_kwargs[k]=v
+        
+        ax=render_functions.render_polygon_3d(
+            polygon=(self.get_shell(),[]),
+            polygon_triangles=None,
+            ax=ax,
+            set_lims=set_lims,
+            outline_kwargs=outline_kwargs,
+            surface_kwargs=surface_kwargs
+            )
+        
+        return ax
+        
+    
+    
     
     
 
@@ -724,61 +780,7 @@ class Surface():
     
     
     
-class Opening():
-    ""
-    
-    
-    def get_shell(self):
-        """Returns a Polygon of the outer polyloop of the opening.
-        
-        The following sources are tried in order:
-            - PlanarGeometry
-            - RectangularGeometry/PolyLoop
-            - RectangularGeoemetry... from height and width
-            
-        :rtype: tuple(tuple(float))
-            
-        """
-        return gbxml_functions.get_shell_of_Opening(self,
-                                                    self.xsd_schema)
-        
-        
-    def render(self,
-               ax=None, 
-               set_lims=True, 
-               outline_kwargs=None,
-               surface_kwargs=None):
-        ""
-        x=dict(color='green')
-        if outline_kwargs is None:
-            outline_kwargs=x
-        else:
-            for k,v in x.items:
-                if not k in outline_kwargs:
-                    outline_kwargs[k]=v
-            
-        x=dict(color='green')
-        if surface_kwargs is None:
-            surface_kwargs=x
-        else:
-            for k,v in x.items:
-                if not k in surface_kwargs:
-                    surface_kwargs[k]=v
-        
-        ax=render_functions.render_polygon_3d(
-            polygon=(self.get_shell(),[]),
-            polygon_triangles=None,
-            ax=ax,
-            set_lims=set_lims,
-            outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
-            )
-        
-        return ax
-        
-    
-    
-    
+
     
     
     

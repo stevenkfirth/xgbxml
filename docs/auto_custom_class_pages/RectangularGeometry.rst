@@ -1,6 +1,6 @@
 RectangularGeometry
 ===================
 
-.. autoclass:: xgbxml.custom_bases.RectangularGeometry
+.. autoclass:: xgbxml.xgbxml.RectangularGeometry
    :members:
 

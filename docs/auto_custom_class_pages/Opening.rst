@@ -1,6 +1,7 @@
 Opening
 =======
 
-.. autoclass:: xgbxml.custom_bases.Opening
+.. autoclass:: xgbxml.xgbxml.Opening
    :members:
-
+   
+   

@@ -1,6 +1,6 @@
 Campus
 ======
 
-.. autoclass:: xgbxml.custom_bases.Campus
+.. autoclass:: xgbxml.xgbxml.Campus
    :members:
 

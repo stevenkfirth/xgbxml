@@ -1,6 +1,6 @@
 Surface
 =======
 
-.. autoclass:: xgbxml.custom_bases.Surface
+.. autoclass:: xgbxml.xgbxml.Surface
    :members:
 

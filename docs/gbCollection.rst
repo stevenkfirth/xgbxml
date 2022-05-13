@@ -1,7 +1,7 @@
 gbCollection class
 ==================
 
-.. autoclass:: xgbxml.gbElement.gbCollection
+.. autoclass:: xgbxml.xgbxml.gbCollection
    :members:
    
    

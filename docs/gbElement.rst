@@ -1,7 +1,7 @@
-gbElement class
-===============
+gbElement base class
+====================
 
-.. autoclass:: xgbxml.gbElement.gbElement
+.. autoclass:: xgbxml.xgbxml.gbElement
    :members:
    
    

@@ -1,6 +1,6 @@
 PlanarGeometry
 ==============
 
-.. autoclass:: xgbxml.custom_bases.PlanarGeometry
+.. autoclass:: xgbxml.xgbxml.PlanarGeometry
    :members:
 

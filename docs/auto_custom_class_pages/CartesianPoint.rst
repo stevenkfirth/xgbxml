@@ -1,6 +1,6 @@
 CartesianPoint
 ==============
 
-.. autoclass:: xgbxml.custom_bases.CartesianPoint
+.. autoclass:: xgbxml.xgbxml.CartesianPoint
    :members:
 

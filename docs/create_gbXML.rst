@@ -1,4 +1,4 @@
 create_gbXML function
 =====================
 
-.. autofunction:: xgbxml.parser.create_gbXML
+.. autofunction:: xgbxml.xgbxml.create_gbXML

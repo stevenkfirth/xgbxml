@@ -1,6 +1,6 @@
 PolyLoop
 ========
 
-.. autoclass:: xgbxml.custom_bases.PolyLoop
+.. autoclass:: xgbxml.xgbxml.PolyLoop
    :members:
 

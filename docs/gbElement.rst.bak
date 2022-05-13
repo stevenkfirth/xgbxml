@@ -1,0 +1,7 @@
+gbElement class
+===============
+
+.. autoclass:: xgbxml.xgbxml.gbElement
+   :members:
+   
+   
