@@ -9,7 +9,7 @@ What is xgbxml?
 
 It would be entirely possible to work with gbXML files using *lxml* alone. However *xgbxml* provides additional methods and features that make working with gbXML much quicker and easier.
 
-
+The source code for *xgbxml* is on GitHub here: https://github.com/stevenkfirth/xgbxml
 
 ..
   A standard way to work with XML files with Python is to use the python library *lxml* https://lxml.de/.

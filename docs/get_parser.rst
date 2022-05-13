@@ -1,4 +1,4 @@
-get_parser function
-===================
+get_parser
+==========
 
 .. autofunction:: xgbxml.xgbxml.get_parser

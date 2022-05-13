@@ -1,11 +1,63 @@
 How do I edit a gbXML file?
 ===========================
 
-A standard way to work with XML files with Python is to use the python library *lxml* https://lxml.de/.
+Editing a gbXML file using lxml
+-------------------------------
 
-In the *lxml* documentation, there is a section on `Using custom Element classes in lxml <https://lxml.de/element_classes.html>`_. 
-This describes how the standard classes in lxml can be extended to include custom methods and properties.
+A gbXML file can be edited using the `standard properties of the lxml Element class <https://lxml.de/tutorial.html#the-element-class>`_.
 
-*xgbxml* (this package) uses these custom element classes to provide a more user-friendly way of using *lxml* to work with gbXML files. 
-By using the parser provided by *xgbxml*, a user gains access to additional methods and functions to read, edit and create gbXML files and elements.
+.. code-block:: python
 
+   from lxml import etree
+
+   tree=etree.parse('gbXMLStandard.xml')
+   gbxml=tree.getroot()
+
+   # edit an attribute
+   gbxml.attrib['temperatureUnit']='F'
+   print(gbxml.attrib['temperatureUnit'])  
+   # prints "F"
+
+   # add a child node
+   new_node=etree.SubElement(gbxml,'{http://www.gbxml.org/schema}Construction')
+   print(new_node.tag)  
+   # prints "{http://www.gbxml.org/schema}Construction"
+
+   # edit node text
+   gbxml[0][0][0].text = 'my_new_station_id'
+   print(gbxml[0][0][0].text)
+   # prints "my_new_station_id"
+
+Note the final edit changes the text of the 'StationId' element, located in 'gbXML/Camus/Location'.
+
+
+Additional editing methods provided by xgbxml
+---------------------------------------------
+
+In *xgbxml*, new element properties are available to edit GBXML nodes. In particular, the :code:`add_Construction()` method shown below automatically creates a child Construction node on the gbXML element.
+
+
+.. code-block:: python
+
+   from lxml import etree
+   import xgbxml
+
+   parser=xgbxml.get_parser('0.37')   
+
+   tree=etree.parse('gbXMLStandard.xml', parser)
+   gbxml=tree.getroot()
+
+   # edit an attribute
+   gbxml.temperatureUnit='F'
+   print(gbxml.temperatureUnit)  
+   # prints "F"
+
+   # add a child node
+   new_node=gbxml.add_Construction()
+   print(new_node.tag)  
+   # prints "{http://www.gbxml.org/schema}Construction"
+
+   # edit node text
+   gbxml.Campus.Location.StationId.text = 'my_new_station_id'
+   print(gbxml.Campus.Location.StationId.text)
+   # prints "my_new_station_id"

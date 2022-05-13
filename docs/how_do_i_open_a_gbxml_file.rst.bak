@@ -1,11 +1,55 @@
 How do I open a gbXML file?
 ===========================
 
-A standard way to work with XML files with Python is to use the python library *lxml* https://lxml.de/.
+Opening a gbXML file using lxml
+-------------------------------
 
-In the *lxml* documentation, there is a section on `Using custom Element classes in lxml <https://lxml.de/element_classes.html>`_. 
-This describes how the standard classes in lxml can be extended to include custom methods and properties.
+gbXML files can be `opened using the standard *lxml* process <https://lxml.de/tutorial.html#parsing-from-strings-and-files>`_ as follows:
 
-*xgbxml* (this package) uses these custom element classes to provide a more user-friendly way of using *lxml* to work with gbXML files. 
-By using the parser provided by *xgbxml*, a user gains access to additional methods and functions to read, edit and create gbXML files and elements.
+.. code-block:: python
 
+   from lxml import etree
+
+   tree=etree.parse('gbXMLStandard.xml')
+   gbxml=tree.getroot()
+
+   print(type(gbxml))        
+   # prints "<class 'lxml.etree._Element'>"
+
+   print(len(list(gbxml)))   
+   # prints "1159" 
+
+   print (gbxml.attrib)      
+   # prints "{'useSIUnitsForResults': 'false', 'temperatureUnit': 'C', 'lengthUnit': 'Feet', 
+   #          'areaUnit': 'SquareFeet', 'volumeUnit': 'CubicFeet', 'version': '0.37'}"
+   
+Opening a gbXML file using xgbxml
+---------------------------------
+
+When using *xgbxml*, a parser is first created using the :py:func:`~xgbxml.xgbxml.get_parser` function. 
+
+This parser is then used by *lxml* when parsing the gbXML file.
+
+
+.. code-block:: python
+
+   from lxml import etree
+   import xgbxml
+
+   parser=xgbxml.get_parser('0.37')   
+
+   tree=etree.parse('gbXMLStandard.xml', parser)
+   gbxml=tree.getroot()
+
+   print(type(gbxml))        
+   # prints "<class 'xgbxml.xgbxml.gbXML'>"
+
+   print(len(list(gbxml)))   
+   # prints "1159" 
+
+   print (gbxml.attrib)      
+   # prints "{'useSIUnitsForResults': 'false', 'temperatureUnit': 'C', 'lengthUnit': 'Feet', 
+   #          'areaUnit': 'SquareFeet', 'volumeUnit': 'CubicFeet', 'version': '0.37'}"
+	
+Note that the :code:`gbxml` variable is now an instance of the :code:`xgbxml.xgbxml.gbXML` class. This is a class provided by *xgbxml* which extends the :code:`lxml.etree._Element` class with additional attributes and methods.
+	

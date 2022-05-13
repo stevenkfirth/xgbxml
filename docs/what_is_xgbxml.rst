@@ -1,11 +1,11 @@
 What is xgbxml?
 ===============
 
-*xgbxml* is an extension for the well-known python package *lxml* https://lxml.de/.
+*xgbxml* is an extension for the well-known python package *lxml*: https://lxml.de/.
 
 *lxml* is a Python processor for XML files and comes with Anaconda distribution as standard.
 
-*xgbxml* extends *lxml* for working with gbXML files. gbXML (Green Building XML, https://www.gbxml.org/) is an XML format for sharing information about buildings, often for the purposes of energy simulation.
+*xgbxml* extends *lxml* for working with gbXML files. gbXML (Green Building XML: https://www.gbxml.org/) is an XML format for sharing information about buildings, often for the purposes of energy simulation.
 
 It would be entirely possible to work with gbXML files using *lxml* alone. However *xgbxml* provides additional methods and features that make working with gbXML much quicker and easier.
 
