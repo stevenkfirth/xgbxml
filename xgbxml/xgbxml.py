@@ -27,10 +27,47 @@ from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, v
 def get_parser(version='6.01'):
     """Returns a lxml.etree.XMLParser containing custom elements for gbXML files.
     
-    :param version: The gbxml version string. Default is '6.01'.
+    :param version: The `gbxml version string <https://www.gbxml.org/schema_doc/6.01/GreenBuildingXML_Ver6.01.html#Link27C>`_. Default is '6.01'.
     :type version: str
     
     :rtype: lxml.etree.XMLParser
+
+    .. note::
+        
+      Using this parser means that when lxml is used to read in a gbXML file, 
+      the different elements (`gbXML`, `Campus`, `Building` etc.) are instantiated with
+      custom classes.
+      
+      This means that the lxml/xgbxml elements have additional features, which are 
+      specifically designed for working with gbXML files.
+      
+      For example, the `gbXML` element has additional properties such as 
+      :code:`version` and :code:`temperatureUnit` for direct access to the
+      XML attributes. It also has additional methods, such as :code:`add_Campus`,
+      for creating new child elements.
+      
+      The *xgbxml* parser provides two types of additional properties and methods:
+
+      1. Properties and methods that are automatically generated from the 
+         gbXML schema file. This method generates the :code:`version` property and
+         the :code:`add_Campus` method for the gbXML element.
+      2. Properties and methods which are custom written for the element. 
+         This is bespoke code written for a particular element to provide
+         additional functionality. An example is the 
+         :py:func:`~xgbxml.xgbxml.Surface.get_shell` method of the 
+         :py:class:`~xgbxml.xgbxml.Surface` class.
+
+    .. rubric:: Code Example
+    
+    .. code-block:: python
+    
+       from lxml import etree
+       import xgbxml
+
+       parser=xgbxml.get_parser()  # default is gbXML version 6.01
+
+       tree=etree.parse('my_gbxml_file.xml', parser)
+       gbxml=tree.getroot()
     
     """    
     #create lookup
@@ -99,14 +136,32 @@ def create_gbXML(id=None,
                  version='6.01',
                  SurfaceReferenceLocation=None
                  ):
-    """Returns a root <gbXML> element for a new, blank gbXML file.
+    """Returns a root `gbXML` element for a new, blank gbXML file.
+    
+    The keyword arguments for this function set the XML attributes of the
+    newly created `gbXML` element. `See the gbXML schema for details
+    of these attributes.
+    <https://www.gbxml.org/schema_doc/6.01/GreenBuildingXML_Ver6.01.html#Link105>`_.
+    
+    :rtype: xgbxml.xgbxml.gbXML (subclass of lxml.etree._Element)
     
     .. note::
         
         The returned object is a subclass of lxml.Element, not an lxml.ElementTree.
+        
+        To access the ElementTree of the returned gbXML element, the lxml 
+        method :code:`getroottree()` can be used. This is needed to save the 
+        gbXML file using the ElementTree :code:`write()` method.
     
-    :rtype: gbXML
     
+    .. rubric:: Code Example
+    
+    .. code-block:: python
+    
+       import xgbxml
+       gbxml=xgbxml.create_gbXML()
+       tree=gbxml.getroottree()
+       tree.write('new_gbxml_file.xml')
     
     """
     xml='<gbXML version="%s" xmlns="http://www.gbxml.org/schema"></gbXML>' % version
