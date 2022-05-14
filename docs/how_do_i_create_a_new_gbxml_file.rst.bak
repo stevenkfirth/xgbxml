@@ -26,3 +26,46 @@ Note, to access the element tree the lxml method :code:`getroottree` can be used
 
 
 Adding more elements
+--------------------
+
+Adding new elements to the gbxml root note is done in *xgbxml* using the :code:`add_[...]` methods.
+
+.. code-block:: python
+
+   import xgbxml
+   gbxml=xgbxml.create_gbXML()
+   campus=gbxml.add_Campus(id='my_campus')
+   building1=campus.add_Building(id='my_building1')
+   print(gbxml.tostring())
+   # prints ...
+   # <gbXML xmlns="http://www.gbxml.org/schema" version="6.01" temperatureUnit="C" lengthUnit="Meters" areaUnit="SquareMeters" volumeUnit="CubicMeters" useSIUnitsForResults="true">
+   #   <Campus id="my_campus">
+   #     <Building id="my_building1"/>
+   #   </Campus>
+   # </gbXML>
+
+Note how the :code:`id` arguments are passed into :code:`add_Campus` and :code:`add_Building`. This can be done for all of the XML attributes associated with these nodes.
+
+
+Saving the gbXML file
+---------------------
+
+This is done with the standard *lxml* process using the :code:`write` method of the *etree* instance.
+
+.. code-block::python
+
+   import xgbxml
+   gbxml=xgbxml.create_gbXML()
+   tree=gbxml.getroottree()
+   tree.write('new_gbxml_file.xml') 
+
+
+
+
+
+
+
+
+
+
+

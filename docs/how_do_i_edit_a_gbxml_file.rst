@@ -61,3 +61,37 @@ In *xgbxml*, new element properties are available to edit gbXML elements. In par
    gbxml.Campus.Location.StationId.text = 'my_new_station_id'
    print(gbxml.Campus.Location.StationId.text)
    # prints "my_new_station_id"
+   
+   
+Saving the gbXML file
+---------------------
+
+This is done with the standard *lxml* process using the :code:`write` method of the *etree* instance.
+
+.. code-block:: python
+
+   from lxml import etree
+   import xgbxml
+
+   parser=xgbxml.get_parser('0.37')   
+
+   tree=etree.parse('gbXMLStandard.xml', parser)
+   gbxml=tree.getroot()
+
+   # edit an attribute
+   gbxml.temperatureUnit='F'
+
+   # save the edited file
+   tree.write('edited_gbxml_file.xml')
+
+
+
+
+
+
+
+
+
+
+   
+   
