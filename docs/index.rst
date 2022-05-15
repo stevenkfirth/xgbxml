@@ -15,7 +15,7 @@ UNDER DEVELOPMENT
    how_do_i_edit_a_gbxml_file
    how_do_i_create_a_new_gbxml_file
    how_do_i_ask_a_question_about_xgbxml
-   
+   query_examples
    
 .. toctree::
    :maxdepth: 2
