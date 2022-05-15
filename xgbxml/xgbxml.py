@@ -21,7 +21,7 @@ import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 
 import math
 from . import render_functions
-from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
+from . import geometry_functions 
 
 
 def get_parser(version='6.01'):
@@ -539,6 +539,17 @@ class CartesianPoint():
 class Opening():
     ""
     
+    def get_area(self):
+        """
+        
+        :returns: The area of the Opening
+        :rtype: float
+        
+        """
+        shell=self.get_shell()
+        holes=[]
+        return geometry_functions.polygon_area_3d(shell,holes)
+    
     
     def get_shell(self):
         """Returns a Polygon of the outer polyloop of the opening.
@@ -595,6 +606,18 @@ class Opening():
 
 class PlanarGeometry():
     ""
+    
+    def get_area(self):
+        """
+        
+        :returns: The area of the PlanarGeometry
+        :rtype: float
+        
+        """
+        shell=self.get_shell()
+        holes=[]
+        return geometry_functions.polygon_area_3d(shell,holes)
+    
     
     def get_coordinates(self):
         """Returns the coordinates of the polyloop child element.
@@ -657,6 +680,18 @@ class PolyLoop():
             self.add_CartesianPoint().create_Coordinates(*point_coordinates)
         return self.CartesianPoints
             
+    
+    def get_area(self):
+        """
+        
+        :returns: The area of the PolyLoop
+        :rtype: float
+        
+        """
+        shell=self.get_shell()
+        holes=[]
+        return geometry_functions.polygon_area_3d(shell,holes)
+    
             
     def get_coordinates(self):
         """Returns the coordinates of the CartesianPoint child elements.
@@ -765,6 +800,18 @@ class Surface():
             self.xsd_schema,
             tolerance=tolerance
             )
+
+
+    def get_area(self):
+        """
+        
+        :returns: The area of the Surface (the shell area minus the Opening areas)
+        :rtype: float
+        
+        """
+        shell=self.get_shell()
+        holes=self.get_holes()
+        return geometry_functions.polygon_area_3d(shell,holes)
 
 
     def get_holes(self):
