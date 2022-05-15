@@ -13,7 +13,7 @@ Latest development version
 
 *xgbxml* is developed on GitHub here: https://github.com/stevenkfirth/xgbxml
 
-To install the latest development version on GitHub use: `pip install git+https://github.com/stevenkfirth/xgbxml.git@main`.
+To install the latest development version on GitHub use: :code:`pip install git+https://github.com/stevenkfirth/xgbxml.git@main`.
 
 Problems with installation?
 ---------------------------
