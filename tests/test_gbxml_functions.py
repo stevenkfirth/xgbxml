@@ -31,10 +31,34 @@ xsd_schema = etree.parse(fp).getroot()
 class Test_common(unittest.TestCase):
     ""
     
-    def test_set_attribute(self):
+    def test_add_child_to_gbxml_element(self):
         ""
         xml='<gbXML version="6.01" xmlns="http://www.gbxml.org/schema"></gbXML>' 
         gbxml=etree.fromstring(xml)  # root node
+        
+        # valid child name
+        gbxml_functions.add_child_to_gbxml_element(
+            gbxml_element=gbxml,
+            child_nntag='Campus',
+            xsd_schema=xsd_schema,
+            )
+    
+        # invalid child name
+        with self.assertRaises(KeyError):
+            gbxml_functions.add_child_to_gbxml_element(
+                gbxml_element=gbxml,
+                child_nntag='xxxxxx',
+                xsd_schema=xsd_schema,
+                )
+        
+        
+    
+    def test_set_attribute_on_gbxml_element(self):
+        ""
+        xml='<gbXML version="6.01" xmlns="http://www.gbxml.org/schema"></gbXML>' 
+        gbxml=etree.fromstring(xml)  # root node
+        
+        # correct input
         gbxml_functions.set_attribute_on_gbxml_element(
             gbxml_element=gbxml,
             attribute_name='temperatureUnit',
@@ -43,6 +67,62 @@ class Test_common(unittest.TestCase):
             )
         self.assertEqual(gbxml.attrib,
                          {'version': '6.01', 'temperatureUnit': 'C'})
+        
+        # incorrect attribute name 
+        with self.assertRaises(KeyError):
+            gbxml_functions.set_attribute_on_gbxml_element(
+                gbxml_element=gbxml,
+                attribute_name='xxxxxx',
+                value='C',
+                xsd_schema=xsd_schema
+                )
+            
+        
+        # attribute value not in enumeration list
+        with self.assertRaises(ValueError):
+            gbxml_functions.set_attribute_on_gbxml_element(
+                gbxml_element=gbxml,
+                attribute_name='temperatureUnit',
+                value='xxxxxx',
+                xsd_schema=xsd_schema
+                )
+            
+        # attribute value not same type as in schema
+        with self.assertRaises(TypeError):
+            gbxml_functions.set_attribute_on_gbxml_element(
+                gbxml_element=gbxml,
+                attribute_name='useSIUnitsForResults',
+                value=6,
+                xsd_schema=xsd_schema
+                )
+        
+        
+    
+    def test_set_value_of_gbxml_element(self):
+        ""
+        xml='''<gbXML version="6.01" xmlns="http://www.gbxml.org/schema">
+        <Campus><Name/></Campus></gbXML>'''
+        gbxml=etree.fromstring(xml)  # root node
+        campus=gbxml[0]
+        name=campus[0]
+        
+        # correct value type
+        gbxml_functions.set_value_of_gbxml_element(
+            gbxml_element=name,
+            value='campus1',
+            xsd_schema=xsd_schema
+            )
+        
+        # incorrect value type
+        with self.assertRaises(TypeError):
+            gbxml_functions.set_value_of_gbxml_element(
+                gbxml_element=name,
+                value=1234,
+                xsd_schema=xsd_schema
+                )
+        
+        
+        
 
 
 class Test_CartesianPoint(unittest.TestCase):

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-import json
 import importlib.resources as pkg_resources
 import importlib
 from lxml import etree
 
-from . import schema_dicts
 from . import schemas
 
 import collections.abc
@@ -19,7 +17,6 @@ import xgbxml.gbxml_functions as gbxml_functions
 import xgbxml.xml_functions as xml_functions
 import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 
-import math
 from . import render_functions
 from . import geometry_functions 
 
@@ -182,12 +179,18 @@ def create_gbXML(id=None,
 
     
 class gbElement(etree.ElementBase):
-    """The default element class for the gbxml parser.
+    """A base class which is inherited by all xgbxml element instances.
+    
+    When using either :py:func:`~xgbxml.xgbxml.get_parser` or 
+    :py:func:`~xgbxml.xgbxml.create_gbXML`, all elements created will have the 
+    properties and methods available in this class.
     
     """
     
     def __repr__(self):
-        """The repr for the class
+        """The repr for the class.
+        
+        Determines how the instance is displayed when printed.
         
         :returns: A different value is returned depending on if this is the 
         gbElement class or a subclass, and/or if the element has an 'id' attribute.
@@ -209,27 +212,62 @@ class gbElement(etree.ElementBase):
                                id_st)
     
         
-    def add_child(self,child_nntag,**kwargs):
+    def add_child(self,
+                  child_nntag,
+                  value=None,
+                  **kwargs):
         """Adds a new child element to the element.
         
-        :param child_nntag: The 'no namespace' tag of the child element.
+        :param child_nntag: The 'no namespace' tag of the child element (i.e. "Campus")
         :type child_nntag: str
-        :param kwargs: Attributes to be set for the child element.
+        :param value: The value for the element. Optional.
+        :type value: str, float, bool etc.
+        :param kwargs: Attributes to be set for the child element. Optional.
+        
+        :raises KeyError: If the child name does not exist in the schema.
+        :raises: Other error may be raised if the optional value or attributes are
+            not specified correctly.
         
         :returns: The newly created child element.
         :rtype: (subclass of) gbElement
         
         """
         return gbxml_functions.add_child_to_gbxml_element(
-            self,
-            child_nntag,
-            self.xsd_schema,
+            gbxml_element=self,
+            child_nntag=child_nntag,
+            xsd_schema=self.xsd_schema,
+            value=value
             **kwargs)
+       
+    
+    def get_attribute(self,attribute_name):
+        """Returns the attribute value of the element.
         
+        :param attribute_name: The name of the attribute.
+        :param attribute_name: str
+            
+        :raises KeyError: If the attribute is not present in the element.
         
+        :returns: The text value of the attribute converted to the python type
+            of the attribute.
+        :rtype: bool, str or float etc.
+        
+        """
+        return gbxml_functions.get_attribute_of_gbxml_element(
+            gbxml_element=self,
+            attribute_name=attribute_name,
+            xsd_schema=self.xsd_schema
+            )
+    
+    
     @property
     def get_attributes(self):
-        """The attributes of the element.
+        """Returns the attributes of the element.
+        
+        :param gbxml_element: A gbXML element.
+        :type gbxml_element: lxml.etree._Element
+        :param xsd_schema: The root node of a gbXML schema.
+        :type xsd_schema: lxml.etree._Element
         
         :returns: A dictionary of attributes where the attribute values
             have been converted to the correct python types according to the 
@@ -238,44 +276,11 @@ class gbElement(etree.ElementBase):
         :rtype: dict
         
         """
+        return gbxml_functions.get_attributes_of_gbxml_element(
+            gbxml_element=self,
+            xsd_schema=self.xsd_schema
+            )
         
-        return gbxml_functions.get_attributes_of_gbxml_element(self,
-                                                               self.xsd_schema)
-        
-       
-    
-    @property
-    def id(self):
-        """The id of the element.
-        
-        :raises KeyError: If, on retrieval, the 'id' attribute is not present in the element.
-        
-        :rtype: str
-        
-        """
-        return self.get_attribute('id')
-            
-    
-    @id.setter
-    def id(self,value):
-        ""
-        self.set_attribute('id',value)
-        
-    
-    def get_attribute(self,attribute_name):
-        """Returns the attribute value as a python type.
-        
-        :param attribute_name: The name of the attribute.
-        :param attribute_name: str
-        
-        :raises KeyError: If the attribute is not present in the element.
-        
-        :rtype: bool, str, float
-        
-        """
-        return gbxml_functions.get_attribute_of_gbxml_element(self,
-                                                              attribute_name,
-                                                              self.xsd_schema)
     
     
     def get_child(self,
@@ -290,7 +295,7 @@ class gbElement(etree.ElementBase):
         :param child_id: Optional, the 'id' attribute of the child element.
         :type child_id: str
         
-        :raises ??: If the child element is not present.
+        :raises KeyError: If the child element is not present.
         
         :rtype: (subclass of) gbElement 
         
@@ -302,12 +307,12 @@ class gbElement(etree.ElementBase):
         
         
     def get_children(self,child_nntag):
-        """Returns child elements with a specified tag.
+        """Returns all child element with specified tag.
         
-        :param child_nntag: The 'no e coercednamespace' tag of the child elements.
+        :param child_nntag: The 'no namespace' tag of the child element (i.e. "Campus")
         :type child_nntag: str
         
-        :rtype: list ??
+        :rtype: gbCollection
 
         """
         return gbCollection(
@@ -318,44 +323,47 @@ class gbElement(etree.ElementBase):
             )
     
     
-    def set_attribute(self,attribute_name,value):
-        """Sets an attribute value of the element.
+    @property
+    def id(self):
+        """Returns the 'id' attribute of the element.
         
-        Attribute will be created if it does not already exist.
-        Attribute value is modified if attribute does already exist.
-        Value is coerced to the correct python type if needed.
+        :raises KeyError: If the 'id' attribute is not present in the element.
         
-        :param attribute_name: The name of the attribute.
-        :param attribute_name: str
-        :param value: The new value for the attribute.
-        :type value: bool, str, float
-        
-        :raises KeyError: If attribute does not exist in the schema.
-        :raises ValueError: If attribute has enumerations, and 'value' does not
-            match one of the enumeration options.
-        
-        :rtype: The (coerced) value assigned to the attribute.
+        :rtype: str
         
         """
+        return self.get_attribute('id')
+            
+    
+    @id.setter
+    def id(self,value):
+        """Sets the 'id' attribute of the element.
         
-        return gbxml_functions.set_attribute_on_gbxml_element(self,
-                                                              attribute_name,
-                                                              value,
-                                                              self.xsd_schema)
+        :param value: The value of the id attribute
+        :type value: str
         
+        """
+        self.set_attribute('id',value)
+        
+    
+    
+    
         
     @property
     def nntag(self):
         """Returns the tag without the namespace ('no namespace tag')
         
-        Example:
-            
-        >>> print(gbXML.tag)
-        {http://www.gbxml.org/schema}gbXML
-        >>> print(gbXML.nntag)
-        gbXML
-        
         :rtype: str
+        
+        .. rubric:: Code Example
+            
+        .. code-block:: python
+        
+           >>> print(gbxml.tag)
+           {http://www.gbxml.org/schema}gbXML
+           >>> print(gbxml.nntag)
+           gbXML
+        
         
         """
         return xml_functions.nntag(self)
@@ -369,6 +377,32 @@ class gbElement(etree.ElementBase):
         
         """
         return gbxml_functions.ns
+    
+    
+    def set_attribute(self,attribute_name,value):
+        """Sets an attribute value of the element.
+        
+        Attribute will be created if it does not already exist.
+        Attribute value is modified if attribute does already exist.
+        
+        :param attribute_name: The name of the attribute.
+        :param attribute_name: str
+        :param value: The new value for the attribute.
+        :type value: bool, str, float
+        
+        :raises KeyError: If attribute name does not exist in the schema.
+        :raises ValueError: If attribute has enumerations, and 'value' does not
+            match one of the enumeration options.
+        :raises TypeError: If the attribute value is of a type that does not match 
+            the schema.
+        
+        """
+        
+        return gbxml_functions.set_attribute_on_gbxml_element(self,
+                                                              attribute_name,
+                                                              value,
+                                                              self.xsd_schema)
+        
     
     
     def tostring(self):
@@ -389,9 +423,15 @@ class gbElement(etree.ElementBase):
     
     @property
     def value(self):
-        """The value of the element text as a python type.
+        """Returns the value of the gbXML element.
         
-        :rtype: str, float
+        :param gbxml_element: A gbXML element.
+        :type gbxml_element: lxml.etree._Element
+        :param xsd_schema: The root node of a gbXML schema.
+        :type xsd_schema: lxml.etree._Element
+        
+        :returns: A value which is converted from the element text node.
+        :rtype: str, int, float or book etc.
         
         """
         xsd_type=gbxml_xsd_functions.get_xsd_type_of_text_of_xsd_element(
@@ -405,8 +445,25 @@ class gbElement(etree.ElementBase):
     
     @value.setter
     def value(self,value):
-        ""
-        self.text=str(value)
+        """Sets the value of the element.
+        
+        This is stored in the text value of the XML element.
+        
+        :param value: The value for the element.
+        :type value: str, float, bool etc.
+        
+        :raises TypeError: If value is of a type that does not match 
+            the schema.
+        """
+        
+        gbxml_functions.set_value_of_gbxml_element(
+            gbxml_element=self,
+            value=value,
+            xsd_schema=self.xsd_schema
+            )
+        
+        
+        
     
     
     

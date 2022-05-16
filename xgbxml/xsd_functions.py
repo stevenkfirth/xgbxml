@@ -8,6 +8,48 @@ Created on Mon May  9 12:01:45 2022
 ns={'xsd':"http://www.w3.org/2001/XMLSchema"}
 
 
+#%% General
+
+def xsd_type_to_python_type(xsd_type):
+    """Returns the python type for a given xsd type.
+    
+    :param xsd_type: The xsd type to be converted.
+    :type xsd_type: str
+    
+    :raises Exception: If an unrecognized xsd_type is supplied.
+    
+    :rtype: bol, str, float
+    
+    """
+    if xsd_type=='xsd:boolean':
+        return bool
+    
+    elif xsd_type=='xsd:NMTOKEN':
+        return str
+    
+    elif xsd_type=='xsd:ID':
+        return str
+    
+    elif xsd_type=='xsd:double':
+        return float
+    
+    elif xsd_type=='xsd:string':
+        return str
+    
+    elif xsd_type=='xsd:decimal':
+        return float
+    
+    elif xsd_type=='xsd:IDREF':
+        return str
+    
+    elif xsd_type=='xsd:integer':
+        return int
+    
+    else:
+        raise Exception(xsd_type)
+    
+
+
 #%% xsd_attribute
 
 def get_type_from_xsd_attribute(xsd_attribute):
@@ -39,7 +81,8 @@ def get_xsd_simple_content_from_xsd_complex_type(xsd_complex_type):
         return xsd_complex_type.xpath('./xsd:simpleContent',
                                       namespaces=ns)[0]
     except IndexError:
-        raise Exception
+        raise Exception(f'<xsd:element name={xsd_complex_type.getparent().attrib["name"]}>'
+                        + f'/xsd:complexType has no xsd:simpleContent child node')
     
     
 
@@ -53,7 +96,7 @@ def get_xsd_attribute_from_xsd_element(xsd_element,
         return xsd_element.xpath('.//xsd:attribute[@name="%s"]' % name, 
                                  namespaces=ns)[0]
     except IndexError:
-        raise Exception
+        raise KeyError(f'Attribute "{name}" not in schema for element "{xsd_element.attrib["name"]}"')
         
         
 def get_xsd_attribute_names_from_xsd_element(xsd_element):
@@ -67,6 +110,20 @@ def get_xsd_attributes_from_xsd_element(xsd_element):
     """
     """
     return xsd_element.xpath('.//xsd:attribute', 
+                             namespaces=ns)
+
+
+def get_xsd_element_refs_from_xsd_element(xsd_element):
+    """
+    """
+    elements=get_xsd_elements_from_xsd_element(xsd_element)
+    return [x.attrib['ref'] for x in elements]
+
+
+def get_xsd_elements_from_xsd_element(xsd_element):
+    """
+    """
+    return xsd_element.xpath('.//xsd:element', 
                              namespaces=ns)
     
 

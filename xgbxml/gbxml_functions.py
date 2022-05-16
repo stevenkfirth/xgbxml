@@ -11,6 +11,8 @@ from copy import copy
 
 import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 import xgbxml.xml_functions as xml_functions
+import xgbxml.xsd_functions as xsd_functions
+
 from .geometry_functions import vector_normalize_3d, vector_multiplication_3d, vector_addition_3d
 import xgbxml.geometry_functions as geometry_functions
 
@@ -22,23 +24,49 @@ ns={'gbxml':'http://www.gbxml.org/schema'}
 def add_child_to_gbxml_element(gbxml_element,
                                child_nntag,
                                xsd_schema,
-                               text=None,
+                               value=None,
                                **kwargs):
     """Adds a new child element to the element.
     
-    :param child_nntag: The 'no namespace' tag of the child element.
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param child_nntag: The 'no namespace' tag of the child element (i.e. "Campus")
     :type child_nntag: str
-    :param kwargs: Attributes to be set for the child element.
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
+    :param value: The value for the element. Optional.
+    :type value: str, float, bool etc.
+    :param kwargs: Attributes to be set for the child element. Optional.
+    
+    :raises KeyError: If the child name does not exist in the schema.
+    :raises: Other error may be raised if the optional value or attributes are
+        not specified correctly.
     
     :returns: The newly created child element.
     :rtype: (subclass of) gbElement
     
     """
+    element_name=xml_functions.nntag(gbxml_element)
+    
+    xsd_element=xsd_functions.get_xsd_element_from_xsd_schema(
+        xsd_schema=xsd_schema,
+        name=element_name)
+    
+    if not child_nntag \
+        in xsd_functions.get_xsd_element_refs_from_xsd_element(xsd_element):
+        
+        raise KeyError(f'Child name "{child_nntag}" does not exist in schema '
+                        + f'for element "{element_name}"')
+            
+    
     gbxml_element.append(etree.Element('{http://www.gbxml.org/schema}%s' % child_nntag))
     child=gbxml_element.findall('gbxml:%s' % child_nntag,
                                 namespaces=ns)[-1]
-    if not text is None:
-        child.text=text
+    if not value is None:
+        set_value_of_gbxml_element(gbxml_element=child,
+                                   value=value,
+                                   xsd_schema=xsd_schema)
+        
     for attribute_name,value in kwargs.items():
         if value is not None:
             set_attribute_on_gbxml_element(child,
@@ -52,14 +80,20 @@ def add_child_to_gbxml_element(gbxml_element,
 def get_attribute_of_gbxml_element(gbxml_element,
                                    attribute_name,
                                    xsd_schema):
-    """Returns the attribute value as a python type.
+    """Returns the attribute value of the element.
     
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
     :param attribute_name: The name of the attribute.
     :param attribute_name: str
-    
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
+        
     :raises KeyError: If the attribute is not present in the element.
     
-    :rtype: bool, str, float
+    :returns: The text value of the attribute converted to the python type
+        of the attribute.
+    :rtype: bool, str or float etc.
     
     """
     value=gbxml_element.attrib[attribute_name]
@@ -86,6 +120,14 @@ def get_attribute_of_gbxml_element(gbxml_element,
     elif python_type is str:
         
         return value
+    
+    elif python_type is int:
+        
+        return int(value)
+    
+    elif python_type is float:
+        
+        return float(value)
         
     else:
         raise Exception
@@ -93,7 +135,12 @@ def get_attribute_of_gbxml_element(gbxml_element,
 
 def get_attributes_of_gbxml_element(gbxml_element,
                                     xsd_schema):
-    """The attributes of the element.
+    """Returns the attributes of the element.
+    
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
     
     :returns: A dictionary of attributes where the attribute values
         have been converted to the correct python types according to the 
@@ -115,22 +162,26 @@ def get_child_of_gbxml_element(gbxml_element,
     
     If child_id is not supplied, then the first child element found is returned.
     
-    :param child_nntag: The 'no namespace' tag of the child element.
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param child_nntag: The 'no namespace' tag of the child element (i.e. "Campus")
     :type child_nntag: str
     :param child_id: Optional, the 'id' attribute of the child element.
     :type child_id: str
     
-    :raises ??: If the child element is not present.
+    :raises KeyError: If the child element is not present.
     
     :rtype: (subclass of) gbElement 
     
     """
+    element_name=xml_functions.nntag(gbxml_element)
+    
     if child_id is None:
         
         result=gbxml_element.find('gbxml:%s' % child_nntag,
                                   namespaces=ns)        
         if result is None:
-            raise KeyError('Child element with nntag "%s" does not exist' % child_nntag)
+            raise KeyError(f'Child element with nntag "{child_nntag}" does not exist')
         else:
             return result
     
@@ -140,30 +191,48 @@ def get_child_of_gbxml_element(gbxml_element,
                                                              child_id), 
                                   namespaces=ns)
         if result is None:
-            raise KeyError('Child element with nntag "%s" and id "%s" does not exist' % (child_nntag,
-                                                                                         child_id))
+            raise KeyError(f'Child element with nntag "{child_nntag}" and '
+                           + f'id "{child_id}" does not exist' 
+                           + f'in element "{element_name}')
         else:
             return result
         
         
 def get_children_of_gbxml_element(gbxml_element,
                                   child_nntag):
-    """
+    """Returns all child element with specified tag.
+    
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param child_nntag: The 'no namespace' tag of the child element (i.e. "Campus")
+    :type child_nntag: str
+    
+    :rtype: list
+    
     """
     return gbxml_element.findall('gbxml:%s' % child_nntag,
-                                 namespaces=ns)  
+                                  namespaces=ns)  
         
 
 def get_value_of_gbxml_element(gbxml_element,
                                xsd_schema):
-    """
+    """Returns the value of the gbXML element.
+    
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
+    
+    :returns: A value which is converted from the element text node.
+    :rtype: str, int, float or book etc.
+    
     """
     xsd_type=gbxml_xsd_functions.get_xsd_type_of_text_of_xsd_element(
         xml_functions.nntag(gbxml_element),
         xsd_schema
         )
     #print(xsd_type)
-    python_type=xml_functions.xsd_type_to_python_type(xsd_type)
+    python_type=xsd_functions.xsd_type_to_python_type(xsd_type)
     #print(python_type)
     
     text=gbxml_element.text
@@ -179,18 +248,21 @@ def set_attribute_on_gbxml_element(gbxml_element,
     
     Attribute will be created if it does not already exist.
     Attribute value is modified if attribute does already exist.
-    Value is coerced to the correct python type if needed.
     
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
     :param attribute_name: The name of the attribute.
-    :param attribute_name: str
+    :type attribute_name: str
     :param value: The new value for the attribute.
     :type value: bool, str, float
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
     
-    :raises KeyError: If attribute does not exist in the schema.
+    :raises KeyError: If attribute name does not exist in the schema.
     :raises ValueError: If attribute has enumerations, and 'value' does not
         match one of the enumeration options.
-    
-    :rtype: The (coerced) value assigned to the attribute.
+    :raises TypeError: If the attribute value is of a type that does not match 
+        the schema.
     
     """
     element_name=xml_functions.nntag(gbxml_element)
@@ -219,10 +291,17 @@ def set_attribute_on_gbxml_element(gbxml_element,
     if not enumerations is None:
         
         if not value in enumerations:
-            raise ValueError('Attribute value "%s" must be one of the enumerations' % value)
+            raise ValueError(f'Attribute value "{value}" must be one of the '
+                             + f'enumerations "{enumerations}".' 
+                             + f'({element_name}/@{attribute_name})')
     
-    python_type=xml_functions.xsd_type_to_python_type(xsd_type)
+    python_type=xsd_functions.xsd_type_to_python_type(xsd_type)
     #print(python_type)
+    
+    if not isinstance(value,python_type):
+        raise TypeError(f'Attribute value {value} has type {type(value)} '
+                        + f'which does not match with schema type "{xsd_type}". '
+                        + f'({element_name}/@{attribute_name})')
        
     if python_type is str:
         
@@ -241,7 +320,48 @@ def set_attribute_on_gbxml_element(gbxml_element,
         
     gbxml_element.set(attribute_name,value2)
     
-    return value2
+    
+    
+    
+    
+def set_value_of_gbxml_element(gbxml_element,
+                               value,
+                               xsd_schema):
+    """Sets the value of the element.
+    
+    This is stored in the text value of the XML element.
+    
+    :param gbxml_element: A gbXML element.
+    :type gbxml_element: lxml.etree._Element
+    :param value: The value for the element.
+    :type value: str, float, bool etc.
+    :param xsd_schema: The root node of a gbXML schema.
+    :type xsd_schema: lxml.etree._Element
+    
+    :raises TypeError: If value is of a type that does not match 
+        the schema.
+        
+    """
+    element_name=xml_functions.nntag(gbxml_element)
+    
+    xsd_type=gbxml_xsd_functions.get_xsd_type_of_text_of_xsd_element(
+        element_name,
+        xsd_schema
+        )    
+    #print(xsd_type)
+    
+    python_type=xsd_functions.xsd_type_to_python_type(xsd_type)
+    #print(python_type)
+    
+    if not isinstance(value,python_type):
+        raise TypeError(f'Value {value} has type {type(value)} '
+                        + f'which does not match with schema type "{xsd_type}". '
+                        + f'({element_name})')
+        
+    gbxml_element.text=str(value)
+       
+    
+    
     
     
     
@@ -283,7 +403,7 @@ def add_Coordinates_to_CartesianPoint(gbxml_element,
         x=add_child_to_gbxml_element(gbxml_element,
                                      'Coordinate',
                                      xsd_schema,
-                                     text=str(coordinate))
+                                     value=coordinate)
         result.append(x)
         
     return result
