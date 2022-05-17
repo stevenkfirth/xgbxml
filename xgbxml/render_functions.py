@@ -29,7 +29,7 @@ def render_polygon_3d(polygon,
                       ax=None, 
                       set_lims=True, 
                       outline_kwargs=None,
-                      surface_kwargs=None):
+                      fill_kwargs=None):
     """Plots the polygon on the supplied axes.
         
     :param ax: An 2D or 3D Axes instance.
@@ -47,12 +47,12 @@ def render_polygon_3d(polygon,
     if outline_kwargs is None:
         outline_kwargs={}
     
-    if surface_kwargs is None:
-        surface_kwargs={}
+    if fill_kwargs is None:
+        fill_kwargs={}
         
-    surface_kwargs['color']=surface_kwargs.get('color','tab:blue')
-    surface_kwargs['alpha']=surface_kwargs.get('alpha',0.2)
-    surface_kwargs['linewidth']=surface_kwargs.get('linewidth',0)
+    fill_kwargs['color']=fill_kwargs.get('color','tab:blue')
+    fill_kwargs['alpha']=fill_kwargs.get('alpha',0.2)
+    fill_kwargs['linewidth']=fill_kwargs.get('linewidth',0)
     
     shell, holes=polygon
     
@@ -60,7 +60,7 @@ def render_polygon_3d(polygon,
         polygon_triangles=polygon_triangulate_3d(shell,holes)
     
     verts=[tri[:-1] for tri in polygon_triangles]
-    pc=Poly3DCollection(verts,**surface_kwargs)
+    pc=Poly3DCollection(verts,**fill_kwargs)
     ax.add_collection3d(pc)
             
     outline_kwargs['color']=outline_kwargs.get('color','tab:blue')

@@ -299,7 +299,7 @@ def plane_of_polygon_3d(shell, abs_tol = 1e-7):
         l=vector_length_3d(*N)
         if not math.isclose(l, 0, abs_tol=abs_tol):
             return (shell[0],N)
-        raise ValueError
+    raise ValueError
         
         
 def planes_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):

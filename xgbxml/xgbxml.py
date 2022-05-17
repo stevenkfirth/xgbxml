@@ -239,7 +239,7 @@ class gbElement(etree.ElementBase):
             gbxml_element=self,
             child_nntag=child_nntag,
             xsd_schema=self.xsd_schema,
-            value=value
+            value=value,
             **kwargs)
        
     
@@ -651,17 +651,44 @@ class Campus():
     def render(self,
                ax=None, 
                set_lims=True, 
-               outline_kwargs=None,
-               surface_kwargs=None):
-        """
+               surface_outline_kwargs=None,
+               surface_fill_kwargs=None,
+               opening_outline_kwargs=None,
+               opening_fill_kwargs=None):
+        """Renders the Campus in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param surface_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of surfaces (passed to ax.plot method).
+        :param surface_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of surfaces (passed to Poly3DCollection method).
+        :param opening_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of openings (passed to ax.plot method).
+        :param opening_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of openings (passed to Poly3DCollection method).
+            
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
         """
         #print(self)
         for su in self.Surfaces:
-            try:
-                ax=su.render(ax=ax)
-            except Exception as err:
-                print(su)
-                print(type(err))
+            #try:
+            ax=su.render(ax=ax,
+                         set_lims=set_lims,
+                         surface_outline_kwargs=surface_outline_kwargs,
+                         surface_fill_kwargs=surface_fill_kwargs,
+                         opening_outline_kwargs=opening_outline_kwargs,
+                         opening_fill_kwargs=opening_fill_kwargs
+                         )
+            #except TypeError as err:
+            #    print(su)
+            #    print(type(err))
                 
         return ax
     
@@ -674,10 +701,11 @@ class CartesianPoint():
         """Creates Coordinate child elements and sets their value.
         
         :param coordinates: The values of the x,y,(z) coordinates as an argument list.
-        :type coordinates: int, float
+            For example: ((0,0,0),(1,0,0),(0,1,0)) 
+        :type coordinates: tuple otr list etc.
         
         :returns: The newly creeated Coordinate elements.
-        :rtype: list(Coordinate)
+        :rtype: gbCollection
         
         """
         return gbCollection(
@@ -706,9 +734,9 @@ class Opening():
     ""
     
     def get_area(self):
-        """
+        """Calculates the area of the opening.
         
-        :returns: The area of the Opening
+        :returns: The area of the Opening.
         :rtype: float
         
         """
@@ -718,7 +746,7 @@ class Opening():
     
     
     def get_shell(self):
-        """Returns a Polygon of the outer polyloop of the opening.
+        """Returns the shell of the outer polyloop of the opening.
         
         The following sources are tried in order:
             - PlanarGeometry
@@ -736,8 +764,25 @@ class Opening():
                ax=None, 
                set_lims=True, 
                outline_kwargs=None,
-               surface_kwargs=None):
-        ""
+               fill_kwargs=None):
+        """
+        Renders the Opening in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of the openings (passed to ax.plot method).
+        :param surface_kwargs: matplotlib keywork arguments for formatting the 
+            surface rendering (passed to Poly3DCollection method).
+            
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
         x=dict(color='green')
         if outline_kwargs is None:
             outline_kwargs=x
@@ -747,12 +792,12 @@ class Opening():
                     outline_kwargs[k]=v
             
         x=dict(color='green')
-        if surface_kwargs is None:
-            surface_kwargs=x
+        if fill_kwargs is None:
+            fill_kwargs=x
         else:
             for k,v in x.items:
-                if not k in surface_kwargs:
-                    surface_kwargs[k]=v
+                if not k in fill_kwargs:
+                    fill_kwargs[k]=v
         
         ax=render_functions.render_polygon_3d(
             polygon=(self.get_shell(),[]),
@@ -760,23 +805,18 @@ class Opening():
             ax=ax,
             set_lims=set_lims,
             outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
+            fill_kwargs=fill_kwargs
             )
         
         return ax
         
-    
-    
-    
-    
 
 class PlanarGeometry():
     ""
     
     def get_area(self):
-        """
+        """Returns the area of the polygon described by the PlanarGeometry.
         
-        :returns: The area of the PlanarGeometry
         :rtype: float
         
         """
@@ -800,9 +840,9 @@ class PlanarGeometry():
         
     
     def get_shell(self):
-        """Returns a Polygon of the polyloop child element.
+        """Returns the shell of the polyloop child element.
         
-        :rtype: tuple
+        :rtype: tuple(tuple(float))
         
         """
         return gbxml_functions.get_shell_of_PlanarGeometry(
@@ -815,13 +855,29 @@ class PlanarGeometry():
                ax=None, 
                set_lims=True, 
                outline_kwargs=None,
-               surface_kwargs=None):
-        ""
+               fill_kwargs=None):
+        """Renders the PlanarGeometry in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines (passed to ax.plot method).
+        :param fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill (passed to Poly3DCollection method).
+        
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
         ax=self.PolyLoop.render(
             ax=ax,
             set_lims=set_lims,
             outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
+            fill_kwargs=fill_kwargs
             )
         
         return ax
@@ -887,15 +943,31 @@ class PolyLoop():
                ax=None, 
                set_lims=True, 
                outline_kwargs=None,
-               surface_kwargs=None):
-        ""
+               fill_kwargs=None):
+        """Renders the PolyLoop in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines (passed to ax.plot method).
+        :param fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill (passed to Poly3DCollection method).
+        
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
         ax=render_functions.render_polygon_3d(
             polygon=(self.get_shell(),[]),
             polygon_triangles=None,
             ax=ax,
             set_lims=set_lims,
             outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
+            fill_kwargs=fill_kwargs
             )
         
         return ax
@@ -906,7 +978,7 @@ class RectangularGeometry():
     """
     
     def get_shell(self):
-        """Returns the coordinates of the rectangular geometry.
+        """Returns the shell coordinates of the rectangular geometry.
         
         The following sources are tried in order:
             - RectangularGeometry/PolyLoop
@@ -921,21 +993,42 @@ class RectangularGeometry():
             )
     
     
-    def get_shell_from_height_and_width(self):
-        """
-        """
-        return gbxml_functions.get_shell_from_height_and_width_of_RectangularGeometry(
-            self,
-            self.xsd_schema
-            )
+    # def get_shell_from_height_and_width(self):
+    #     """Returns the shell coordinates of the rectangular geometry.
+        
+        
+        
+    #     :rtype: tuple(tuple(float))
+            
+    #     """
+    #     return gbxml_functions.get_shell_from_height_and_width_of_RectangularGeometry(
+    #         self,
+    #         self.xsd_schema
+    #         )
     
     
     def render(self,
                ax=None, 
                set_lims=True, 
                outline_kwargs=None,
-               surface_kwargs=None):
-        ""
+               fill_kwargs=None):
+        """Renders the RectangularGeometry in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines (passed to ax.plot method).
+        :param fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill (passed to Poly3DCollection method).
+        
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
         
         ax=render_functions.render_polygon_3d(
             polygon=(self.get_shell(),[]),
@@ -943,7 +1036,7 @@ class RectangularGeometry():
             ax=ax,
             set_lims=set_lims,
             outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
+            fill_kwargs=fill_kwargs
             )
         
         return ax
@@ -969,7 +1062,7 @@ class Surface():
 
 
     def get_area(self):
-        """
+        """Calculates the area of the surface (does not include the area of any openings)
         
         :returns: The area of the Surface (the shell area minus the Opening areas)
         :rtype: float
@@ -981,14 +1074,17 @@ class Surface():
 
 
     def get_holes(self):
-        """
+        """Returns the coordinates of the holes of the surface.
+        
+        :rtype: list(tuple(tuple(float)))
+        
         """
         return gbxml_functions.get_holes_of_Surface(self,
                                                     self.xsd_schema)
         
 
     def get_shell(self):
-        """Returns a Polygon of the outer polyloop of the opening.
+        """Returns the shell coordinates of the outer polyloop of the opening.
         
         The following sources are tried in order:
             - PlanarGeometry
@@ -1005,19 +1101,25 @@ class Surface():
     def get_Spaces(self):
         """Returns the space elements adjacent to the surface.
         
+        :returns: The Spaces as given by the AdjacentSpaceId elements.
+        :rtype: gbCollection
+        
         """
-        return gbxml_functions.get_Spaces_of_Surface(self)
+        return gbCollection(
+            *gbxml_functions.get_Spaces_of_Surface(self)
+            )
         
     
     def get_polygon(self):
-        """Returns a Polygon of the outer polyloop of the surface.
+        """Returns the polygon coordinates of the outer polyloop of the surface.
         
         The following sources are tried in order:
             - PlanarGeometry
             - RectangularGeometry/PolyLoop
             - RectangularGeoemetry... from height and width
             
-        :rtype: tuple(tuple(float))
+        :returns: (shell_coordinates, list of hole coordinates)
+        :rtype: ( tuple(tuple(float)), list(tuple(tuple(float))) )
             
         """
         return gbxml_functions.get_polygon_of_Surface(self,
@@ -1028,21 +1130,46 @@ class Surface():
     def render(self,
                ax=None, 
                set_lims=True, 
-               outline_kwargs=None,
-               surface_kwargs=None):
-        ""
+               surface_outline_kwargs=None,
+               surface_fill_kwargs=None,
+               opening_outline_kwargs=None,
+               opening_fill_kwargs=None):
+        """Renders the Surface in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param surface_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of surfaces (passed to ax.plot method).
+        :param surface_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of surfaces (passed to Poly3DCollection method).
+        :param opening_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of openings (passed to ax.plot method).
+        :param opening_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of openings (passed to Poly3DCollection method).
+            
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
         
         ax=render_functions.render_polygon_3d(
             polygon=self.get_polygon(),
             polygon_triangles=None,
             ax=ax,
             set_lims=set_lims,
-            outline_kwargs=outline_kwargs,
-            surface_kwargs=surface_kwargs
+            outline_kwargs=surface_outline_kwargs,
+            fill_kwargs=surface_fill_kwargs
             )
         
         for op in self.Openings:
-            ax=op.render(ax=ax)
+            ax=op.render(ax=ax,
+                         set_lims=set_lims,
+                         outline_kwargs=opening_outline_kwargs,
+                         fill_kwargs=opening_fill_kwargs)
         
         return ax
     
