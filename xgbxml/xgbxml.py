@@ -43,12 +43,15 @@ def get_parser(version='6.01'):
       XML attributes. It also has additional methods, such as :code:`add_Campus`,
       for creating new child elements.
       
-      The *xgbxml* parser provides two types of additional properties and methods:
-
-      1. Properties and methods that are automatically generated from the 
-         gbXML schema file. This method generates the :code:`version` property and
+      The *xgbxml* parser provides three types of additional properties and methods:
+          
+      1. Properties and methods inherited from the :py:class:`~xgbxml.xgbxml.gbElement` class.
+      
+      2. Properties and methods that are automatically generated from the 
+         gbXML schema file. For example, this method generates the :code:`version` property and
          the :code:`add_Campus` method for the gbXML element.
-      2. Properties and methods which are custom written for the element. 
+         
+      3. Properties and methods which are custom written for the element. 
          This is bespoke code written for a particular element to provide
          additional functionality. An example is the 
          :py:func:`~xgbxml.xgbxml.Surface.get_shell` method of the 
@@ -463,17 +466,116 @@ class gbElement(etree.ElementBase):
     
     
 class gbCollection(collections.abc.Sequence):
-    """
+    """This class is a collection of xgbxml elements.
+    
+    It acts like a list, but is immutable so cannot be changed or updated. 
+    However the items in the list can be changed.
+    
+    Instances of this class occur when a list of xgbxml elements is returned 
+    using the :py:func:`get_children` method or a method that is based on 
+    :py:func:`get_children`.
+    
+    For example, the code below returns a :code:`gbCollection` instance of 
+    Building elements:
+
+    .. code-block:: python
+        
+       from lxml import etree
+       import xgbxml
+    
+       parser=xgbxml.get_parser()  # default is gbXML version 6.01
+    
+       tree=etree.parse('gbXMLStandard.xml', parser)
+       gbxml=tree.getroot()
+       buildings=gbxml.Campus.Buildings
+    
+       print(buildings)
+       # prints "gbCollection(<Building (id="aim0013")>)"
+    
+       print(type(buildings))
+       # prints "<class 'xgbxml.xgbxml.gbCollection'>"
+       
+    
     """
     
     def __getattr__(self,key):
-        """
+        """This method catches any unknown attribute calls on a gbCollection instance.
+        
+        This allows gbCollection instances to propogate methods and property calls
+        onto the elements stored in the collection.
         
         :param key: The key passes to __getattr__
         :param key: str
         
+        This can be used to access all child elements of the elements in a gbCollection.
+        For example, the code below shows a quick access approach to query 
+        all the openings in a gbXML file.
         
+        .. code-block::  python
         
+           from lxml import etree
+           import xgbxml
+
+           parser=xgbxml.get_parser()  # default is gbXML version 6.01
+
+           tree=etree.parse('gbXMLStandard.xml', parser)
+           gbxml=tree.getroot()
+           openings=gbxml.Campus.Surfaces.Openings
+
+           print(len(openings))
+           # prints "138"
+           
+           print(type(buildings))
+           # prints "<class 'xgbxml.xgbxml.gbCollection'>"
+
+        This can also be used to access the properties of the elements of a gbCollection.
+        For example, the code below shows a quick-access approach to listing
+        all the openingTypes attributes of the openings in a gbXL file.
+        
+        .. code-block:: python
+        
+           from lxml import etree
+           import xgbxml
+
+           parser=xgbxml.get_parser()  # default is gbXML version 6.01
+
+           tree=etree.parse('gbXMLStandard.xml', parser)
+           gbxml=tree.getroot()
+           opening_types=gbxml.Campus.Surfaces.Openings.openingType
+
+           print(len(opening_types))
+           # prints "138"
+
+           print(type(opening_types))
+           # prints "<class 'tuple'>"
+
+           print(opening_types)
+           # prints "('NonSlidingDoor', 'NonSlidingDoor', 'NonSlidingDoor', ...)"
+        
+        The approach also works with method calls. For example, the code below 
+        creates a list of the areas of all openings in a gbXML file.
+        
+        .. code-block:: python
+        
+           from lxml import etree
+           import xgbxml
+
+           parser=xgbxml.get_parser()  # default is gbXML version 6.01
+
+           tree=etree.parse('gbXMLStandard.xml', parser)
+           gbxml=tree.getroot()
+           surface_areas=gbxml.Campus.Surfaces.Openings.get_area()
+
+           print(len(surface_areas))
+           # prints "138"
+
+           print(type(surface_areas))
+           # prints "<class 'tuple'>"
+
+           print(surface_areas)
+           # prints "(21.0, 21.000000056466668, 21.0, ...)"
+            
+            
         """
         #print('__getattr__', key)
         
