@@ -117,7 +117,7 @@ def get_parser(version='6.01'):
                          )
                      )
             
-    parser = etree.XMLParser()
+    parser = etree.XMLParser(remove_blank_text=True)
     parser.set_element_class_lookup(lookup)
     return parser
 
