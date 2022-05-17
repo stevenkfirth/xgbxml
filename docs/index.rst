@@ -2,8 +2,6 @@
 Welcome to xgbxml's documentation!
 ==================================
 
-UNDER DEVELOPMENT
-
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started:
