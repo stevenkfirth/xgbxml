@@ -106,7 +106,7 @@ def get_attribute_of_gbxml_element(gbxml_element,
         xsd_schema
         )    
     
-    python_type=xml_functions.xsd_type_to_python_type(xsd_type)
+    python_type=xsd_functions.xsd_type_to_python_type(xsd_type)
         
     if python_type is bool:
         

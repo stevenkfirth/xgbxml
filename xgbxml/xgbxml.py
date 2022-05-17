@@ -193,7 +193,7 @@ class gbElement(etree.ElementBase):
         Determines how the instance is displayed when printed.
         
         :returns: A different value is returned depending on if this is the 
-        gbElement class or a subclass, and/or if the element has an 'id' attribute.
+            gbElement class or a subclass, and/or if the element has an 'id' attribute.
         :rtype: str
 
         """
@@ -325,11 +325,17 @@ class gbElement(etree.ElementBase):
     
     @property
     def id(self):
-        """Returns the 'id' attribute of the element.
+        """Returns / sets the 'id' attribute of the element.
         
-        :raises KeyError: If the 'id' attribute is not present in the element.
+        :param value: When setting, the value of the id attribute
+        :type value: str
         
-        :rtype: str
+        :raises KeyError: When returning, if the 'id' attribute is not present in the element.
+        :raises KeyError: When setting, if attribute name does not exist in the schema.
+        :raises TypeError: When setting, if the attribute value is of a type that does not match 
+            the schema.
+        
+        :rtype: str (when returning)
         
         """
         return self.get_attribute('id')
@@ -338,13 +344,7 @@ class gbElement(etree.ElementBase):
     @id.setter
     def id(self,value):
         """Sets the 'id' attribute of the element.
-        
-        :param value: The value of the id attribute
-        :type value: str
-        
-        :raises KeyError: If attribute name does not exist in the schema.
-        :raises TypeError: If the attribute value is of a type that does not match 
-            the schema.
+
         
         """
         self.set_attribute('id',value)
@@ -423,14 +423,17 @@ class gbElement(etree.ElementBase):
     
     @property
     def value(self):
-        """Returns the value of the gbXML element.
+        """Returns / set the value of the gbXML element.
         
-        :param gbxml_element: A gbXML element.
-        :type gbxml_element: lxml.etree._Element
-        :param xsd_schema: The root node of a gbXML schema.
-        :type xsd_schema: lxml.etree._Element
+        This is stored in the text value of the XML element.
         
-        :returns: A value which is converted from the element text node.
+        :param value: When setting, the value for the element.
+        :type value: str, float, bool etc.
+        
+        :raises TypeError: When setting, if value is of a type that does not match 
+            the schema.
+        
+        :returns: When returning, a value which is converted from the element text node.
         :rtype: str, int, float or book etc.
         
         """
@@ -447,13 +450,8 @@ class gbElement(etree.ElementBase):
     def value(self,value):
         """Sets the value of the element.
         
-        This is stored in the text value of the XML element.
         
-        :param value: The value for the element.
-        :type value: str, float, bool etc.
         
-        :raises TypeError: If value is of a type that does not match 
-            the schema.
         """
         
         gbxml_functions.set_value_of_gbxml_element(
@@ -469,7 +467,14 @@ class gbCollection(collections.abc.Sequence):
     """
     
     def __getattr__(self,key):
-        ""
+        """
+        
+        :param key: The key passes to __getattr__
+        :param key: str
+        
+        
+        
+        """
         #print('__getattr__', key)
         
         result=[]
@@ -507,7 +512,12 @@ class gbCollection(collections.abc.Sequence):
     
     
     def __getitem__(self,index):
-        ""
+        """
+        
+        :param index: The index value passed to __getitem__
+        :type index: int
+        
+        """
         if isinstance(index, slice):
             indices = range(*index.indices(len(self._items)))
             return gbCollection(*[self._items[i] for i in indices])

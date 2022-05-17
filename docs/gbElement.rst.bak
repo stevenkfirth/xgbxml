@@ -3,6 +3,7 @@ gbElement base class
 
 .. autoclass:: xgbxml.xgbxml.gbElement
    :members:
-   :private:
+   :private-members:
+   :special-members:
    
    
