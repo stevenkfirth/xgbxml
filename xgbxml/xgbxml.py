@@ -342,13 +342,14 @@ class gbElement(etree.ElementBase):
         :param value: The value of the id attribute
         :type value: str
         
+        :raises KeyError: If attribute name does not exist in the schema.
+        :raises TypeError: If the attribute value is of a type that does not match 
+            the schema.
+        
         """
         self.set_attribute('id',value)
         
     
-    
-    
-        
     @property
     def nntag(self):
         """Returns the tag without the namespace ('no namespace tag')
@@ -408,7 +409,6 @@ class gbElement(etree.ElementBase):
     def tostring(self):
         """Returns a string of the xml of the element.
         
-        
         :rtype: str
         
         """
@@ -462,9 +462,6 @@ class gbElement(etree.ElementBase):
             xsd_schema=self.xsd_schema
             )
         
-        
-        
-    
     
     
 class gbCollection(collections.abc.Sequence):
