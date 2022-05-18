@@ -1,8 +1,8 @@
 What extra methods does xgbxml provide?
 =======================================
 
-Viewing methods on xgbxml elements
-----------------------------------
+Viewing the available methods on xgbxml elements
+------------------------------------------------
 
 Each gbXML element in xgbxml has a number of methods and properties.
 

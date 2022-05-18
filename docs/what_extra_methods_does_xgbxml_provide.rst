@@ -1,10 +1,10 @@
 What extra methods does xgbxml provide?
 =======================================
 
-Viewing the available methods on xgbxml elements
-------------------------------------------------
+Viewing the available properties and methods on xgbxml elements
+---------------------------------------------------------------
 
-Each gbXML element in xgbxml has a number of methods and properties.
+Each gbXML element in xgbxml has a number of properties and methods.
 
 The are a combination of:
 
@@ -16,7 +16,7 @@ The are a combination of:
   :py:func:`~xgbxml.xgbxml.Surface.get_shell` method of the :py:class:`~xgbxml.xgbxml.Surface` class.
 
 To view these methods for a particular element, a call to the python built-in function :code:`dir` can be used.
-In the example below, the methods and properties of the *gbXML* element are displayed.
+In the example below, the properties and methods of the *gbXML* element are displayed.
 
 .. code-block:: python
 
@@ -29,9 +29,9 @@ In the example below, the methods and properties of the *gbXML* element are disp
 Schema-based automatically-generated methods and properties
 -----------------------------------------------------------
 
-Depending on the version used in the *xgbxml* parser, a series of automatically-generated methods and properties are created based on the schema for that version.
+Depending on the version used in the *xgbxml* parser, a series of automatically-generated properties and methods are created based on the schema for that version.
 
-These methods and properties are useful for working with child elements and XML attributes.
+These properties and methods are useful for working with child elements and XML attributes.
 
 For example, according to the schema the *gbXML* element can have *AirLoop* child elements. As such, the *gbXML* element in *xgbxml* contains:
 

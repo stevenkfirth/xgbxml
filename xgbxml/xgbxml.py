@@ -191,7 +191,7 @@ class gbElement(etree.ElementBase):
     
     """
     
-    def introspect(self):
+    def _introspect(self):
         ""
         
         print('self.__class__',self.__class__)
