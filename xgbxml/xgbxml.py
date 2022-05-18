@@ -542,7 +542,7 @@ class gbCollection(collections.abc.Sequence):
            print(len(openings))
            # prints "138"
            
-           print(type(buildings))
+           print(type(openings))
            # prints "<class 'xgbxml.xgbxml.gbCollection'>"
 
         This can also be used to access the properties of the elements of a gbCollection.
