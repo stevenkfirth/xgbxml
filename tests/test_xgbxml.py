@@ -17,6 +17,13 @@ tree = etree.parse(fp,parser)
 class Test_gbElement(unittest.TestCase):
     ""
     
+    def test_introspect(self):
+        ""
+        gbxml=tree.getroot()
+        
+        print(gbxml.introspect())
+    
+    
     def test_get_children(self):
         ""
         gbXML=tree.getroot()

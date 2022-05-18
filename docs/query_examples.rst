@@ -21,23 +21,13 @@ This query calculates the total area for each surfaceType.
     
        surface_type = surface.surfaceType
     
-       try:  
-           surface_plus_openings_area = surface.PlanarGeometry.get_area()  # this raises an error in a few cases as the polygon in the 'gbXMLStandard.xml' file has three adjacent vertices on a line.
-       except ValueError:
-           print(f'Error raised for get_area() of Surface {surface.id}')
-           continue
+       surface_plus_openings_area = surface.PlanarGeometry.get_area()
     
        x = result.setdefault(surface_type,0)
        result[surface_type] = x + surface_plus_openings_area
     
    print(result)
-   # prints "{'ExteriorWall': 38663.957965668895, 
-   #          'Shade': 3602.1242386749996, 
-   #          'InteriorWall': 59075.35491038435, 
-   #          'InteriorFloor': 71901.632959902, 
-   #          'Ceiling': 2041.1025198133002, 
-   #          'Roof': 20895.388879540173, 
-   #          'SlabOnGrade': 19542.64927603096}"
+   # prints "{'ExteriorWall': 38672.963271488894, 'Shade': 3602.216580203344, 'InteriorWall': 59075.35491038435, 'InteriorFloor': 71942.48957665001, 'Ceiling': 2041.1025198133002, 'Roof': 20902.619670830172, 'SlabOnGrade': 19542.64927603096}"
 
 
 
@@ -63,15 +53,11 @@ This query calculates the opening, surface and total areas, and the window-to-wa
        surface_azimuth = surface.RectangularGeometry.Azimuth.value
        orientation = cad_model_azimuth + surface_azimuth
     
-       try:
-           total_area=surface.PlanarGeometry.get_area()  # this raises an error in a few cases as the polygon in the 'gbXMLStandard.xml' file has three adjacent vertices on a line.
-           surface_area=surface.get_area()  # this raises an error in a few cases as the polygon in the 'gbXMLStandard.xml' file has three adjacent vertices on a line.
-       except ValueError:
-           print(f'Error raised for get_area() of Surface {surface.id}')
-           continue
+       total_area=surface.PlanarGeometry.get_area()  
+       surface_area=surface.get_area()  
         
        opening_area = total_area - surface_area   
-    
+        
        x=result.setdefault(orientation,
                            {'opening_area':0,
                             'surface_area':0,

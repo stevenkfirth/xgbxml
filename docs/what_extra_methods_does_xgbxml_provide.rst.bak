@@ -36,12 +36,13 @@ These methods and properties are useful for working with child elements and XML 
 For example, according to the schema the *gbXML* element can have *AirLoop* child elements. As such, the *gbXML* element in *xgbxml* contains:
 
 - the :code:`AirLoop` property, which returns the first *AirLoop* child element found (uses :py:func:`~xgbxml.xgbxml.gbElement.get_child`).
-- the :code:`AirLoops` property (named by appending a "s" to the child element name), which returns all the *AirLoop* child elements.
-- the :code:`add_AirLoop()` method, which is useful for creating new AirLoop child elements.
+- the :code:`AirLoops` property (named by appending a "s" to the child element name), which returns all the *AirLoop* child elements (uses :py:func:`~xgbxml.xgbxml.gbElement.get_children`).
+- the :code:`add_AirLoop()` method, which is useful for creating new AirLoop child elements (uses :py:func:`~xgbxml.xgbxml.gbElement.add_child`).
 
 Similarly, according to the schema the *gbXML* element can have a *temperatureUnit* XML attribute. As such, the *gbXML* element in *xgbxml* contains:
 
-- the :code:`temperatureUnit` property, which can be used to return and set the *temperatureUnit* attribute.
+- the :code:`temperatureUnit` property, which can be used to return and set the *temperatureUnit* attribute (uses :py:func:`~xgbxml.xgbxml.gbElement.get_attribute`
+  and :py:func:`~xgbxml.xgbxml.gbElement.set_attribute`).
 
 
 

@@ -1,65 +1,40 @@
-How do I query a gbXML file?
+Query Examples
 ============================
 
-Querying a gbXML file using lxml
---------------------------------
+Areas by surfaceType
+--------------------
 
-A gbXML file can be queried using the `standard properties of the lxml Element class <https://lxml.de/tutorial.html#the-element-class>`_.
-
-
-.. code-block:: python
-
-   from lxml import etree
-
-   tree=etree.parse('gbXMLStandard.xml')
-   gbxml=tree.getroot()
-
-   # query an attribute
-   print(gbxml.attrib['version'])  
-   # prints "0.37"
-
-   # query a child element
-   print(gbxml[0].tag)
-   # prints "{http://www.gbxml.org/schema}Campus"
-
-   # query element text
-   print(gbxml[0][0][0].text)
-   # prints "52939_2004"
-
-Note the final query is the text for the 'StationId' element, located in 'gbXML/Camus/Location'.
-
-
-Querying a gbXML file using XPATH
----------------------------------
-
-gbXML files opened in *lxml* can also be queried using `XPATH <https://lxml.de/xpathxslt.html>`_.
+This query calculates the total area for each surfaceType.
 
 .. code-block:: python
 
    from lxml import etree
+   import xgbxml
 
-   tree=etree.parse('gbXMLStandard.xml')
-   gbxml=tree.getroot()
+   parser = xgbxml.get_parser('0.37')   
 
-   ns={'gbxml':'http://www.gbxml.org/schema'}
+   tree = etree.parse('gbXMLStandard.xml', parser)  # file available on GitHub here: https://github.com/GreenBuildingXML/Sample_gbXML_Files
+   gbxml = tree.getroot()
 
-   # query an attribute
-   print(gbxml.xpath('./@version')[0])  
-   # prints "0.37"
+   result = {}
+   for surface in gbxml.Campus.Surfaces:
+    
+       surface_type = surface.surfaceType
+    
+       surface_plus_openings_area = surface.PlanarGeometry.get_area()
+    
+       x = result.setdefault(surface_type,0)
+       result[surface_type] = x + surface_plus_openings_area
+    
+   print(result)
+   # prints "{'ExteriorWall': 38672.963271488894, 'Shade': 3602.216580203344, 'InteriorWall': 59075.35491038435, 'InteriorFloor': 71942.48957665001, 'Ceiling': 2041.1025198133002, 'Roof': 20902.619670830172, 'SlabOnGrade': 19542.64927603096}"
 
-   # query a child element
-   print(gbxml.xpath("./gbxml:*", namespaces=ns)[0].tag)
-   # prints "{http://www.gbxml.org/schema}Campus"
-
-   # query element text
-   print(gbxml.xpath(".//gbxml:StationId/text()", namespaces=ns)[0])
-   # prints "52939_2004"
 
 
-Additional querying methods provided by xgbxml
-----------------------------------------------
+Areas and window-to-wall ratio by orientation
+---------------------------------------------
 
-In *xgbxml*, additional properties are available to query the gbXML file:
+This query calculates the opening, surface and total areas, and the window-to-wall ratio for each orientation of the surfaces.
 
 .. code-block:: python
 
@@ -68,47 +43,47 @@ In *xgbxml*, additional properties are available to query the gbXML file:
 
    parser=xgbxml.get_parser('0.37')   
 
-   tree=etree.parse('gbXMLStandard.xml', parser)
+   tree=etree.parse('gbXMLStandard.xml', parser)  # file available on GitHub here: https://github.com/GreenBuildingXML/Sample_gbXML_Files
    gbxml=tree.getroot()
 
-   # query an attribute
-   print(gbxml.version)  
-   # prints "0.37"
-
-   # query a child element
-   print(gbxml.Campus.tag)
-   # prints "{http://www.gbxml.org/schema}Campus"
-
-   # query element text
-   print(gbxml.Campus.Location.StationId.text)
-   # prints "52939_2004"
-   
-The additional properties that *xgbxml* supplies include:
-
-- attributes for accessing gbXML element attributes (i.e. :code:`version`)
-- attributes for accessing gbXML child elements (i.e. :code:`Campus`)
-
-Advanced querying using xgbxml
-------------------------------
-
-*xgbxml* attributes can query for multiple child elements (i.e. :code:`gbxml.Campus.Surfaces`). 
-
-These can also be nested (i.e. :code:`gbxml.Campus.Surfaces.Openings`).
-
-.. code-block:: python
-
-   from lxml import etree
-   import xgbxml
-
-   parser=xgbxml.get_parser('0.37')   
-
-   tree=etree.parse('gbXMLStandard.xml', parser)
-   gbxml=tree.getroot()
-
-   print(len(gbxml.Campus.Surfaces))
-   # prints "2590"
-
-   print(len(gbxml.Campus.Surfaces.Openings))
-   # prints "138"
-
-This shows that the gbXML file has 2,590 surfaces and 138 openings.
+   result={}
+   for surface in gbxml.Campus.Surfaces:
+    
+       cad_model_azimuth = gbxml.Campus.Location.CADModelAzimuth.value
+       surface_azimuth = surface.RectangularGeometry.Azimuth.value
+       orientation = cad_model_azimuth + surface_azimuth
+    
+       try:
+           total_area=surface.PlanarGeometry.get_area()  # this raises an error in a few cases as the polygon in the 'gbXMLStandard.xml' file has three adjacent vertices on a line.
+           surface_area=surface.get_area()  # this raises an error in a few cases as the polygon in the 'gbXMLStandard.xml' file has three adjacent vertices on a line.
+       except ValueError:
+           print(f'Error raised for get_area() of Surface {surface.id}')
+           continue
+        
+       opening_area = total_area - surface_area   
+    
+       x=result.setdefault(orientation,
+                           {'opening_area':0,
+                            'surface_area':0,
+                            'total_area':0}
+                          )
+       x['opening_area']+=opening_area
+       x['surface_area']+=surface_area
+       x['total_area']+=total_area
+    
+   for k,v in result.items():
+       result[k]['window_to_wall_ratio']=result[k]['opening_area'] / result[k]['total_area']
+    
+   result = dict(sorted(result.items()))  # sorts the dictionary by key
+    
+   print(result)
+   # prints "{0.0: {'opening_area': 1054.302770011667, 
+   #                'surface_area': 39379.89112896028, 
+   #                'total_area': 40434.19389897194, 
+   #                'window_to_wall_ratio': 0.026074534159031996}, 
+   #         0.01: {'opening_area': 0.0, 
+   #                'surface_area': 18.75935256182059, 
+   #                'total_area': 18.75935256182059, 
+   #                'window_to_wall_ratio': 0.0}, 
+   #         ...
+   #         }

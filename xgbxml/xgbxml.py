@@ -15,6 +15,7 @@ from copy import copy
 
 import xgbxml.gbxml_functions as gbxml_functions
 import xgbxml.xml_functions as xml_functions
+import xgbxml.xsd_functions as xsd_functions
 import xgbxml.gbxml_xsd_functions as gbxml_xsd_functions
 
 from . import render_functions
@@ -189,6 +190,22 @@ class gbElement(etree.ElementBase):
     properties and methods available in this class.
     
     """
+    
+    def introspect(self):
+        ""
+        
+        print('self.__class__',self.__class__)
+        print('self.__class__.__bases__',self.__class__.__bases__)
+        print(self.__class__.__bases__[1])
+        print([x for x in dir(self.__class__.__bases__[1]) if not x.startswith('_')])
+        
+        import inspect
+        for name,obj in inspect.getmembers(self.__class__.__bases__[1]):
+            print(name, type(obj))
+            if inspect.isfunction(obj):
+                print(inspect.signature(obj))
+        
+        
     
     def __repr__(self):
         """The repr for the class.
@@ -444,7 +461,7 @@ class gbElement(etree.ElementBase):
             self.nntag,
             self.xsd_schema
             )
-        python_type=xml_functions.xsd_type_to_python_type(xsd_type)
+        python_type=xsd_functions.xsd_type_to_python_type(xsd_type)
         
         return python_type(self.text)
     

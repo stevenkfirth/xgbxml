@@ -1,11 +1,7 @@
-How do I create a new gbXML file?
-=================================
+How do I ask a question about xgbxml?
+=====================================
 
-A standard way to work with XML files with Python is to use the python library *lxml* https://lxml.de/.
+- Raise an issue on GitHub here: https://github.com/stevenkfirth/xgbxml/issues (also a good place to request a new feature)
 
-In the *lxml* documentation, there is a section on `Using custom Element classes in lxml <https://lxml.de/element_classes.html>`_. 
-This describes how the standard classes in lxml can be extended to include custom methods and properties.
-
-*xgbxml* (this package) uses these custom element classes to provide a more user-friendly way of using *lxml* to work with gbXML files. 
-By using the parser provided by *xgbxml*, a user gains access to additional methods and functions to read, edit and create gbXML files and elements.
+- email the author here: s.k.firth@lboro.ac.uk
 
