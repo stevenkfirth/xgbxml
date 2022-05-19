@@ -1,0 +1,7 @@
+ProductName_auto
+================
+
+.. autoclass:: xgbxml.auto.gbElements_0_34.ProductName_auto
+   :members:
+   :undoc-members:
+

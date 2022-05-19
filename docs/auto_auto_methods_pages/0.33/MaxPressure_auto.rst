@@ -1,0 +1,7 @@
+MaxPressure_auto
+================
+
+.. autoclass:: xgbxml.auto.gbElements_0_33.MaxPressure_auto
+   :members:
+   :undoc-members:
+

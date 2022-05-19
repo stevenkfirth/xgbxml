@@ -1,0 +1,7 @@
+DDHiHrCool_auto
+===============
+
+.. autoclass:: xgbxml.auto.gbElements_0_33.DDHiHrCool_auto
+   :members:
+   :undoc-members:
+

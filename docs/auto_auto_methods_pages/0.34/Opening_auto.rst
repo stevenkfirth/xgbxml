@@ -1,0 +1,7 @@
+Opening_auto
+============
+
+.. autoclass:: xgbxml.auto.gbElements_0_34.Opening_auto
+   :members:
+   :undoc-members:
+

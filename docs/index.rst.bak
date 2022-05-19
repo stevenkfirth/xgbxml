@@ -12,6 +12,7 @@ Welcome to xgbxml's documentation!
    how_do_i_query_a_gbxml_file
    how_do_i_edit_a_gbxml_file
    how_do_i_create_a_new_gbxml_file
+   how_do_i_visualise_a_gbxml_file
    what_extra_methods_does_xgbxml_provide
    how_do_i_ask_a_question_about_xgbxml
    query_examples

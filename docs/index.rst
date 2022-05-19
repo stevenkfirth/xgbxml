@@ -25,6 +25,7 @@ Welcome to xgbxml's documentation!
    create_gbXML
    gbElement
    gbCollection
+   auto_generated_methods
    auto_custom_class_pages/Campus
    auto_custom_class_pages/CartesianPoint
    auto_custom_class_pages/PlanarGeometry

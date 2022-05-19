@@ -11,7 +11,6 @@ The are a combination of:
 - Properties and methods inherited from lxml etree.Element (as xgbxml is an extension of lxml).
 - Properties and methods inherited from the :py:class:`~xgbxml.xgbxml.gbElement` class.
 - Properties and methods that are automatically generated from the gbXML schema file. For example, this method generates the :code:`version` property and the :code:`add_Campus` method for the gbXML element.
-  *Please note that the schema-generated methods and properties are not listed in documentation, as the gbXML schema is a large schema and listing each method and property is impractical as there are too many*.
 - Properties and methods which are custom written for the element. This is bespoke code written for a particular element to provide additional functionality. An example is the 
   :py:func:`~xgbxml.xgbxml.Surface.get_shell` method of the :py:class:`~xgbxml.xgbxml.Surface` class.
 

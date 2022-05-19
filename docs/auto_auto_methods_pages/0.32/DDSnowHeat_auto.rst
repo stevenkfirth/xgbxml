@@ -1,0 +1,7 @@
+DDSnowHeat_auto
+===============
+
+.. autoclass:: xgbxml.auto.gbElements_0_32.DDSnowHeat_auto
+   :members:
+   :undoc-members:
+

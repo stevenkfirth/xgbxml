@@ -1,0 +1,7 @@
+HeatingSizingFactor_auto
+========================
+
+.. autoclass:: xgbxml.auto.gbElements_6_01.HeatingSizingFactor_auto
+   :members:
+   :undoc-members:
+

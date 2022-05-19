@@ -1,0 +1,7 @@
+PeopleNumber_auto
+=================
+
+.. autoclass:: xgbxml.auto.gbElements_0_34.PeopleNumber_auto
+   :members:
+   :undoc-members:
+
