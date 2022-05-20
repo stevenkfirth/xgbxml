@@ -713,7 +713,7 @@ def copy_Opening_to_Surface(gbxml_opening,
     
     opening_shell_on_plane=[]
     for xyz in opening_shell:
-        distance, base_point=geometry_functions.dist_point_to_plane_3d(
+        distance, base_point=geometry_functions.plane_dist_to_point_3d(
             xyz,
             *surface_plane
             )
@@ -752,9 +752,41 @@ def copy_Opening_to_Surface(gbxml_opening,
     return gbxml_opening2
     
     
+
     
+def get_new_coordinate_system_of_Surface(gbxml_surface,
+                                         xsd_schema):
+    """
     
+    Returns a new coordinate system where:
+    - the origin is the left lowest point of the surface shell
+    - the x,y axis describe the plane of the surface
+    - the z axis is the normal of the surface plane
     
+    """
+    shell=get_shell_of_Surface(gbxml_surface,
+                               xsd_schema)
+    
+    V0,N=geometry_functions.plane_of_polygon_3d(shell)
+    
+    vx_new, vy_new, vz_new = geometry_functions.plane_new_projection_axes_3d(N)
+    
+    P0_new=shell[0]
+    
+    shell_new=[geometry_functions.point_project_on_new_coordinate_system_3d(
+        x,y,z,P0_new,vx_new,vy_new,vz_new
+        ) for x,y,z in shell]
+    #print(shell_new)
+    
+    shell_new_2d=[(x,y) for x,y,z in shell_new]
+    #print(shell_new_2d)
+    
+    left_lowest_index=\
+        geometry_functions.polygon_leftmost_lowest_vertex_index_2D(shell_new_2d)
+        
+    P0=shell[left_lowest_index]
+    
+    return P0, vx_new, vy_new, vz_new
     
 
 
@@ -827,7 +859,19 @@ def get_polygon_of_Surface(gbxml_surface,
 
 
 
-
+def create_rectangular_geometry_from_PlanarGeometry_for_Opening(gbxml_opening,
+                                                                xsd_schema):
+    """
+    
+    """
+    gbxml_planar_geometry=get_child_of_gbxml_element(gbxml_opening,
+                                                     'PlanarGeometry')
+    shell=get_shell_of_PlanarGeometry(gbxml_planar_geometry,
+                                      xsd_schema)
+    print(etree.tostring(copy(gbxml_opening),pretty_print=True).decode())
+    
+    #print(geometry_functions.polygon_leftmost_lowest_vertex_2D(shell,[]))
+    
     
                
 def get_shell_of_Opening(gbxml_opening,
@@ -887,6 +931,9 @@ def set_shell_of_Opening(gbxml_opening,
     set_shell_of_PolyLoop(gbxml_poly_loop,
                           shell,
                           xsd_schema)
+
+
+    # TO DO - ADD RECTANGULA GEOMETRY
 
     #print(etree.tostring(copy(gbxml_opening),pretty_print=True).decode())
     

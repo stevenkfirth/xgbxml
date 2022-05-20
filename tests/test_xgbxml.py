@@ -21,7 +21,7 @@ class Test_gbElement(unittest.TestCase):
         ""
         gbxml=tree.getroot()
         
-        print(gbxml.introspect())
+        print(gbxml._introspect())
     
     
     def test_get_children(self):

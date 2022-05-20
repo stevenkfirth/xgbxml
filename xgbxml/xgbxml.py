@@ -1067,7 +1067,16 @@ class Surface():
     def copy_opening(self,
                      opening,
                      tolerance=0.01):
-        """
+        """Makes a copy of an Opening and places it on the Surface.
+        
+        :param opening: The opening to be copied.
+        :type opening: xgbxml.xgbxml.Opening
+        :param tolerance: The distance which an opening can be 'snapped' to a surface in meters.
+        :type tolerance: fload
+        
+        :returns: The newly created Opening.
+        :rtype: xgbxml.xgbxml.Opening
+        
         """
         
         return gbxml_functions.copy_Opening_to_Surface(

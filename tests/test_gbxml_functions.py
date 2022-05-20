@@ -243,6 +243,20 @@ class Test_Surface(unittest.TestCase):
             tolerance=0.01)
         
         
+    def test_get_new_coordinate_system_of_Surface(self):
+        ""
+        
+        result=gbxml_functions.get_new_coordinate_system_of_Surface(
+            su,
+            xsd_schema
+            )
+        self.assertEqual(
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (0.0, 1.0, 0.0), 
+             (-0.0, -0.0, 1.0), 
+             (1.0, 0.0, 0.0))
+            )
     
     
     def test_get_holes_of_Surface(self):
@@ -293,6 +307,18 @@ class Test_Surface(unittest.TestCase):
     
 class Test_Opening(unittest.TestCase):
     ""
+    
+    def xtest_create_rectangular_geometry_from_PlanarGeometry_for_Opening(self):
+        ""
+        
+        
+        
+        
+        gbxml_functions.create_rectangular_geometry_from_PlanarGeometry_for_Opening(
+            op,
+            xsd_schema
+            )
+    
     
     def test_get_shell_of_Opening(self):
         ""

@@ -101,12 +101,30 @@ def point_difference_3d(a1,a2,a3,b1,b2,b3):
     return b1-a1,b2-a2,b3-a3
 
 
+def point_project_on_new_coordinate_system_3d(x,y,z,P0_new,vx_new,vy_new,vz_new):
+    """Projects a point onto a new coordinate system.
+    
+    New coordinate system described by origin and three axis vectors.
+    
+    Returns new x,y,z coordinates for the point.
+    
+    """
+    point=(x,y,z)
+    x_new=plane_dist_to_point_3d(point,P0_new,vx_new)[0]
+    y_new=plane_dist_to_point_3d(point,P0_new,vy_new)[0]
+    z_new=plane_dist_to_point_3d(point,P0_new,vz_new)[0]
+    
+    return x_new, y_new, z_new
+    
+    
+
+
 
 
 
 #%% VECTOR
 
-def angle_3d(v1,v2,v3,w1,w2,w3):
+def vector_angle_3d(v1,v2,v3,w1,w2,w3):
         """Returns the angle between this vector and the supplied vector.
         
         :param vector: A 2D or 3D vector.
@@ -116,13 +134,27 @@ def angle_3d(v1,v2,v3,w1,w2,w3):
         :rtype: float
         
         """
-        x=dot_product_3d(v1,v2,v3,w1,w2,w3)
+        x=vector_dot_product_3d(v1,v2,v3,w1,w2,w3)
         y=vector_length_3d(v1,v2,v3)
         z=vector_length_3d(w1,w2,w3)
         return math.acos(x/y/z)
     
+    
+def vector_collinear_3d(v1,v2,v3,w1,w2,w3, abs_tol = 1e-7):
+    """Tests if two vectors are collinear.
+    
+    :returns: True if both vectors are parallel, i.e. they lie on the same line.
+        They do not need to be pointing in the same direction. 
+        Otherwise returns False.
+    :rtype: bool
+    
+    """
+    cp=vector_cross_product_3d(v1,v2,v3,w1,w2,w3)
+    vl=vector_length_3d(*cp)
+    return math.isclose(vl, 0, abs_tol=abs_tol)
+    
 
-def cross_product_3d(v1,v2,v3,w1,w2,w3):
+def vector_cross_product_3d(v1,v2,v3,w1,w2,w3):
     """Returns the 3D cross product of two vectors
     
     :return vector: the cross product of V0 x V1
@@ -131,7 +163,7 @@ def cross_product_3d(v1,v2,v3,w1,w2,w3):
     return v2*w3-v3*w2,v3*w1-v1*w3,v1*w2-v2*w1   
 
 
-def dot_product_2d(v1,v2,w1,w2):
+def vector_dot_product_2d(v1,v2,w1,w2):
     """Returns the dot product of two vectors
     
     :return vector: the dot product of v.w
@@ -140,7 +172,7 @@ def dot_product_2d(v1,v2,w1,w2):
     return v1*w1+v2*w2
 
 
-def dot_product_3d(v1,v2,v3,w1,w2,w3):
+def vector_dot_product_3d(v1,v2,v3,w1,w2,w3):
     """Returns the dot product of two vectors
     
     :return vector: the dot product of v.w
@@ -149,7 +181,7 @@ def dot_product_3d(v1,v2,v3,w1,w2,w3):
     return v1*w1+v2*w2+v3*w3
 
 
-def index_largest_absolute_coordinate_3d(v1, v2, v3):
+def vector_index_largest_absolute_coordinate_3d(v1, v2, v3):
     """Returns the index of the largest absolute coordinate of the vector.
     
     :return: 0 if the x-coordinate has the largest absolute value, 
@@ -162,7 +194,7 @@ def index_largest_absolute_coordinate_3d(v1, v2, v3):
     return absolute_coords.index(max(absolute_coords)) 
 
 
-def perp_product_2d(v1,v2,w1,w2):
+def vector_perp_product_2d(v1,v2,w1,w2):
     """Returns the perp product of two vectors
     
     :return scalar: the perp product of v and w
@@ -219,24 +251,62 @@ def vector_normalize_3d(v1,v2,v3):
     return v1/length,v2/length,v3/length
         
         
-def vectors_collinear_3d(v1,v2,v3,w1,w2,w3, abs_tol = 1e-7):
-    """Tests if two vectors are collinear.
-    
-    :returns: True if both vectors are parallel, i.e. they lie on the same line.
-        They do not need to be pointing in the same direction. 
-        Otherwise returns False.
-    :rtype: bool
-    
-    """
-    cp=cross_product_3d(v1,v2,v3,w1,w2,w3)
-    vl=vector_length_3d(*cp)
-    return math.isclose(vl, 0, abs_tol=abs_tol)
 
 
 
 #%% PLANE
 
-def dist_point_to_plane_3d(test_point,V0,N):
+def plane_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
+    """Tests if two planes occupy the same space.
+    
+    plane1 - V0, N
+    plane2 - W0, O
+    
+    :rtype: bool
+    
+    """
+    return (vector_collinear_3d(*N, *O, abs_tol=abs_tol1) 
+            and math.isclose(plane_dist_to_point_3d(W0, V0, N)[0],
+                             0,
+                             abs_tol=abs_tol2))
+    
+
+def plane_new_projection_axes_3d(N, abs_tol = 1e-7):
+    """Returns three vectors which represent a new set of x,y,z axes.
+    
+    The plane lies on the new axes where new_z=0.
+    
+    The vx_new vector is the crossproduct of the plane normal vector and
+    the z-axis vector (0,0,1). This vector will therefore have a zero z-component.    
+    If the plane normal vector is also (0,0,1),
+    then the y-axis vector (0,1,0)  is used instead.
+    
+    The vy_new is crossproduct of both the vx_new and the plane normal vector.
+    
+    The vz_new is crossprodut of vx_new and vy_new.
+    
+    """
+    
+    # vx_new
+    a=vector_cross_product_3d(0, 0, 1, *N)
+    if not math.isclose(vector_length_3d(*a),0,abs_tol=abs_tol):
+        vx_new=a
+    else:
+        vx_new=vector_cross_product_3d(0, 1, 0, *N)
+
+    # vy_new
+    vy_new=vector_multiplication_3d(*vector_cross_product_3d(*vx_new,*N),
+                                -1)
+    
+    # normalise vectors
+    vx_new=vector_normalize_3d(*vx_new)
+    vy_new=vector_normalize_3d(*vy_new)
+    vz_new=vector_normalize_3d(*N)
+
+    return vx_new, vy_new, vz_new
+
+
+def plane_dist_to_point_3d(test_point, V0, N):
     """Get distance (and perp base) from a point to a plane
     
     :param test_point: a 3D point
@@ -249,35 +319,14 @@ def dist_point_to_plane_3d(test_point,V0,N):
     :rtype tuple:
     
     """
-    sn=-dot_product_3d(*N,*point_difference_3d(*V0,*test_point))
-    sd=dot_product_3d(*N,*N)
+    sn=-vector_dot_product_3d(*N,*point_difference_3d(*V0,*test_point))
+    sd=vector_dot_product_3d(*N,*N)
     sb=sn/sd
     PB = vector_addition_3d(*test_point,*vector_multiplication_3d(*N,sb))
     l=vector_length_3d(*point_difference_3d(*PB,*test_point))
     return l, PB
 
 
-def plane_axes_3d(N, abs_tol = 1e-7):
-    """Returns 'xy' and 'z'vectors for the plane 
-    
-    
-    """
-    
-    # xy vector
-    a=cross_product_3d(0, 0, -1, *N)
-    if not math.isclose(vector_length_3d(*a),0,abs_tol=abs_tol):
-        vxy=a
-    else:
-        vxy=cross_product_3d(0, -1, 0, *N)
-
-    #z vector
-    vz=cross_product_3d(*vxy,*N)
-    
-    # normalise vectors
-    vxy=vector_normalize_3d(*vxy)
-    vz=vector_normalize_3d(*vz)
-
-    return vxy, vz
 
 
 def plane_of_polygon_3d(shell, abs_tol = 1e-7):
@@ -295,32 +344,75 @@ def plane_of_polygon_3d(shell, abs_tol = 1e-7):
         c0,c1,c2=shell[i:i+3]
         v1=point_difference_3d(*c0,*c1) #vector_from_points(c0,c1)
         v2=point_difference_3d(*c1,*c2) #vector_from_points(c1,c2)
-        N=cross_product_3d(*v1,*v2)
+        N=vector_cross_product_3d(*v1,*v2)
         l=vector_length_3d(*N)
         if not math.isclose(l, 0, abs_tol=abs_tol):
             return (shell[0],N)
     raise ValueError
         
-        
-def planes_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
-    """Tests if two planes occupy the same space.
     
-    plane1 - V0, N
-    plane2 - W0, O
+# def plane_point_on_plane_axes_3d(V0,N,
+#                                  point,
+#                                  v1,v2,
+#                                  abs_tol = 1e-7):
+#     """Returns x and y coordinates of a 3D point on a 3D plane.
     
-    :rtype: bool
+#     Relative to the plane start point (V0) and the plane v1 and v2 axes.
     
-    """
-    return (vectors_collinear_3d(*N, *O, abs_tol=abs_tol1) 
-            and math.isclose(dist_point_to_plane_3d(W0, V0, N)[0],
-                             0,
-                             abs_tol=abs_tol2))
+#     :param plane: A plane.
+#     :param point: A 3D point on the plane
+    
+#     v1, v2 from 'plane_axes_3D' method
+    
+#     :rtype: x, y
+    
+#     """
+#     #print('point',point)
+#     #print('v1',v1)
+#     #print('v2',v2)
+    
+#     if plane_dist_to_point_3d(point,V0,N)[0] > abs_tol:
+#         raise ValueError('Point does not lie on the plane')
+
+#     x=plane_dist_to_point_3d(point,V0,v1)[0]
+#     y=plane_dist_to_point_3d(point,V0,v2)[0]
+    
+#     #print('x',x)
+#     #print('y',y)
+    
+#     return x, y
     
 
 
 
 
 #%% POLYGON
+
+# def polygon_on_plane_axes_3d(shell, holes):
+#     """
+#     """
+#     V0,N=plane_of_polygon_3d(shell)
+#     v1,v2=plane_axes_3d(N)
+    
+#     shell_axes_2d=[]
+#     for point in shell:
+#         point_axes_2d=plane_point_on_plane_axes_3d(V0, N, point, v1, v2)
+#         shell_axes_2d.append(point_axes_2d)
+#     shell_axes_2d=tuple(shell_axes_2d)
+        
+        
+#     holes_axes_2d=[]
+#     for hole in holes:
+#         x=[]
+#         for point in hole:
+#             point_axes_2d=plane_point_on_plane_axes_3d(V0, N, point, v1, v2)
+#             x.append(point_axes_2d)
+#         holes_axes_2d.append(tuple(x))
+    
+#     return V0, N, v1, v2, shell_axes_2d, holes_axes_2d
+    
+
+
 
 def polygon_2d_to_3d(coordinate_index, V0, N, shell, holes):
     """
@@ -352,7 +444,7 @@ def polygon_area_3d(shell,holes):
     """
     """
     V0,N=plane_of_polygon_3d(shell)
-    coordinate_index=index_largest_absolute_coordinate_3d(*N)
+    coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
     shell_2d,holes_2d=polygon_3d_to_2d(coordinate_index, shell, holes)
     area_2d=Polygon(shell_2d,holes_2d).area
     return abs(area_2d * (vector_length_3d(*N) / N[coordinate_index]))
@@ -361,16 +453,16 @@ def polygon_area_3d(shell,holes):
 def polygon_azimuth_3d(shell,holes):
     """The azimuth angle of the polygon from the y axis.
         
-    :type polygon: crossproduct.SimplePolygon
+    :type polygon: 
     
     :returns: The azimuth angle in degrees where 0 degrees is the direction 
         of the y axis and a positive angle is clockwise.
-        If the surface is horizontal, then returns None.
-    :rtype: float, None
+        If the surface is horizontal, then raises Error.
+    :rtype: float
             
     """
     V0,N=plane_of_polygon_3d(shell)
-    if vectors_collinear_3d(0,0,1,*N):
+    if vector_collinear_3d(0,0,1,*N):
         raise Exception
     else:
         # working in 2d
@@ -378,12 +470,12 @@ def polygon_azimuth_3d(shell,holes):
         y_axis=(0,1)
         
         # angle between vectors
-        angle=math.acos(dot_product_2d(*v,*y_axis)
+        angle=math.acos(vector_dot_product_2d(*v,*y_axis)
                         / vector_length_2d(*v)
                         / vector_length_2d(*y_axis))
         angle=math.degrees(angle)
     
-        if perp_product_2d(*v,*y_axis)>=0: # if y_axis is on the left of v
+        if vector_perp_product_2d(*v,*y_axis)>=0: # if y_axis is on the left of v
             return angle
         else: # y_axis is on the right of v
             return angle * -1
@@ -409,10 +501,164 @@ def polygon_centroid_3d(shell,holes):
     """
     """
     V0,N=plane_of_polygon_3d(shell)
-    coordinate_index=index_largest_absolute_coordinate_3d(*N)
+    coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
     shell_2d,holes_2d=polygon_3d_to_2d(coordinate_index, shell, holes)
     pt=polygon_centroid_2d(shell_2d,holes_2d)
     return point_2d_to_3d(coordinate_index, V0, N, *pt)
+
+
+def polygon_contains_2d(shell1, holes1, 
+                        shell2, holes2,
+                        ):
+    """Tests if one 2D polygon contains the other.
+    
+    :rtype: bool
+    
+    """
+    return Polygon(shell1, holes1).contains(Polygon(shell2, holes2))
+    
+
+def polygon_contains_3d(shell1, holes1, shell2, holes2,
+                       abs_tol = 1e-7, abs_tol1=1e-7, abs_tol2=1e-7):
+    """Tests if one 2D polygon contains the other.
+    
+    :rtype: bool
+    
+    """
+    V0,N=plane_of_polygon_3d(shell1, abs_tol=abs_tol)
+    W0,O=plane_of_polygon_3d(shell2, abs_tol=abs_tol)
+    
+    if plane_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
+        
+        coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
+        shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
+        shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)
+        return polygon_contains_2d(shell1_2d, holes1_2d, 
+                                   shell2_2d, holes2_2d)
+    
+    else:
+        
+        return False
+    
+
+def polygon_difference_2d(shell1, holes1, shell2, holes2):
+    """The difference of two 2D polygons
+    
+    :returns: The coords for the intersection polygons.
+        [(shell1, holes1), (shell2, holes2), ...]
+    
+    
+    """
+    result=Polygon(shell1, holes1).difference(Polygon(shell2, holes2))
+    
+    if isinstance(result,Polygon):
+        result=GeometryCollection([result])
+        
+    return [(tuple(pg.exterior.coords), 
+             [tuple(lr.coords) for lr in pg.interiors]) 
+            for pg in result.geoms]
+
+
+
+def polygon_equals_2d(shell1, holes1, 
+                      shell2, holes2):
+    """Tests if two 2D polygons are equal/equivalent.
+    
+    Shapely - Returns True if the set-theoretic boundary, interior, and exterior of the object coincide with those of the other.
+    
+    
+    :rtype: bool
+    
+    """
+    return Polygon(shell1, holes1).equals(Polygon(shell2, holes2))
+
+
+def polygon_equals_3d(shell1, holes1, 
+                      shell2, holes2, 
+                      abs_tol = 1e-7,
+                      abs_tol1=1e-7, abs_tol2=1e-7):
+    """Tests if two 2D polygons are equal/equivalent.
+    
+    :rtype: bool
+    
+    """
+    V0,N=plane_of_polygon_3d(shell1, abs_tol=abs_tol)
+    W0,O=plane_of_polygon_3d(shell2, abs_tol=abs_tol)
+    
+    if plane_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
+    
+        coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
+        shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
+        shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)
+        return polygon_equals_2d(shell1_2d, holes1_2d, 
+                                 shell2_2d, holes2_2d)
+    
+    else:
+        
+        return False
+   
+    
+def polygon_intersection_overlapping_2d(shell1, holes1, shell2, holes2):
+    """The intersection of two overlapping 2D polygons
+    
+    :returns: The coords for the intersection polygons.
+        [(shell1, holes1), (shell2, holes2), ...].
+        Intersection will always be at least one polygon as the initial
+        polygons are overlapping.
+    
+    
+    """
+    result=Polygon(shell1, holes1).intersection(Polygon(shell2, holes2))
+    
+    if isinstance(result,Polygon):
+        result=GeometryCollection([result])
+        
+    return [(tuple(pg.exterior.coords), 
+             [tuple(lr.coords) for lr in pg.interiors]) 
+            for pg in result.geoms]
+    
+
+def polygon_intersects_2d(shell1, holes1, shell2, holes2):
+    """Tests if two 2D polygons intersect.
+    
+    From shapely - Returns True if the boundary or interior of the object 
+        intersect in any way with those of the other. In other words, 
+        geometric objects intersect if they have any boundary or 
+        interior point in common.
+        
+    returns False if the polygons are equal
+    
+    :rtype: bool
+    
+    """
+    return Polygon(shell1, holes1).intersects(Polygon(shell2, holes2))
+
+
+def polygon_leftmost_lowest_vertex_index_2D(shell):
+    """Returns the index of the leftmost lowest point of the polygon.
+    
+    :rtype: int
+    
+       
+    """
+    
+    min_i=0
+    for i in range(1,len(shell)):
+        if shell[i][1]>shell[min_i][1]:
+            continue
+        if (shell[i][1]==shell[min_i][1]) and (shell[i][0] > shell[min_i][0]):
+            continue
+        min_i=i
+    return min_i
+
+    
+def polygon_overlaps_2d(shell1, holes1, shell2, holes2):
+    """Tests if two 2D polygons overlap.
+    
+    :rtype: bool
+    
+    """
+    return Polygon(shell1, holes1).overlaps(Polygon(shell2, holes2))
 
 
 def polygon_tilt_3d(shell,holes):
@@ -426,14 +672,12 @@ def polygon_tilt_3d(shell,holes):
     V0,N=plane_of_polygon_3d(shell)
     z_axis=(0,0,1)
     # angle between vectors
-    angle=math.acos(dot_product_3d(*N,*z_axis)
+    angle=math.acos(vector_dot_product_3d(*N,*z_axis)
                     / vector_length_3d(*N)
                     / vector_length_3d(*z_axis))
     angle=math.degrees(angle)
 
     return angle
-
-
 
 
 def polygon_triangulate_2d(shell,holes):
@@ -503,7 +747,7 @@ def polygon_triangulate_3d(shell,holes):
 
     """
     V0,N=plane_of_polygon_3d(shell)
-    coordinate_index=index_largest_absolute_coordinate_3d(*N)
+    coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
     shell_2d,holes_2d=polygon_3d_to_2d(coordinate_index, shell, holes)
     tris_2d=polygon_triangulate_2d(shell_2d,holes_2d)
     tris_3d=[]
@@ -511,144 +755,6 @@ def polygon_triangulate_3d(shell,holes):
         tris_3d.append(polygon_2d_to_3d(coordinate_index, V0, N, tri_2d, [])[0])
     return tuple(tris_3d)
     
-
-#%% POLYGONS
-
-def polygon_equals_2d(shell1, holes1, 
-                      shell2, holes2):
-    """Tests if two 2D polygons are equal/equivalent.
-    
-    Shapely - Returns True if the set-theoretic boundary, interior, and exterior of the object coincide with those of the other.
-    
-    
-    :rtype: bool
-    
-    """
-    return Polygon(shell1, holes1).equals(Polygon(shell2, holes2))
-
-
-def polygon_equals_3d(shell1, holes1, 
-                      shell2, holes2, 
-                      abs_tol = 1e-7,
-                      abs_tol1=1e-7, abs_tol2=1e-7):
-    """Tests if two 2D polygons are equal/equivalent.
-    
-    :rtype: bool
-    
-    """
-    V0,N=plane_of_polygon_3d(shell1, abs_tol=abs_tol)
-    W0,O=plane_of_polygon_3d(shell2, abs_tol=abs_tol)
-    
-    if planes_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
-    
-        coordinate_index=index_largest_absolute_coordinate_3d(*N)
-        shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
-        shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)
-        return polygon_equals_2d(shell1_2d, holes1_2d, 
-                                 shell2_2d, holes2_2d)
-    
-    else:
-        
-        return False
-    
-
-def polygon_contains_2d(shell1, holes1, 
-                        shell2, holes2,
-                        ):
-    """Tests if one 2D polygon contains the other.
-    
-    :rtype: bool
-    
-    """
-    return Polygon(shell1, holes1).contains(Polygon(shell2, holes2))
-    
-
-def polygon_contains_3d(shell1, holes1, shell2, holes2,
-                       abs_tol = 1e-7, abs_tol1=1e-7, abs_tol2=1e-7):
-    """Tests if one 2D polygon contains the other.
-    
-    :rtype: bool
-    
-    """
-    V0,N=plane_of_polygon_3d(shell1, abs_tol=abs_tol)
-    W0,O=plane_of_polygon_3d(shell2, abs_tol=abs_tol)
-    
-    if planes_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
-        
-        coordinate_index=index_largest_absolute_coordinate_3d(*N)
-        shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
-        shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)
-        return polygon_contains_2d(shell1_2d, holes1_2d, 
-                                   shell2_2d, holes2_2d)
-    
-    else:
-        
-        return False
-    
-
-
-def polygons_difference_2d(shell1, holes1, shell2, holes2):
-    """The difference of two 2D polygons
-    
-    :returns: The coords for the intersection polygons.
-        [(shell1, holes1), (shell2, holes2), ...]
-    
-    
-    """
-    result=Polygon(shell1, holes1).difference(Polygon(shell2, holes2))
-    
-    if isinstance(result,Polygon):
-        result=GeometryCollection([result])
-        
-    return [(tuple(pg.exterior.coords), 
-             [tuple(lr.coords) for lr in pg.interiors]) 
-            for pg in result.geoms]
-
-
-def polygons_intersection_overlapping_2d(shell1, holes1, shell2, holes2):
-    """The intersection of two overlapping 2D polygons
-    
-    :returns: The coords for the intersection polygons.
-        [(shell1, holes1), (shell2, holes2), ...].
-        Intersection will always be at least one polygon as the initial
-        polygons are overlapping.
-    
-    
-    """
-    result=Polygon(shell1, holes1).intersection(Polygon(shell2, holes2))
-    
-    if isinstance(result,Polygon):
-        result=GeometryCollection([result])
-        
-    return [(tuple(pg.exterior.coords), 
-             [tuple(lr.coords) for lr in pg.interiors]) 
-            for pg in result.geoms]
-    
-
-def polygon_intersects_2d(shell1, holes1, shell2, holes2):
-    """Tests if two 2D polygons intersect.
-    
-    From shapely - Returns True if the boundary or interior of the object 
-        intersect in any way with those of the other. In other words, 
-        geometric objects intersect if they have any boundary or 
-        interior point in common.
-        
-    returns False if the polygons are equal
-    
-    :rtype: bool
-    
-    """
-    return Polygon(shell1, holes1).intersects(Polygon(shell2, holes2))
-
-
-def polygon_overlaps_2d(shell1, holes1, shell2, holes2):
-    """Tests if two 2D polygons overlap.
-    
-    :rtype: bool
-    
-    """
-    return Polygon(shell1, holes1).overlaps(Polygon(shell2, holes2))
-
 
 def polygon_touches_2d(shell1, holes1, shell2, holes2):
     """Tests if two 2D polygons touch.
@@ -659,7 +765,7 @@ def polygon_touches_2d(shell1, holes1, shell2, holes2):
     return Polygon(shell1, holes1).touches(Polygon(shell2, holes2))
 
 
-def polygons_union_2d(shell1, holes1, shell2, holes2):
+def polygon_union_2d(shell1, holes1, shell2, holes2):
     """The union of two 2D polygons
     
     :returns: The coords for the union polygons.
@@ -689,7 +795,7 @@ def polyhedron_from_base_shell_and_extrud_point_3d(base_shell, extrud_point):
     """
     V0,N=plane_of_polygon_3d(base_shell) 
     v=point_difference_3d(*V0,*extrud_point)
-    x=dot_product_3d(*N,*v)  # greater than zero if both vectors are pointing on same side of plane
+    x=vector_dot_product_3d(*N,*v)  # greater than zero if both vectors are pointing on same side of plane
     if x>0:
         base_shell=tuple(list(base_shell)[::-1])  # reverse tr1
     
@@ -712,7 +818,7 @@ def polyhedron_from_base_shell_and_extrud_vector_3d(base_shell, extrud_vector):
     
     """
     V0,N=plane_of_polygon_3d(base_shell)  # gets the normal of tr1
-    x=dot_product_3d(*N,*extrud_vector)  # greater than zero if both vectors are on same side of triangle
+    x=vector_dot_product_3d(*N,*extrud_vector)  # greater than zero if both vectors are on same side of triangle
     if x>0:
         base_shell=tuple(list(base_shell)[::-1])  # reverse tr1
     
@@ -759,7 +865,7 @@ def tetrahedron_from_points_3d(P0,P1,P2,P3):
     # is the first triangle 'outward facing'? If not then reverse.
     V0,N=plane_of_polygon_3d(tr1)  # gets the normal of tr1
     v=point_difference_3d(*P0,*P3)  # vector from P0 to P3
-    x=dot_product_3d(*N,*v)  # greater than zero if both vectors are on same side of triangle
+    x=vector_dot_product_3d(*N,*v)  # greater than zero if both vectors are on same side of triangle
     if x>0:
         tr1=((P0,P2,P1,P0))  # reverse tr1
         
@@ -790,9 +896,9 @@ def tetrahedron_volume_3d(tetrahedron):
     """
     # NEEDS testing
     a,b,c,d=list(set(pt for tr in tetrahedron for pt in tr))
-    return (abs(dot_product_3d(*point_difference_3d(*d,*a),
-                               *cross_product_3d(*point_difference_3d(*d,*b),
-                                                 *point_difference_3d(*d,*c))))
+    return (abs(vector_dot_product_3d(*point_difference_3d(*d,*a),
+                                      *vector_cross_product_3d(*point_difference_3d(*d,*b),
+                                                               *point_difference_3d(*d,*c))))
             / 6)
 
 
@@ -860,14 +966,14 @@ def tetrahedrons_intersect(th1, th2, abs_tol=1e-7):
     for tr in th1:
         V0,N=plane_of_polygon_3d(tr)
         vs=[point_difference_3d(*V0,*pt) for pt in th2_points]
-        x=[dot_product_3d(*v,*N) for v in vs]
+        x=[vector_dot_product_3d(*v,*N) for v in vs]
         if all((y>0 or math.isclose(y,0,abs_tol=abs_tol)) for y in x):
             return False
         
     for tr in th2:
         V0,N=plane_of_polygon_3d(tr)
         vs=[point_difference_3d(*V0,*pt) for pt in th1_points]
-        x=[dot_product_3d(*v,*N) for v in vs]
+        x=[vector_dot_product_3d(*v,*N) for v in vs]
         if all((y>0 or math.isclose(y,0,abs_tol=abs_tol)) for y in x):
             return False
     
@@ -887,7 +993,7 @@ def tetrahedrons_intersect(th1, th2, abs_tol=1e-7):
     # edge planes
     for th1_edge in th1_edges:
         for th2_edge in th2_edges:
-            N=cross_product_3d(*th1_edge,*th2_edge)
+            N=vector_cross_product_3d(*th1_edge,*th2_edge)
             
             if not math.isclose(vector_length_3d(*N),0,abs_tol=abs_tol):
             
@@ -896,11 +1002,11 @@ def tetrahedrons_intersect(th1, th2, abs_tol=1e-7):
                 
                 # th1 values
                 vs=[point_difference_3d(*V0,*pt) for pt in th1_points]
-                x=[dot_product_3d(*v,*N)*vector_length_3d(*v) for v in vs]
+                x=[vector_dot_product_3d(*v,*N)*vector_length_3d(*v) for v in vs]
                 
                 # th2 values
                 vs=[point_difference_3d(*V0,*pt) for pt in th2_points]
-                y=[dot_product_3d(*v,*N)*vector_length_3d(*v) for v in vs]
+                y=[vector_dot_product_3d(*v,*N)*vector_length_3d(*v) for v in vs]
                 
                 if ((max(x)<min(y) 
                      or math.isclose(max(x),min(y),abs_tol=abs_tol)) 
