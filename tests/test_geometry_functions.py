@@ -33,6 +33,12 @@ class Test_Point(unittest.TestCase):
             (1.0, 2.0, 0.0)
             )
         
+        x=geometry_functions.point_unproject_from_new_coordinate_system_3d(
+            *result,p0,vx_new,vy_new,vz_new
+            )
+        print(x)
+        
+        
         
     
 class Test_Vector(unittest.TestCase):

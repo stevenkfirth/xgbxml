@@ -117,6 +117,21 @@ def point_project_on_new_coordinate_system_3d(x,y,z,P0_new,vx_new,vy_new,vz_new)
     return x_new, y_new, z_new
     
     
+def point_unproject_from_new_coordinate_system_3d(x,y,z,P0_new,vx_new,vy_new,vz_new):
+    """Projects a point onto a new coordinate system.
+    
+    New coordinate system described by origin and three axis vectors.
+    
+    Returns new x,y,z coordinates for the point.
+    
+    """
+    
+    a=vector_multiplication_3d(*vx_new,x)
+    b=vector_multiplication_3d(*vy_new,y)
+    c=vector_multiplication_3d(*vz_new,z)
+    
+    return tuple(P0_new[i]+a[i]+b[i]+c[i] for i in [0,1,2])
+    
 
 
 
@@ -175,6 +190,12 @@ def vector_dot_product_2d(v1,v2,w1,w2):
 def vector_dot_product_3d(v1,v2,v3,w1,w2,w3):
     """Returns the dot product of two vectors
     
+    :returns: The dot product of the two vectors: 
+        returns 0 if self and vector are perpendicular; 
+        returns >0 if the angle between self and vector is an acute angle (i.e. <90deg); 
+        returns <0 if the angle between self and vector is an obtuse angle (i.e. >90deg).
+    :rtype: float
+    
     :return vector: the dot product of v.w
     :rtype tuple: 
     """
@@ -201,6 +222,24 @@ def vector_perp_product_2d(v1,v2,w1,w2):
     :rtype float: 
     """
     return v1*w2-v2*w1
+
+
+def vector_perpendicular_2d(v1,v2,w1,w2, abs_tol = 1e-7):
+    """Tests if the vectors are perpendicular
+    
+    """
+    dot=vector_dot_product_2d(v1,v2,w1,w2)
+    return math.isclose(dot, 0, abs_tol=abs_tol)
+    
+
+
+def vector_perpendicular_3d(v1,v2,v3,w1,w2,w3, abs_tol = 1e-7):
+    """Tests if the vectors are perpendicular
+    
+    """
+    dot=vector_dot_product_3d(v1,v2,v3,w1,w2,w3)
+    return math.isclose(dot, 0, abs_tol=abs_tol)
+    
 
 
 def vector_addition_3d(v1,v2,v3,w1,w2,w3):
@@ -270,6 +309,35 @@ def plane_almost_equal_3d(V0, N, W0, O, abs_tol1=1e-7, abs_tol2=1e-7):
                              0,
                              abs_tol=abs_tol2))
     
+def plane_azimuth_3d(V0,N):
+    """The azimuth angle of the polygon from the y axis.
+        
+    :type polygon: 
+    
+    :returns: The azimuth angle in degrees where 0 degrees is the direction 
+        of the y axis and a positive angle is clockwise.
+        If the surface is horizontal, then raises Error.
+    :rtype: float
+            
+    """
+    if vector_collinear_3d(0,0,1,*N):
+        raise Exception
+    else:
+        # working in 2d
+        v=N[0],N[1]
+        y_axis=(0,1)
+        
+        # angle between vectors
+        angle=math.acos(vector_dot_product_2d(*v,*y_axis)
+                        / vector_length_2d(*v)
+                        / vector_length_2d(*y_axis))
+        angle=math.degrees(angle)
+    
+        if vector_perp_product_2d(*v,*y_axis)>=0: # if y_axis is on the left of v
+            return angle
+        else: # y_axis is on the right of v
+            return angle * -1
+
 
 def plane_new_projection_axes_3d(N, abs_tol = 1e-7):
     """Returns three vectors which represent a new set of x,y,z axes.
@@ -350,6 +418,24 @@ def plane_of_polygon_3d(shell, abs_tol = 1e-7):
             return (shell[0],N)
     raise ValueError
         
+    
+def plane_tilt_3d(V0,N):
+    """The tilt angle of the polygon from the horizontal.
+    
+    :returns: The tilt angle in degrees where vertically up is 0 degrees and 
+        face down is 180 degrees.
+    :rtype: float
+        
+    """
+    z_axis=(0,0,1)
+    # angle between vectors
+    angle=math.acos(vector_dot_product_3d(*N,*z_axis)
+                    / vector_length_3d(*N)
+                    / vector_length_3d(*z_axis))
+    angle=math.degrees(angle)
+
+    return angle
+    
     
 # def plane_point_on_plane_axes_3d(V0,N,
 #                                  point,
@@ -450,35 +536,7 @@ def polygon_area_3d(shell,holes):
     return abs(area_2d * (vector_length_3d(*N) / N[coordinate_index]))
 
 
-def polygon_azimuth_3d(shell,holes):
-    """The azimuth angle of the polygon from the y axis.
-        
-    :type polygon: 
-    
-    :returns: The azimuth angle in degrees where 0 degrees is the direction 
-        of the y axis and a positive angle is clockwise.
-        If the surface is horizontal, then raises Error.
-    :rtype: float
-            
-    """
-    V0,N=plane_of_polygon_3d(shell)
-    if vector_collinear_3d(0,0,1,*N):
-        raise Exception
-    else:
-        # working in 2d
-        v=N[0],N[1]
-        y_axis=(0,1)
-        
-        # angle between vectors
-        angle=math.acos(vector_dot_product_2d(*v,*y_axis)
-                        / vector_length_2d(*v)
-                        / vector_length_2d(*y_axis))
-        angle=math.degrees(angle)
-    
-        if vector_perp_product_2d(*v,*y_axis)>=0: # if y_axis is on the left of v
-            return angle
-        else: # y_axis is on the right of v
-            return angle * -1
+
 
 
 def polygon_bounds_3d(shell,holes):
@@ -659,25 +717,6 @@ def polygon_overlaps_2d(shell1, holes1, shell2, holes2):
     
     """
     return Polygon(shell1, holes1).overlaps(Polygon(shell2, holes2))
-
-
-def polygon_tilt_3d(shell,holes):
-    """The tilt angle of the polygon from the horizontal.
-    
-    :returns: The tilt angle in degrees where vertically up is 0 degrees and 
-        face down is 180 degrees.
-    :rtype: float
-        
-    """
-    V0,N=plane_of_polygon_3d(shell)
-    z_axis=(0,0,1)
-    # angle between vectors
-    angle=math.acos(vector_dot_product_3d(*N,*z_axis)
-                    / vector_length_3d(*N)
-                    / vector_length_3d(*z_axis))
-    angle=math.degrees(angle)
-
-    return angle
 
 
 def polygon_triangulate_2d(shell,holes):

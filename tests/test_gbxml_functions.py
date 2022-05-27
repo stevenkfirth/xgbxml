@@ -14,7 +14,8 @@ import xgbxml.gbxml_functions as gbxml_functions
 
 
 fp=r'files\gbXMLStandard.xml'
-tree = etree.parse(fp)
+parser = etree.XMLParser(remove_blank_text=True)
+tree = etree.parse(fp, parser)
 gbxml=tree.getroot()
 ns={'gbxml':'http://www.gbxml.org/schema'}
 
@@ -26,6 +27,11 @@ op=gbxml.xpath('//gbxml:Surface[@id="aim12670"]/gbxml:Opening', namespaces=ns)[0
 
 fp=r'files\GreenBuildingXML_Ver6.01.xsd'
 xsd_schema = etree.parse(fp).getroot()
+
+
+#su_str=etree.tostring(copy(su),pretty_print=True).decode()
+#with open('su.xml', 'w') as f:
+#    f.write(su_str)
 
 
 class Test_common(unittest.TestCase):
@@ -168,66 +174,194 @@ class Test_PlanarGeometry(unittest.TestCase):
              (47.90424, 58.64111, 474.0))
             )
     
+
+
+class Test_PolyLoop(unittest.TestCase):
+    ""
+    
+    def test_get_new_coordinate_system_of_PolyLoop(self):
+        ""
+        su_pg=gbxml_functions.get_child_of_gbxml_element(
+            su,
+            'PlanarGeometry'
+            )
+        su_pg_pl=gbxml_functions.get_child_of_gbxml_element(
+            su_pg,
+            'PolyLoop'
+            )
+        
+        result=gbxml_functions.get_new_coordinate_system_of_PolyLoop(
+            su_pg_pl,
+            xsd_schema
+            )
+        self.assertEqual(
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (0.0, 1.0, 0.0), 
+             (-0.0, -0.0, 1.0), 
+             (1.0, 0.0, 0.0))
+            )
+
+
+
         
         
 class Test_RectangularGeometry(unittest.TestCase):
     ""
     
-    def test_get_x_vector_of_RectangularGeometry(self):
+    
+    def test_get_new_coordinate_system_of_RectangularGeometry(self):
         ""
-        self.assertEqual(
-            gbxml_functions.get_x_vector_of_RectangularGeometry(
-                rg,
+        
+        # for Surface
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            su,
+            'RectangularGeometry'
+            )
+        P0, vx_new, vy_new, vz_new = \
+            gbxml_functions.get_new_coordinate_system_of_RectangularGeometry(
+                gbxml_rectangular_geometry,
                 xsd_schema
-                ),
-            (-1.8369701987210297e-16,
-             -1.0,
-             0.0)
+                )
+        #print((P0, vx_new, vy_new, vz_new))
+        self.assertEqual(
+            (P0, vx_new, vy_new, vz_new),
+            ((97.352170013123, 67.503110006562, 490.0), 
+             (-6.123233995736766e-17, 1.0, 0.0), 
+             (6.123233995736766e-17, 3.749399456654644e-33, 1.0), 
+             (1.0, 6.123233995736766e-17, -6.123233995736766e-17))
             )
         
-        
-    def test_get_y_vector_of_RectangularGeometry(self):
+    
+    def test_get_start_point_of_RectangularGeometry(self):
         ""
-        self.assertEqual(
-            gbxml_functions.get_y_vector_of_RectangularGeometry(
-                rg,
-                xsd_schema
-                ),
-            (-1.1248198369963932e-32,
-             -6.123233995736766e-17,
-             1.0)
+        
+        # for Surface
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            su,
+            'RectangularGeometry'
             )
+        start_point=gbxml_functions.get_start_point_of_RectangularGeometry(
+                    gbxml_rectangular_geometry,
+                    xsd_schema
+                    )
+        #print(start_point)
+        self.assertEqual(
+            start_point,
+            (97.352170013123, 67.503110006562, 490.0)
+            )
+        
+        # for Opening
+    
+    
+    # def test_get_x_vector_of_RectangularGeometry(self):
+    #     ""
+    #     self.assertEqual(
+    #         gbxml_functions.get_x_vector_of_RectangularGeometry(
+    #             rg,
+    #             xsd_schema
+    #             ),
+    #         (-1.8369701987210297e-16,
+    #          -1.0,
+    #          0.0)
+    #         )
+        
+        
+    # def test_get_y_vector_of_RectangularGeometry(self):
+    #     ""
+    #     self.assertEqual(
+    #         gbxml_functions.get_y_vector_of_RectangularGeometry(
+    #             rg,
+    #             xsd_schema
+    #             ),
+    #         (-1.1248198369963932e-32,
+    #          -6.123233995736766e-17,
+    #          1.0)
+    #         )
     
     
     def test_get_shell_from_height_and_width_of_RectangularGeometry(self):
         ""
+        # for Surface
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            su,
+            'RectangularGeometry'
+            )
+        result=gbxml_functions.get_shell_from_height_and_width_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+        #print(result); return
         self.assertEqual(
-            gbxml_functions.get_shell_from_height_and_width_of_RectangularGeometry(
-                rg,
-                xsd_schema
-                ),
-            ((47.90423999343799, 75.5578, 474.0), 
-             (47.90423999343799, 75.5578, 484.5), 
-             (47.904239993438, 106.0994, 484.5), 
-             (47.904239993438, 106.0994, 474.0),
-             (47.90423999343799, 75.5578, 474.0))
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (97.35217, 70.50311, 490.0), 
+             (97.35217, 70.50311, 497.0), 
+             (97.35217, 67.50311, 497.0), 
+             (97.35217, 67.50311, 490.0))
+            )
+    
+        # for Opening
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            op,
+            'RectangularGeometry'
+            )
+        result=gbxml_functions.get_shell_from_height_and_width_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+        #print(result); return
+        self.assertEqual(
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (97.35217, 70.47030000000001, 490.0), 
+             (97.35217, 70.47030000000001, 496.96719), 
+             (97.35217, 67.50311, 496.96719), 
+             (97.35217, 67.50311, 490.0))
             )
     
     
-    def test_get_shell_from_polyloop_of_RectangularGeometry(self):
+    def test_get_shell_from_poly_loop_of_RectangularGeometry(self):
         ""
-        self.assertEqual(
-            gbxml_functions.get_shell_from_polyloop_of_RectangularGeometry(
-                rg,
-                xsd_schema
-                ),
-            ((47.90423999343799, 75.557789993438, 474.0), 
-             (47.90423999343799, 75.557789993438, 484.5), 
-             (47.904239993438, 106.0994, 484.5), 
-             (47.904239993438, 106.0994, 474.0),
-             (47.90423999343799, 75.557789993438, 474.0))
+        
+        # for Surface
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            su,
+            'RectangularGeometry'
             )
-   
+        result=gbxml_functions.get_shell_from_poly_loop_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+        #print(result); return
+        self.assertEqual(
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (97.35217, 70.50311, 490.0), 
+             (97.35217, 70.50311, 497.0), 
+             (97.35217, 67.50311, 497.0), 
+             (97.35217, 67.50311, 490.0))
+            )
+        
+        
+        # for Opening
+        gbxml_rectangular_geometry=gbxml_functions.get_child_of_gbxml_element(
+            op,
+            'RectangularGeometry'
+            )
+        result=gbxml_functions.get_shell_from_poly_loop_of_RectangularGeometry(
+            gbxml_rectangular_geometry,
+            xsd_schema
+            )
+        #print(result); return
+        self.assertEqual(
+            result,
+            ((97.35217, 67.50311, 490.0), 
+             (97.35217, 70.50311, 490.0), 
+             (97.35217, 70.50311, 497.0), 
+             (97.35217, 67.50311, 497.0), 
+             (97.35217, 67.50311, 490.0))
+            )
         
         
 class Test_Surface(unittest.TestCase):
@@ -243,20 +377,6 @@ class Test_Surface(unittest.TestCase):
             tolerance=0.01)
         
         
-    def test_get_new_coordinate_system_of_Surface(self):
-        ""
-        
-        result=gbxml_functions.get_new_coordinate_system_of_Surface(
-            su,
-            xsd_schema
-            )
-        self.assertEqual(
-            result,
-            ((97.35217, 67.50311, 490.0), 
-             (0.0, 1.0, 0.0), 
-             (-0.0, -0.0, 1.0), 
-             (1.0, 0.0, 0.0))
-            )
     
     
     def test_get_holes_of_Surface(self):
@@ -305,20 +425,24 @@ class Test_Surface(unittest.TestCase):
             )
     
     
-class Test_Opening(unittest.TestCase):
-    ""
-    
-    def xtest_create_rectangular_geometry_from_PlanarGeometry_for_Opening(self):
+    def test_set_rectangular_geometry_from_planar_geometry_of_Surface(self):
         ""
         
+        su2=copy(su)
         
-        
-        
-        gbxml_functions.create_rectangular_geometry_from_PlanarGeometry_for_Opening(
-            op,
+        gbxml_functions.set_rectangular_geometry_from_planar_geometry_of_Surface(
+            su2,
             xsd_schema
             )
     
+    
+    
+    
+    
+class Test_Opening(unittest.TestCase):
+    ""
+    
+       
     
     def test_get_shell_of_Opening(self):
         ""
@@ -335,7 +459,8 @@ class Test_Opening(unittest.TestCase):
     
     def test_set_shell_of_opening(self):
         ""
-        op2=copy(op)
+        su2=copy(su)
+        op2=su2.xpath('./gbxml:Opening', namespaces=ns)[0] 
         x=gbxml_functions.set_shell_of_Opening(
             op2,
             ((97.35217, 67.50311, 491.0), 
@@ -354,6 +479,18 @@ class Test_Opening(unittest.TestCase):
              (97.35217, 67.50311, 496.0),
              (97.35217, 67.50311, 491.0))
             )
+    
+    def test_set_rectangular_geometry_from_planar_geometry_of_Opening(self):
+        ""
+        
+        su2=copy(su)
+        op2=su2.xpath('./gbxml:Opening', namespaces=ns)[0] 
+        
+        gbxml_functions.set_rectangular_geometry_from_planar_geometry_of_Opening(
+            op2,
+            xsd_schema
+            )
+    
     
         
         
