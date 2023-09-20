@@ -747,6 +747,48 @@ class CartesianPoint():
             )
    
     
+class ClosedShell():
+    ""
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               outline_kwargs=None,
+               fill_kwargs=None):
+        """Renders the PolyLoops of the ClosedShell in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of surfaces (passed to ax.plot method).
+        :param fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of surfaces (passed to Poly3DCollection method).
+        
+            
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
+        #print(self)
+        for pl in self.PolyLoops:
+            #try:
+            ax=pl.render(ax=ax,
+                         set_lims=set_lims,
+                         outline_kwargs=outline_kwargs,
+                         fill_kwargs=fill_kwargs
+                         )
+            #except TypeError as err:
+            #    print(su)
+            #    print(type(err))
+                
+        return ax
+    
+    
+    
 class Opening():
     ""
     
@@ -1058,8 +1100,69 @@ class RectangularGeometry():
         
         return ax
             
-
     
+    
+class Space():
+    
+    def get_surfaces(
+            self
+            ):
+        """Returns all Surfaces adjacent to the Space.
+        """
+        
+        result = gbxml_functions.get_Surfaces_of_Space(
+            self,
+            self.xsd_schema
+            )
+    
+        return gbCollection(*result)
+    
+    
+    def render(self,
+               ax=None, 
+               set_lims=True, 
+               surface_outline_kwargs=None,
+               surface_fill_kwargs=None,
+               opening_outline_kwargs=None,
+               opening_fill_kwargs=None):
+        """Renders the Surfaces of the Space in 3D using matplotlib.
+        
+        :param ax: A matplotlib 3D Axes instance. Optional, if not supplied
+            then an axis is created and returned.
+        :type ax:  matplotlib.axes._subplots.Axes3DSubplot
+        :param set_lims: If True, then the x, y and z axis limits are set
+            automatically based on the geometry being rendered.
+        :type set_lims: bool
+        :param surface_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of surfaces (passed to ax.plot method).
+        :param surface_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of surfaces (passed to Poly3DCollection method).
+        :param opening_outline_kwargs: matplotlib keywork arguments for formatting
+            the outlines of openings (passed to ax.plot method).
+        :param opening_fill_kwargs: matplotlib keywork arguments for formatting the 
+            fill of openings (passed to Poly3DCollection method).
+            
+        :returns: The axis instance.
+        :rtype: matplotlib.axes._subplots.Axes3DSubplot
+        
+        """
+        #print(self)
+        for su in self.get_surfaces():
+            #try:
+            ax=su.render(ax=ax,
+                         set_lims=set_lims,
+                         surface_outline_kwargs=surface_outline_kwargs,
+                         surface_fill_kwargs=surface_fill_kwargs,
+                         opening_outline_kwargs=opening_outline_kwargs,
+                         opening_fill_kwargs=opening_fill_kwargs
+                         )
+            #except TypeError as err:
+            #    print(su)
+            #    print(type(err))
+                
+        return ax
+    
+
 class Surface():
     ""
 

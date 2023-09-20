@@ -812,6 +812,28 @@ def get_start_point_of_RectangularGeometry(
         
     
 
+#%% Space
+
+def get_Surfaces_of_Space(
+        gbxml_space,
+        xsd_schema,
+        verbose=False
+        ):
+    ""
+        
+    space_id=get_attribute_of_gbxml_element(gbxml_space, 'id', xsd_schema)
+    #print(space_id)
+    
+    query=f'../.././gbxml:Surface[gbxml:AdjacentSpaceId[@spaceIdRef="{space_id}"]]'
+    if verbose: print(query)
+    
+    result=gbxml_space.xpath(
+        query,
+        namespaces=ns
+        )
+    
+    return result
+            
     
     
     
@@ -954,7 +976,7 @@ def get_Spaces_of_Surface(gbxml_surface):
     
     """
     campus=gbxml_surface.getparent()
-    return [campus.xpath('.//Space[@id="%s"]' % AdjacentSpaceId,
+    return [campus.xpath('.//Space[@id="%s"]' % AdjacentSpaceId,  # does this need a 'gbxml:'
                          namespaces=ns)[0]
             for AdjacentSpaceId in get_children_of_gbxml_element(gbxml_surface,
                                                                  'AdjacentSpaceIds')]

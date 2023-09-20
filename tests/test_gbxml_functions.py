@@ -22,6 +22,7 @@ ns={'gbxml':'http://www.gbxml.org/schema'}
 cp=gbxml.xpath('//gbxml:CartesianPoint', namespaces=ns)[0]  # first CartesianPoint
 pg=gbxml.xpath('//gbxml:PlanarGeometry', namespaces=ns)[0]  # first PlanarGeometry
 rg=gbxml.xpath('//gbxml:RectangularGeometry', namespaces=ns)[0]  # first RectangularGeometry
+sp=gbxml.xpath('//gbxml:Space', namespaces=ns)[0]  # first Space
 su=gbxml.xpath('//gbxml:Surface[@id="aim12670"]', namespaces=ns)[0]  # specific surface
 op=gbxml.xpath('//gbxml:Surface[@id="aim12670"]/gbxml:Opening', namespaces=ns)[0]  # specific opening
 
@@ -362,6 +363,17 @@ class Test_RectangularGeometry(unittest.TestCase):
              (97.35217, 67.50311, 497.0), 
              (97.35217, 67.50311, 490.0))
             )
+        
+        
+class Test_Space(unittest.TestCase):
+    ""
+    
+    result=gbxml_functions.get_Surfaces_of_Space(
+        gbxml_space=sp,
+        xsd_schema=xsd_schema
+        )
+        
+    #print(result)
         
         
 class Test_Surface(unittest.TestCase):

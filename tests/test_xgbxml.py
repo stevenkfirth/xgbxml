@@ -21,7 +21,7 @@ class Test_gbElement(unittest.TestCase):
         ""
         gbxml=tree.getroot()
         
-        print(gbxml._introspect())
+        #print(gbxml._introspect())
     
     
     def test_get_children(self):
@@ -42,13 +42,13 @@ class Test_gbCollection(unittest.TestCase):
         
         
         return
-        print(cs.id)
+        #print(cs.id)
         
         
-        print(gbXML.Campuss.Surfaces[:10])
+        #print(gbXML.Campuss.Surfaces[:10])
         
         
-        print(gbXML.Campus.Surfaces.Openings)
+        #print(gbXML.Campus.Surfaces.Openings)
         
         
         #print(gbXML.Campus.Surfaces.PlanarGeometrys[:10].get_Polygon)
@@ -129,7 +129,7 @@ class Test_PlanarGeometry(unittest.TestCase):
         gbXML=tree.getroot()
         pg=gbXML.Campus.Surface.PlanarGeometry
         scene=pg.render()
-        print(scene)
+        #print(scene)
 
 
 
@@ -201,6 +201,15 @@ class Test_PolyLoop(unittest.TestCase):
     
 class Test_Space(unittest.TestCase):
     ""
+    
+    def test_get_surfaces(self):
+        
+        gbXML=tree.getroot()
+        space=gbXML.Campus.Building.Space
+        result = space.get_surfaces()
+        
+        print(result)
+        print(len(result))
     
     
     
