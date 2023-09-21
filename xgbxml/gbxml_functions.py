@@ -395,9 +395,6 @@ def get_vector_of_Azimuth(gbxml_azimuth,
 
 
 
-
-
-
 #%% CartesianPoint
 
 def add_Coordinates_to_CartesianPoint(gbxml_element,
@@ -439,6 +436,48 @@ def get_Coordinate_values_from_CartesianPoint(gbxml_cartesian_point,
                                             xsd_schema) 
                  for gbxml_coordinate in gbxml_coordinates)
     
+
+#%% ClosedShell
+
+def get_gaps_in_ClosedShell(
+        gbxml_closed_shell,
+        xsd_schema
+        ):
+    """Finds any gaps (missing polygons) in a ClosedShell.
+    
+    Use case: export from REVIT sometimes has ClosedShells which are not fully closed
+    
+    """
+    
+    result=[]
+    
+    # get segments of ClosedShell
+    segments=[]
+    for polyloop in gbxml_closed_shell.PolyLoops:
+        shell=get_shell_of_PolyLoop(
+            polyloop,
+            xsd_schema
+            )
+        segments.extend(
+            geometry_functions.polygon_exterior_segments_3d(
+                shell
+                )
+            )
+    #print(segments)
+        
+    for segment in segments:
+        y=geometry_functions.segments_difference_3d(result,[segment])
+        z=geometry_functions.segments_difference_3d([segment],result)
+        result=y+z
+        
+    result=geometry_functions.segments_to_shells(result)
+    
+        
+    return result
+
+    
+
+
 
 
 #%% PlanarGeometry
@@ -738,7 +777,7 @@ def get_shell_from_height_and_width_of_RectangularGeometry(gbxml_rectangular_geo
         )
     
 
-def get_shell_from_poly_loop_of_RectangularGeometry(gbxml_rectangular_geometry,
+def get_shell_from_polyloop_of_RectangularGeometry(gbxml_rectangular_geometry,
                                                    xsd_schema):
     """Returns the coordintes from the rectangular data using the polyloop.
     

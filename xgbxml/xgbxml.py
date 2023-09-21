@@ -750,6 +750,19 @@ class CartesianPoint():
 class ClosedShell():
     ""
     
+    def get_gaps(
+            self
+            ):
+        """
+        """
+        
+        return gbxml_functions.get_gaps_in_ClosedShell(
+            self,
+            self.xsd_schema
+            )
+    
+    
+    
     def render(self,
                ax=None, 
                set_lims=True, 

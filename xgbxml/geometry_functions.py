@@ -12,7 +12,7 @@
 # // Users of this code must verify correctness for their application.
 
 
-from shapely.geometry import Polygon, GeometryCollection
+from shapely.geometry import Polygon, GeometryCollection, LineString, MultiLineString
 import shapely.wkt
 import triangle as triangle_package
 import math
@@ -99,6 +99,26 @@ def point_difference_3d(a1,a2,a3,b1,b2,b3):
     :rtype tuple: 
     """
     return b1-a1,b2-a2,b3-a3
+
+
+def point_equals_3d(a1,a2,a3,b1,b2,b3, abs_tol=1e-7):
+    ""
+    return (
+        math.isclose(a1,b1,abs_tol=abs_tol) 
+        and math.isclose(a2,b2,abs_tol=abs_tol) 
+        and math.isclose(a3,b3,abs_tol=abs_tol)
+    )
+
+
+def point_on_line_3d(pt,P0,vL):
+    ""
+    coordinate_index=vector_index_largest_absolute_coordinate_3d(*vL)
+    t=(pt[coordinate_index]-P0[coordinate_index])/vL[coordinate_index]
+    pt2=vector_addition_3d(
+        *P0,
+        *vector_multiplication_3d(*vL,t)
+    )
+    return point_equals_3d(*pt,*pt2)
 
 
 def point_project_on_new_coordinate_system_3d(x,y,z,P0_new,vx_new,vy_new,vz_new):
@@ -215,6 +235,15 @@ def vector_index_largest_absolute_coordinate_3d(v1, v2, v3):
     return absolute_coords.index(max(absolute_coords)) 
 
 
+def vector_normal_3d(v1,v2,v3):
+    "returns a vector normal to the supplied vector"
+    if not vector_collinear_3d(v1,v2,v3,1,0,0):
+        result=vector_cross_product_3d(v1,v2,v3,1,0,0)
+    else:
+        result=vector_cross_product_3d(v1,v2,v3,0,1,0)
+    return result
+
+
 def vector_perp_product_2d(v1,v2,w1,w2):
     """Returns the perp product of two vectors
     
@@ -291,6 +320,152 @@ def vector_normalize_3d(v1,v2,v3):
         
         
 
+#%% SEGMENT
+
+def segment_2d_to_3d(coordinate_index,V0,N,segment):
+    ""
+    return (
+        point_2d_to_3d(coordinate_index,V0,N,*segment[0]),
+        point_2d_to_3d(coordinate_index,V0,N,*segment[1])
+    )
+
+
+def segment_3d_to_2d(coordinate_index,segment):
+    ""
+    return (
+        point_3d_to_2d(coordinate_index,*segment[0]),
+        point_3d_to_2d(coordinate_index,*segment[1])
+    )
+
+
+def segment_difference_2d(segA,segB):
+    ""
+    x=LineString(segA).difference(LineString(segB))
+    if isinstance(x,LineString):
+        if x.is_empty:
+            result = tuple()
+        else:
+            result=tuple(x.coords),
+    elif isinstance(x,MultiLineString):
+            result=tuple([tuple(y.coords) for y in x.geoms])
+    
+    else:
+        raise Exception
+    
+    return result
+
+
+def segment_difference_3d(segA,segB):
+    ""
+    V0=segA[0]
+    vector_segA=point_difference_3d(*segA[1],*segA[0])
+    if segments_on_same_line_3d(segA,segB): 
+        N=vector_normal_3d(*vector_segA)
+    else:
+        return segA,
+    
+    coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
+    #print(coordinate_index,V0,N)
+    segA_2d=segment_3d_to_2d(coordinate_index,segA)
+    segB_2d=segment_3d_to_2d(coordinate_index,segB)
+    segs_diff_2d=segment_difference_2d(segA_2d,segB_2d)
+    #print(segs_diff_2d)
+    if not len(segs_diff_2d)==0:
+        segs_diff_3d=tuple(segment_2d_to_3d(coordinate_index,V0,N,x) for x in segs_diff_2d)
+    else:
+        segs_diff_3d=tuple()
+    
+    return segs_diff_3d
+    
+
+def segment_segments_difference_3d(segA,segsB):
+    ""
+    result=[segA]
+    for segB in segsB:
+        result2=[]
+        for x in result:
+            y=segment_difference_3d(x,segB)
+            result2.extend(y)
+        result=result2
+        
+    return result
+
+
+#%% SEGMENTS
+
+def segments_difference_3d(segsA,segsB):
+    ""
+    result=[]
+    for segA in segsA:
+        y=segment_segments_difference_3d(segA,segsB)
+        result.extend(y)
+    return result
+
+
+def segments_on_same_line_3d(segA,segB):
+    ""
+    P0=segA[0]
+    vL=point_difference_3d(*segA[1],*segA[0])
+    
+    return point_on_line_3d(segB[0],P0,vL) and point_on_line_3d(segB[1],P0,vL)
+
+
+def segments_to_shells(segments):
+    """
+    
+    Shells have the same point at the front and the end
+    
+    This may return unclosed shells.
+    
+    
+    """
+    result=[]
+    n=len(segments)
+    matched_indices=[]
+    
+    while True:
+        match=False
+        #print('result',result)
+        for shell in result:
+            for i in range(n):
+                if i in matched_indices:
+                    continue
+                segment=segments[i]
+                if point_equals_3d(*segment[0],*shell[-1]):
+                    shell.append(segment[1])
+                    matched_indices.append(i)
+                    match=True
+                    break
+                elif point_equals_3d(*segment[0],*shell[0]):
+                    shell.insert(0,segment[1])
+                    matched_indices.append(i)
+                    match=True
+                    break
+                elif point_equals_3d(*segment[1],*shell[-1]):
+                    shell.append(segment[0])
+                    matched_indices.append(i)
+                    match=True
+                    break
+                elif point_equals_3d(*segment[1],*shell[0]):
+                    shell.insert(0,segment[0])
+                    matched_indices.append(i)
+                    match=True
+                    break
+            
+            if match:
+                break
+        else:
+            for i in range(n):
+                if not i in matched_indices:
+                    matched_indices.append(i)
+                    result.append(list(segments[i]))
+                    break
+                    
+        if len(matched_indices)==n:
+            break
+                
+    return result
+    
 
 
 #%% PLANE
@@ -474,6 +649,8 @@ def plane_tilt_3d(V0,N):
 
 #%% POLYGON
 
+# In a polygon shell the first point is repeated as the last point
+
 # def polygon_on_plane_axes_3d(shell, holes):
 #     """
 #     """
@@ -654,6 +831,21 @@ def polygon_equals_3d(shell1, holes1,
     else:
         
         return False
+   
+    
+def polygon_exterior_segments_3d(shell):
+    """Returns the exterior of a polygon as a sequence of segments.    
+    
+    shell - list of points, last point is equal to first point
+    
+    
+    """
+    result=[]
+    n=len(shell)
+    for i in range(n-1):
+        result.append((shell[i],shell[i+1]))
+    return result
+    
    
     
 def polygon_intersection_overlapping_2d(shell1, holes1, shell2, holes2):
