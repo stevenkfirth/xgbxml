@@ -391,6 +391,62 @@ def get_vector_of_Azimuth(gbxml_azimuth,
                                0)
 
 
+#%% Building
+
+def get_gaps_in_Surfaces_of_Building(
+        gbxml_building,
+        xsd_schema
+        ):
+    """
+    """
+    result=[]
+    
+    # get spaces in building
+    spaces=get_children_of_gbxml_element(
+        gbxml_building, 
+        'Space'
+        )
+    #print(spaces)
+    
+    # get gaps in surfaces of the spaces
+    for space in spaces:
+        
+        space_id=get_attribute_of_gbxml_element(
+            space, 
+            'id', 
+            xsd_schema)
+        
+        gaps=get_gaps_in_Surfaces_of_Space(
+            space, 
+            xsd_schema
+            )
+    
+        for gap in gaps:
+            
+            for x in result:
+                
+                if geometry_functions.polygon_equals_3d(
+                        x['shell'],[],
+                        gap,[]
+                        ):
+                
+                    x['space_ids'].append(space_id)
+                
+                    break
+                
+            else:
+                
+                result.append(
+                    {
+                        'space_ids':[space_id],
+                        'shell': gap
+                        }
+                    )
+                
+            
+    return result
+
+
 #%% Campus
 
 
@@ -451,9 +507,15 @@ def get_gaps_in_ClosedShell(
     
     result=[]
     
+    # get polyloops
+    polyloops=get_children_of_gbxml_element(
+        gbxml_closed_shell,
+        'PolyLoop'
+        )
+    
     # get segments of ClosedShell
     segments=[]
-    for polyloop in gbxml_closed_shell.PolyLoops:
+    for polyloop in polyloops: 
         shell=get_shell_of_PolyLoop(
             polyloop,
             xsd_schema
@@ -470,9 +532,9 @@ def get_gaps_in_ClosedShell(
         z=geometry_functions.segments_difference_3d([segment],result)
         result=y+z
         
+    # convert segments to shells
     result=geometry_functions.segments_to_shells(result)
     
-        
     return result
 
     
@@ -874,6 +936,56 @@ def get_Surfaces_of_Space(
     return result
             
     
+def get_gaps_in_Surfaces_of_Space(
+        gbxml_space,
+        xsd_schema
+        ):
+    """Finds any gaps (missing polygons) in the surfaces adjacent to a Space.
+    
+    Use case: export from REVIT sometimes has surrounding surfaces which are not fully closed
+    
+    """
+    
+    result=[]
+    
+    # get surrounding surfaces
+    surfaces=get_Surfaces_of_Space(
+        gbxml_space,
+        xsd_schema
+        )
+    
+    # get shells of surfaces
+    shells=[]
+    for surface in surfaces:
+        shell=get_shell_of_Surface(
+            surface,
+            xsd_schema
+            )
+        shells.append(shell)
+    
+    # get segments of shells
+    segments=[]
+    for shell in shells:
+        segments.extend(
+            geometry_functions.polygon_exterior_segments_3d(
+                shell
+                )
+            )
+    #print(segments)
+        
+    # find symmetric difference of all segments
+    for segment in segments:
+        y=geometry_functions.segments_difference_3d(result,[segment])
+        z=geometry_functions.segments_difference_3d([segment],result)
+        result=y+z
+        
+    # convert segments to polygon shells
+    result=geometry_functions.segments_to_shells(
+        result
+        )
+    
+    return result
+
     
     
 

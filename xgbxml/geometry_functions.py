@@ -12,7 +12,7 @@
 # // Users of this code must verify correctness for their application.
 
 
-from shapely.geometry import Polygon, GeometryCollection, LineString, MultiLineString
+from shapely import Polygon, GeometryCollection, LineString, MultiLineString  # 2023-09-23 -> using shapely v2.01
 import shapely.wkt
 import triangle as triangle_package
 import math
@@ -410,7 +410,12 @@ def segments_on_same_line_3d(segA,segB):
     return point_on_line_3d(segB[0],P0,vL) and point_on_line_3d(segB[1],P0,vL)
 
 
-def segments_to_shells(segments):
+def segments_to_shells(
+        segments,
+        remove_non_closed_shells=True,
+        remove_zero_area_shells=True,
+        abs_tol=1e-5
+        ):
     """
     
     Shells have the same point at the front and the end
@@ -463,7 +468,28 @@ def segments_to_shells(segments):
                     
         if len(matched_indices)==n:
             break
-                
+        
+    # clean up results
+    if remove_non_closed_shells:
+        
+        x=[]
+        for shell in result:
+            if point_equals_3d(*shell[0],*shell[-1]):
+                x.append(shell)
+        result=x
+        
+    if remove_zero_area_shells:
+        
+        x=[]
+        for shell in result:
+            try: 
+                area=polygon_area_3d(shell,[])
+            except ValueError:
+                continue
+            if not math.isclose(area,0,abs_tol=abs_tol):
+                x.append(shell)
+        result=x
+        
     return result
     
 
@@ -811,7 +837,8 @@ def polygon_equals_2d(shell1, holes1,
 def polygon_equals_3d(shell1, holes1, 
                       shell2, holes2, 
                       abs_tol = 1e-7,
-                      abs_tol1=1e-7, abs_tol2=1e-7):
+                      abs_tol1=1e-7, 
+                      abs_tol2=1e-7):
     """Tests if two 2D polygons are equal/equivalent.
     
     :rtype: bool
@@ -825,6 +852,7 @@ def polygon_equals_3d(shell1, holes1,
         coordinate_index=vector_index_largest_absolute_coordinate_3d(*N)
         shell1_2d,holes1_2d=polygon_3d_to_2d(coordinate_index, shell1, holes1)
         shell2_2d,holes2_2d=polygon_3d_to_2d(coordinate_index, shell2, holes2)
+        
         return polygon_equals_2d(shell1_2d, holes1_2d, 
                                  shell2_2d, holes2_2d)
     

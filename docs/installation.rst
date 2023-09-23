@@ -12,7 +12,7 @@ Please note that for *xgbxml* to run, you will need to have the following packag
 
 - lxml
 - matplotlib
-- shapely
+- shapely (version 2.0.1+)
 - triangle
 
 These can be installed with :code:`pip install ...` or may already be present if using the Anaconda distribution.

@@ -662,6 +662,25 @@ class gbCollection(collections.abc.Sequence):
         
     
     
+class Building():
+    ""
+    
+    def get_gaps_in_surfaces(
+            self
+            ):
+        """
+        """
+        
+        result = gbxml_functions.get_gaps_in_Surfaces_of_Building(
+            self,
+            self.xsd_schema
+            )
+    
+        return result
+    
+    
+    
+    
 class Campus():
     ""
     
@@ -954,6 +973,23 @@ class PlanarGeometry():
         
         return ax
     
+    
+    def set_shell(
+            self,
+            shell
+            ):
+        """
+        
+        - shell is the exterior points of a ploygon
+        - first and lost point of shell are the same
+        
+        """
+    
+        gbxml_functions.set_shell_of_PlanarGeometry(
+            gbxml_planar_geometry=self,
+            shell=shell,
+            xsd_schema=self.xsd_schema)
+    
 
     
 class PolyLoop():
@@ -1116,6 +1152,21 @@ class RectangularGeometry():
     
     
 class Space():
+    
+    def get_gaps_in_surfaces(
+            self
+            ):
+        """
+        """
+        
+        result = gbxml_functions.get_gaps_in_Surfaces_of_Space(
+            self,
+            self.xsd_schema
+            )
+    
+        return result
+        
+        
     
     def get_surfaces(
             self
