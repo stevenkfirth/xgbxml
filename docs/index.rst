@@ -26,11 +26,14 @@ Welcome to xgbxml's documentation!
    gbElement
    gbCollection
    auto_generated_methods
+   auto_custom_class_pages/Building
    auto_custom_class_pages/Campus
    auto_custom_class_pages/CartesianPoint
+   auto_custom_class_pages/ClosedShell
    auto_custom_class_pages/PlanarGeometry
    auto_custom_class_pages/PolyLoop
    auto_custom_class_pages/RectangularGeometry
+   auto_custom_class_pages/Space
    auto_custom_class_pages/Surface
    auto_custom_class_pages/Opening
    
