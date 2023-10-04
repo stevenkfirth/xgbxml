@@ -668,7 +668,44 @@ class Building():
     def get_gaps_in_surfaces(
             self
             ):
-        """
+        """Identifies any gaps in the surfaces of the Building.
+        
+        To be used for spotting errors in the geometry - such as small surfaces 
+        not being exported from REVIT. 
+        See https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12232100.
+        
+        This functions looks at each Space in the Building and determines if
+        the edges of the Surfaces adjacent to the Space match with each other.
+        Where they do not match, this may indicate a gap in the Surfaces.
+        
+        :returns: A list of dictionaries. Each dictionary contains the shell
+            (exterior) of missing surface polygon and a list of the adjacent Spaces.
+            For example:
+                
+        [
+            {
+                'space_ids': ['aim2197'],
+                'shell': [
+                    (72.2287629, -0.3141381, 0.0),
+                    (72.2287629, -0.4999998, 0.0),
+                    (72.0986211, -0.4999998, 0.0),
+                    (72.2287629, -0.3141381, 0.0)
+                    ]
+                },
+            {
+                'space_ids': ['aim2553', 'aim7413'],
+                'shell': [
+                    (80.2291667, 14.5625, 10.0),
+                    (80.0208333, 14.5625, 10.0),
+                    (80.0208333, 16.020833, 10.0),
+                    (80.2291667, 16.020833, 10.0),
+                    (80.2291667, 14.5625, 10.0)
+                    ]
+                }
+            ]
+        
+        :rtype: list
+        
         """
         
         result = gbxml_functions.get_gaps_in_Surfaces_of_Building(
@@ -769,16 +806,16 @@ class CartesianPoint():
 class ClosedShell():
     ""
     
-    def get_gaps(
-            self
-            ):
-        """
-        """
+    # def get_gaps(
+    #         self
+    #         ):
+    #     """
+    #     """
         
-        return gbxml_functions.get_gaps_in_ClosedShell(
-            self,
-            self.xsd_schema
-            )
+    #     return gbxml_functions.get_gaps_in_ClosedShell(
+    #         self,
+    #         self.xsd_schema
+    #         )
     
     
     
@@ -978,10 +1015,11 @@ class PlanarGeometry():
             self,
             shell
             ):
-        """
+        """Creates new coordinate points for the PlanarGeometry.
         
-        - shell is the exterior points of a ploygon
-        - first and lost point of shell are the same
+        :param shell: The exterior points of a polygon 
+            (first and lost point of shell are the same).
+        :type shell: tuple(tuple(float))
         
         """
     
@@ -1038,7 +1076,10 @@ class PolyLoop():
         
     
     def get_shell(self):
-        """
+        """Returns the shell of the Polyloop.
+        
+        :rtype: tuple(tuple(float))
+        
         """
         return gbxml_functions.get_shell_of_PolyLoop(
             self,
@@ -1153,18 +1194,18 @@ class RectangularGeometry():
     
 class Space():
     
-    def get_gaps_in_surfaces(
-            self
-            ):
-        """
-        """
+    # def get_gaps_in_surfaces(
+    #         self
+    #         ):
+    #     """
+    #     """
         
-        result = gbxml_functions.get_gaps_in_Surfaces_of_Space(
-            self,
-            self.xsd_schema
-            )
+    #     result = gbxml_functions.get_gaps_in_Surfaces_of_Space(
+    #         self,
+    #         self.xsd_schema
+    #         )
     
-        return result
+    #     return result
         
         
     
@@ -1172,6 +1213,9 @@ class Space():
             self
             ):
         """Returns all Surfaces adjacent to the Space.
+        
+        :rtype: gbCollection(Surfaces)
+        
         """
         
         result = gbxml_functions.get_Surfaces_of_Space(
